@@ -1,0 +1,13 @@
+{
+    "name"        : "CSS::Specification",
+    "version"     : "*",
+    "description" : "Perl 6 tool-kit for CSS Property specification grammars",
+    "depends"     : [ "JSON::Tiny"  ],
+    "source-url"  : "git://github.com/p6-css/perl6-CSS-Specifcation.git",
+    "provides"    : {
+        "CSS::Specification" : "lib/CSS/Specification.pm",
+        "CSS::Specification::Actions" : "lib/CSS/Specification/Actions.pm"
+     }
+}
+
+ 
