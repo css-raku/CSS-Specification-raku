@@ -1,6 +1,6 @@
 use v6;
 
-class CSS::Language::Specification::Actions {
+class CSS::Specification::Actions {
 
     # these actions translate a CSS property specification to Perl 6
     # rules or actions.

@@ -11,7 +11,7 @@
 #
 #
 
-grammar CSS::Language::Specification {
+grammar CSS::Specification {
     rule TOP {^ <property-spec>* $}
 
     rule property-spec { <prop-names>[ \t | \: ] <terms> }

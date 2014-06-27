@@ -2,13 +2,13 @@
 
 #= translates w3c property definitions to basic Perl 6 roles, grammars or actions.
 
-use CSS::Language::Specification;
-use CSS::Language::Specification::Actions;
+use CSS::Specification;
+use CSS::Specification::Actions;
 
 #= generate parsing grammar
 multi MAIN(Str $properties-spec, Str :$grammar, Bool :$proforma?) {
 
-    my $actions = CSS::Language::Specification::Actions.new;
+    my $actions = CSS::Specification::Actions.new;
     my @defs = load-props($properties-spec, $actions);
 
     say "use v6;";
@@ -25,7 +25,7 @@ multi MAIN(Str $properties-spec, Str :$grammar, Bool :$proforma?) {
 #= generate actions class
 multi MAIN(Str $properties-spec, Str :$class) {
 
-    my $actions = CSS::Language::Specification::Actions.new;
+    my $actions = CSS::Specification::Actions.new;
     my @defs = load-props($properties-spec, $actions);
 
     say "use v6;";
@@ -42,7 +42,7 @@ multi MAIN(Str $properties-spec, Str :$class) {
 #= generate interface roles.
 multi MAIN(Str $properties-spec, Str :$role) {
 
-    my $actions = CSS::Language::Specification::Actions.new;
+    my $actions = CSS::Specification::Actions.new;
     my @defs = load-props($properties-spec, $actions);
 
     say "use v6;";
@@ -68,7 +68,7 @@ sub load-props ($properties-spec, $actions?) {
         # '| inherit' and '| initial' are implied anyway; get rid of them
         my $spec = $prop-spec.subst(/\s* '|' \s* [inherit|initial]/, ''):g;
 
-        my $/ = CSS::Language::Specification.subparse($spec, :rule('property-spec'), :actions($actions) );
+        my $/ = CSS::Specification.subparse($spec, :rule('property-spec'), :actions($actions) );
         die "unable to parse: $spec"
             unless $/.ast;
         my $prop-defn = $/.ast;
