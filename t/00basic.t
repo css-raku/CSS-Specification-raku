@@ -2,11 +2,10 @@
 
 use Test;
 
-use CSS::Language::Specification;
-use CSS::Language::Specification::Actions;
-use CSS::Grammar::Test;
+use CSS::Specification;
+use CSS::Specification::Actions;
 
-my $actions = CSS::Language::Specification::Actions.new;
+my $actions = CSS::Specification::Actions.new;
 
 for (
     'terms' => {'input' => "<single-animation-direction> [, <'single-animation-direction'> ]*",
@@ -34,11 +33,7 @@ for (
     my %test = .value;
     my $input = %test<input>;
 
-    CSS::Grammar::Test::parse-tests( CSS::Language::Specification, $input,
-				     :rule($rule),
-				     :actions($actions),
-				     :suite<spec>,
-				     :expected(%test) );
+    note {rule => $rule, test => %test, input => $input}.perl;
 }
 
 done;
