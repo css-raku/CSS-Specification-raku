@@ -22,4 +22,4 @@ to grammars, actions or interface classes.
 
 See Also
 ========
-See [BUILD.pm](https://github.com/p6-css/perl6-CSS-Language/blob/master/BUILD.pl) in https://github.com/p6-css/perl6-CSS-Language/blob/master/BUILD.pl. `css-gen-properties` is used to compile definitions, for example: [`etc/css21-properties.txt`].
+See [BUILD.pl](https://github.com/p6-css/perl6-CSS-Language/blob/master/BUILD.pl) in [CSS::Language](https://github.com/p6-css/perl6-CSS-Language].
