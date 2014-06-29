@@ -88,14 +88,14 @@ sub generate-perl6-rules(@defs, :$proforma) {
     for @defs -> $def {
 
         my @props = @( $def<props> );
-        my $terms = $def<terms>;
+        my $perl6 = $def<perl6>;
         my $synopsis = $def<synopsis>;
 
         # boxed repeating property. repeat the expr
         my $boxed = $synopsis ~~ / '{1,4}' $/;
         my $repeats = '';
         if $boxed {
-            $terms ~~ s/('**1..4') $//;
+            $perl6 ~~ s/('**1..4') $//;
             $repeats = '**1..4';
         }
 
@@ -106,7 +106,7 @@ sub generate-perl6-rules(@defs, :$proforma) {
             say;
             say "    #= $prop: $synopsis";
             say "    rule decl:sym<{$prop}> \{:i ($match) ':'  [ {$proforma-str}<expr=.expr-{$prop}>$repeats || <any-args> ] \}";
-            say "    rule expr-$prop \{:i $terms \}";
+            say "    rule expr-$prop \{:i $perl6 \}";
         }
     }
 }

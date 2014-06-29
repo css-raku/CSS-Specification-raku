@@ -18,8 +18,8 @@ class CSS::Specification::Actions {
 
         my %prop-def = (
             props    => @props,
-            terms    => $terms,
             synopsis => ~$<terms>,
+            perl6    => $terms,
             );
 
         make %prop-def;
