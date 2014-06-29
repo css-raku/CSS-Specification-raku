@@ -22,4 +22,4 @@ to grammars, actions or interface classes.
 
 See Also
 ========
-See [BUILD.pl](https://github.com/p6-css/perl6-CSS-Language/blob/master/BUILD.pl) in [CSS::Language](https://github.com/p6-css/perl6-CSS-Language].
+See [BUILD.pl](https://github.com/p6-css/perl6-CSS-Language/blob/master/BUILD.pl) in [CSS::Language](https://github.com/p6-css/perl6-CSS-Language).
