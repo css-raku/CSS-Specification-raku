@@ -2,6 +2,8 @@
 
 use Test;
 
+use CSS::Grammar::Test;
+
 use CSS::Specification;
 use CSS::Specification::Actions;
 
@@ -33,7 +35,11 @@ for (
     my %test = .value;
     my $input = %test<input>;
 
-    note {rule => $rule, test => %test, input => $input}.perl;
+    CSS::Grammar::Test::parse-tests( CSS::Specification, $input,
+                                     :rule($rule),
+                                     :actions($actions),
+                                     :suite<spec>,
+                                     :expected(%test) );
 }
 
 done;
