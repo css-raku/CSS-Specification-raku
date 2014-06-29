@@ -1,15 +1,4 @@
-# a grammar for CSS parsing CSS property specifications.
-#
-# An example, from http://www.w3.org/TR/CSS21/propidx.html:
-#
-#    'content'	normal
-#               | none
-#               | [  <string> | <uri> | <counter> | attr(<identifier>)
-#                  | open-quote | close-quote | no-open-quote | no-close-quote
-#                 ]+
-#               | inherit
-#
-#
+# a grammar for parsing CSS property specifications in value definition syntax.
 
 grammar CSS::Specification {
     rule TOP {^ <property-spec>* $}

@@ -2,6 +2,8 @@ use v6;
 
 class CSS::Specification::_Base::Actions {
 
+    has $._proforma-usage = '';
+
     method decl($/, $synopsis is copy, Bool :$boxed?) {
 
 	my $property = (~$0).trim.lc;
