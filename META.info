@@ -3,7 +3,7 @@
     "version"     : "*",
     "description" : "CSS Property definition tools",
     "depends"     : [ "CSS::Grammar", "JSON::Tiny"  ],
-    "source-url"  : "git://github.com/p6-css/perl6-CSS-Specifcation.git",
+    "source-url"  : "git://github.com/p6-css/perl6-CSS-Specification.git",
     "provides"    : {
         "CSS::Specification" : "lib/CSS/Specification.pm",
         "CSS::Specification::Actions" : "lib/CSS/Specification/Actions.pm"
