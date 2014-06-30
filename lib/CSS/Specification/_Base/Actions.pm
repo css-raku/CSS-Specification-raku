@@ -2,7 +2,7 @@ use v6;
 
 class CSS::Specification::_Base::Actions {
 
-    has $._proforma-usage = '';
+    has @._proforma;
 
     method decl($/, $synopsis is copy, Bool :$boxed?) {
 
@@ -13,15 +13,15 @@ class CSS::Specification::_Base::Actions {
         my @expr;
 
         if $<any-args> {
-                $.warning([~] ('usage ', $synopsis, $._proforma-usage));
-                return Any;
+            $.warning( 'usage ' ~  ($synopsis, @._proforma).join(' | ') );
+            return Any;
         }
         elsif $<proforma> {
             @expr = ($<proforma>.ast);
         }
         else {
             my $m = $<expr>;
-            if !$m ||
+            if $m &&
                 ($m.can('caps') && (!$m.caps || $m.caps.grep({! .value.ast.defined}))) {
                     $.warning('dropping declaration', $property);
                     return Any;
