@@ -58,20 +58,23 @@ class CSS::Specification::Actions {
         make '[ ' ~ @choices.join(' | ') ~ ' ]';
     }
 
+    method _choose(@choices) {
+        my $n = 0;
+        return '[:my @*SEEN; ' ~ @choices.map({[~] ($_, ' <!seen(', $n++, ')>')}).join(' | ') ~ ' ]';
+    }
+
     method combo($/) {
         my @choices = @<term>>>.ast;
         return make @choices[0]
             unless @choices > 1;
-
-        my $n = 0;
-        make '[:my @*SEEN; ' ~ @choices.map({[~] ($_, ' <!seen(', $n++, ')>')}).join(' | ') ~ ' ]+';
+        make $._choose( @choices ) ~ '+';
     }
 
     method required($/) {
         my @choices = $<term>>>.ast;
         return make @choices[0]
             unless @choices > 1;
-        make '[ ' ~ @choices.join(' | ') ~ ' ]**' ~ @choices.Int
+        make $._choose( @choices ) ~ '**' ~ @choices.Int
     }
 
     method occurs:sym<maybe>($/)     { make '?' }

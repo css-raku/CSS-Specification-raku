@@ -15,10 +15,10 @@ for (
     },
     # precedence tests taken from: https://developer.mozilla.org/en-US/docs/CSS/Value_definition_syntax
     'terms' => {input => 'bold thin && <length>',
-                ast => "[ bold \& <keyw> thin \& <keyw> | <length> ]**2",
+                ast => "[:my @*SEEN; bold & <keyw> thin & <keyw> <!seen(0)> | <length> <!seen(1)> ]**2",
     },
     'terms' => {input => 'bold || thin && <length>',
-                ast => "[:my @*SEEN; bold & <keyw> <!seen(0)> | [ thin & <keyw> | <length> ]**2 <!seen(1)> ]+",
+                ast => "[:my @*SEEN; bold & <keyw> <!seen(0)> | [:my @*SEEN; thin & <keyw> <!seen(0)> | <length> <!seen(1)> ]**2 <!seen(1)> ]+",
     },
     'property-spec' => {'input' => "'content'\tnormal | none | [ <string> | <uri> | <counter> | attr(<identifier>) | open-quote | close-quote | no-open-quote | no-close-quote ]+ | inherit",
                         ast => {"props" => ["content"],
