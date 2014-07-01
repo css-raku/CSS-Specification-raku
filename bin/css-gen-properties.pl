@@ -34,7 +34,8 @@ multi MAIN(Str $properties-spec, Str :$class) {
     say;
     say "class {$class} \{";
 
-    generate-perl6-actions(@defs);
+    my %prop-refs = $actions.prop-refs;
+    generate-perl6-actions(@defs, %prop-refs);
 
     say '}';
 }
@@ -52,7 +53,8 @@ multi MAIN(Str $properties-spec, Str :$role) {
     say "role {$role} \{";
 
     my %prop-refs = $actions.prop-refs;
-    generate-perl6-interface(@defs, %prop-refs);
+    my %prop-names = $actions.props;
+    generate-perl6-interface(@defs, %prop-refs, %prop-names);
 
     say '}';
 }
@@ -111,7 +113,7 @@ sub generate-perl6-rules(@defs, :$proforma) {
     }
 }
 
-sub generate-perl6-actions(@defs) {
+sub generate-perl6-actions(@defs, %references) {
 
     my %seen;
 
@@ -129,16 +131,19 @@ sub generate-perl6-actions(@defs) {
             say;
             say "    #= {$prop}: $synopsis";
             say "    method decl:sym<{$prop}>(\$/) \{ make \$.decl(\$/, \&\?ROUTINE.WHY{ $boxed ?? ', :boxed' !! ''}) \}";
-            say "    method expr-{$prop}(\$/) \{ make \$.list(\$/) \}";
+            say "    method expr-{$prop}(\$/) \{ make \$.list(\$/) \}"
+                if %references{'expr-' ~ $prop}:exists;
         }
     }
 }
 
 
 #= generate an interface class for all unresolved terms.
-sub generate-perl6-interface(@defs, %references) {
+sub generate-perl6-interface(@defs, %references, %prop-names) {
 
     my %unresolved = %references;
+    %unresolved{'expr-' ~ $_}:delete
+        for %prop-names.keys;
 
     for @defs -> $def {
 

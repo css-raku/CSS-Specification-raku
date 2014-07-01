@@ -5,6 +5,7 @@ class CSS::Specification::Actions {
     # these actions translate a CSS property specification to Perl 6
     # rules or actions.
     has %.prop-refs is rw;
+    has %.props is rw;
 
     method TOP($/) { make $<property-spec>>>.ast };
 
@@ -26,8 +27,9 @@ class CSS::Specification::Actions {
     }
 
     method prop-names($/) {
-        my @prop_names = $<id>>>.ast;
-        make @prop_names;
+        my @prop-names = $<id>>>.ast;
+        %.props{$_}++ for @prop-names;
+        make @prop-names;
     }
 
     method id($/)        { make ~$/ }

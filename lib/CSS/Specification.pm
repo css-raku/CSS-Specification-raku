@@ -1,6 +1,6 @@
 # a grammar for parsing CSS property specifications in value definition syntax.
 
-grammar CSS::Specification {
+grammar CSS::Specification:ver<000.02> {
     rule TOP {^ <property-spec>* $}
 
     rule property-spec { <prop-names>[ \t | \: ] <terms> }
