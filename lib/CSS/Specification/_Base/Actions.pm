@@ -13,7 +13,8 @@ class CSS::Specification::_Base::Actions {
         my @expr;
 
         if $<any-args> {
-            $.warning( 'usage ' ~  ($synopsis, @._proforma).join(' | ') );
+            my $usage = 'usage ' ~ $synopsis.subst(/^ .*? ':' /, $property ~ ':'),;
+            $.warning( ($usage, @._proforma).join: ' | ');
             return Any;
         }
         elsif $<proforma> {
