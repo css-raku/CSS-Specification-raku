@@ -145,12 +145,6 @@ sub generate-perl6-interface(@defs, %references, %prop-names) {
     %unresolved{'expr-' ~ $_}:delete
         for %prop-names.keys;
 
-    for @defs -> $def {
-
-        %unresolved{$_}:delete
-            for @( $def<props> );
-    }
-
     for %unresolved.keys.sort -> $sym {
         say "    method {$sym}(\$/) \{ ... \}";
     }
