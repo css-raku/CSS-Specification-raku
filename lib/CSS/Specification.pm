@@ -1,6 +1,6 @@
 # a grammar for parsing CSS property specifications in value definition syntax.
 
-grammar CSS::Specification:ver<000.03> {
+grammar CSS::Specification:ver<000.04> {
     rule TOP {^ <property-spec>* $}
 
     rule property-spec { <prop-names>[ \t | \: ] <terms> }
@@ -31,8 +31,8 @@ grammar CSS::Specification:ver<000.03> {
 
     proto rule value {*}
     rule value:sym<func>          { <id>'(' ~ ')' <.terms> }
-    rule value:sym<keywords>      { <keyw>   +% '|' }
-    rule value:sym<numbers>       { <digits> +% '|' }
+    rule value:sym<keywords>      { <keyw>   +% '|' <occurs>? }
+    rule value:sym<numbers>       { <digits> +% '|' <occurs>? }
     rule value:sym<group>         { '[' ~ ']' <terms> }
     rule value:sym<rule>          { '<'~'>' <id> }
     rule value:sym<punc>          { ',' | '/' }
