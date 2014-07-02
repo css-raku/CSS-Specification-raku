@@ -31,8 +31,10 @@ grammar CSS::Specification:ver<000.04> {
 
     proto rule value {*}
     rule value:sym<func>          { <id>'(' ~ ')' <.terms> }
-    rule value:sym<keywords>      { <keyw>   +% '|' <occurs>? }
-    rule value:sym<numbers>       { <digits> +% '|' <occurs>? }
+    rule value:sym<keywords>      { [<keyw><!before <occurs>>] +% '|' }
+    rule value:sym<numbers>       { [<digits><!before <occurs>>] +% '|' }
+    rule value:sym<keyw-quant>    { <keyw><occurs> }
+    rule value:sym<num-quant>     { <digits><occurs> }
     rule value:sym<group>         { '[' ~ ']' <terms> }
     rule value:sym<rule>          { '<'~'>' <id> }
     rule value:sym<punc>          { ',' | '/' }

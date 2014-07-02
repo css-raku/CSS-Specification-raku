@@ -10,6 +10,12 @@ use CSS::Specification::Actions;
 my $actions = CSS::Specification::Actions.new;
 
 for (
+    'terms' => {input => 'thin?',
+                ast => "[ thin & <keyw> ]?",
+    },
+    'terms' => {input => '35 | 7 | 42?',
+                ast => "[ [ 35 | 7 ] & <number> | [ 42 & <number> ]? ]",
+    },
     'terms' => {'input' => "<single-animation-direction> [, <'single-animation-direction'> ]*",
                 ast => "<single-animation-direction> [ ',' <expr-single-animation-direction> ]*",
     },
@@ -19,9 +25,6 @@ for (
     },
     'terms' => {input => 'bold || thin && <length>',
                 ast => "[:my @*SEEN; bold & <keyw> <!seen(0)> | [:my @*SEEN; thin & <keyw> <!seen(0)> | <length> <!seen(1)> ]**2 <!seen(1)> ]+",
-    },
-    'terms' => {input => 'thin?',
-                ast => "[ thin & <keyw> ]?",
     },
     'property-spec' => {'input' => "'content'\tnormal | none | [ <string> | <uri> | <counter> | attr(<identifier>) | open-quote | close-quote | no-open-quote | no-close-quote ]+ | inherit",
                         ast => {"props" => ["content"],

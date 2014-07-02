@@ -97,11 +97,11 @@ class CSS::Specification::Actions {
             ?? '[ ' ~ @<keyw>>>.ast.join(' | ') ~ ' ]'
             !! @<keyw>[0].ast;
 
-        my $ast = $keywords ~ ' & <keyw>';
-        $ast = '[ ' ~ $ast ~ ' ]' ~ $<occurs>.ast
-            if $<occurs>;
+        make $keywords ~ ' & <keyw>';
+    }
 
-        make $ast;
+    method value:sym<keyw-quant>($/) {
+        make '[ ' ~ $<keyw>.ast ~ ' & <keyw> ]' ~ $<occurs>.ast
     }
 
     method value:sym<numbers>($/) {
@@ -109,11 +109,11 @@ class CSS::Specification::Actions {
             ?? '[ ' ~ @<digits>>>.ast.join(' | ') ~ ' ]'
             !! @<digits>[0].ast;
 
-        my $ast = $keywords ~ ' & <number>';
-        $ast = '[ ' ~ $ast ~ ' ]' ~ $<occurs>.ast
-            if $<occurs>;
+        make $keywords ~ ' & <number>';
+    }
 
-        make $ast;
+    method value:sym<num-quant>($/) {
+        make '[ ' ~ $<digits>.ast ~ ' & <number> ]' ~ $<occurs>.ast
     }
 
     method value:sym<group>($/) {
