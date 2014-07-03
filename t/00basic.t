@@ -38,14 +38,14 @@ for (
     ) {
 
     my $rule = .key;
-    my %test = .value;
-    my $input = %test<input>;
+    my $test = .value;
+    my $input = $test<input>;
 
     CSS::Grammar::Test::parse-tests( CSS::Specification, $input,
                                      :rule($rule),
                                      :actions($actions),
                                      :suite<spec>,
-                                     :expected(%test) );
+                                     :expected($test) );
 }
 
 done;
