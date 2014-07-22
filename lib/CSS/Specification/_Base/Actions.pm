@@ -4,7 +4,10 @@ class CSS::Specification::_Base::Actions {
 
     has @._proforma;
 
-    method decl($/, $synopsis is copy, Bool :$boxed?) {
+    method decl($/,
+                $synopsis is copy,
+                @proforma = @._proforma,
+                Bool :$boxed?, ) {
 
 	my $property = (~$0).trim.lc;
 	$synopsis = $synopsis.content.join(' ')
@@ -14,7 +17,7 @@ class CSS::Specification::_Base::Actions {
 
         if $<any-args> {
             my $usage = 'usage ' ~ $synopsis.subst(/^ .*? ':' /, $property ~ ':'),;
-            $.warning( ($usage, @._proforma).join: ' | ');
+            $.warning( ($usage, @proforma).join: ' | ');
             return Any;
         }
         elsif $<proforma> {
