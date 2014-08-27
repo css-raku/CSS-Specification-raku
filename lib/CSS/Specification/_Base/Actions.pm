@@ -10,8 +10,8 @@ class CSS::Specification::_Base::Actions {
                 Bool :$boxed?, ) {
 
 	my $property = (~$0).trim.lc;
-	$synopsis = $synopsis.content.join(' ')
-	    if $synopsis.can('content');
+	$synopsis = $synopsis.contents.join(' ')
+	    if $synopsis.can('contents');
 
         my @expr;
 
