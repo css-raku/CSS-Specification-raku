@@ -122,7 +122,7 @@ class CSS::Specification::Actions {
     }
 
     method value:sym<rule>($/)     {
-        %.prop-refs{ $<id>.lc }++;
+        %.prop-refs{ ~$<id> }++;
         make '<' ~ $<id>.ast ~ '>'
     }
 
