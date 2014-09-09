@@ -1,13 +1,13 @@
 # a grammar for parsing CSS property specifications in value definition syntax.
 
 grammar CSS::Specification:ver<000.04> {
-    rule TOP {^ <property-spec>* $}
+    rule TOP { <property-spec> * }
 
     rule property-spec { <prop-names>[ \t | \: ] <terms> }
     # possibly tab delimited. Assume one spec per line.
     token ws {<!ww>' '*}
 
-    token prop-sep    {<[\x20 \, \*]>+}
+    token prop-sep   {<[\x20 \, \*]>+}
     token prop-names { [ <id=.id-quoted> | <id> ] +%% <.prop-sep> }
     token id         { <[a..z]>[\w|\-]* }
     token quote      {<[\' \‘ \’]>}
@@ -15,7 +15,7 @@ grammar CSS::Specification:ver<000.04> {
     rule keyw        { <id> }
     rule digits      { \d+ }
 
-    rule terms       { <term=.options>* }
+    rule terms       { <term=.options>+ }
     rule options     { <term=.combo>    +% '|'  }
     rule combo       { <term=.required> +% '||' }
     rule required    { <term=.values>   +% '&&' }
