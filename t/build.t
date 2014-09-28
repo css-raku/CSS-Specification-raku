@@ -62,12 +62,15 @@ grammar CSS::Aural::Grammar
     is CSS::Grammar::CSS21
     does CSS::Aural::Spec::Interface {
 
+    rule declaration:sym<test> { <.ws>? <decl> <prio>? <any-arg>* <end-decl> }
+    proto rule decl {*}
+
     token keyw        {<ident>}             # keyword (case insensitive)
     token identifier  {<name>}              # identifier (case sensitive)
     token number      {<num> <!before ['%'|\w]>}
     token uri         {<url>}
 
-    rule generic-voice {:i [ male | female | child ] & <keyw> }
+    rule generic-voice  {:i [ male | female | child ] & <keyw> }
     rule specific-voice {:i <identifier> | <string> }
 }
 
@@ -82,32 +85,37 @@ our class CSS::Aural::Actions
     is CSS::Grammar::Actions
     does CSS::Aural::Spec::Interface {
 
+    method declaration:sym<test>($/)  { make $<decl>.ast; }
     method keyw($/)        { make $<ident>.ast }
     method identifier($/)  { make $<name>.ast }
-    method number($/) { make $<num>.ast }
-    method uri($/) { make $<url>.ast }
+    method number($/)      { make $<num>.ast }
+    method uri($/)         { make $<url>.ast }
 
     method generic-voice($/) { make $.list($/) }
     method specific-voice($/) { make $.list($/) }
+
+    method decl($/, $_synopsis) {
+	my $property = (~$0).trim.lc;
+        my @expr = @( $.list($<expr>) );
+        my %ast = property => $property, expr => @expr;
+
+        return %ast;
+    }
+
 }
 
 $aural-actions = CSS::Aural::Actions.new;
 --END--
 
-my $parse;
-lives_ok {$parse = $aural-class.parse('.yay-it-works { stress: 42; speak: loud }', :actions($aural-actions) )}, 'trial parse - lives';
-
-ok $parse, 'input parsed';
-
 my %expected = ast => [{ruleset => {
     declarations => {
-        speak => {expr => [{term => "loud"}]},
-        stress => {expr => [{term => 42}]}},
+        speech-rate => {expr => [{keyw => "fast"}]},
+        stress => {expr => [{number => 42}]}},
     selectors => [{selector => [{simple-selector => [{class => "yay-it-works"}]}]}]
   }
 }];
 
-CSS::Grammar::Test::parse-tests($aural-class, '.yay-it-works { stress: 42; speak: loud }', :actions($aural-actions),
-                                :%expected);
+CSS::Grammar::Test::parse-tests($aural-class, '.yay-it-works { stress: 42; speech-rate: fast }',
+                                :actions($aural-actions), :%expected);
 
 done;
