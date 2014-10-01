@@ -62,7 +62,7 @@ grammar CSS::Aural::Grammar
     is CSS::Grammar::CSS21
     does CSS::Aural::Spec::Interface {
 
-    rule declaration:sym<test> { <.ws>? <decl> <prio>? <any-arg>* <end-decl> }
+    rule module-declaration:sym<test> { <.ws>? <decl> <prio>? <any-arg>* <end-decl> }
     proto rule decl {*}
 
     token keyw        {<ident>}             # keyword (case insensitive)
@@ -85,7 +85,7 @@ our class CSS::Aural::Actions
     is CSS::Grammar::Actions
     does CSS::Aural::Spec::Interface {
 
-    method declaration:sym<test>($/)  { make $<decl>.ast; }
+    method module-declaration:sym<test>($/)  { make $<decl>.ast; }
     method keyw($/)        { make $<ident>.ast }
     method identifier($/)  { make $<name>.ast }
     method number($/)      { make $<num>.ast }
