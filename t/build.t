@@ -4,108 +4,53 @@ use Test;
 use CSS::Grammar::Test;
 use CSS::Specification::Build;
 
-sub pipe($input-path, $code) {
+sub pipe($input-path, $code, $output-path?) {
     my $output;
 
     my $*IN = open $input-path, :r;
-    my $*OUT = class {
-        method print(*@args) {
-            $output ~= @args.join;
+    my $*OUT = $output-path
+        ?? open $output-path, :w
+        !! class {
+            method print(*@args) {
+                $output ~= @args.join;
+            }
+            multi method write(Buf $b){$output ~= $b.decode}
         }
-        multi method write(Buf $b){$output ~= $b.decode}
-    }
+
     $code();
-    return $output;
+
+    return $output-path // $output;
 }
+
+use lib 't';
 
 my $base-name = 'CSS::Aural::Spec';
 my $grammar-name = $base-name ~ '::Grammar';
 my $actions-name = $base-name ~ '::Actions';
 my $interface-name = $base-name ~ '::Interface';
 
-my $aural-grammar-code = pipe( 'examples/css21-aural.txt', {
+pipe( 'examples/css21-aural.txt', {
     CSS::Specification::Build::generate( 'grammar', $grammar-name );
-});
-ok $aural-grammar-code, 'grammar generation';
-lives_ok {EVAL $aural-grammar-code}, 'grammar compilation';
+}, 't/CSS/Aural/Spec/Grammar.pm');
+lives_ok {EVAL "use $grammar-name"}, 'grammar compilation';
 
-my $aural-actions-code = pipe( 'examples/css21-aural.txt', {
+pipe( 'examples/css21-aural.txt', {
     CSS::Specification::Build::generate( 'actions', $actions-name );
-});
-ok $aural-actions-code, 'actions generation';
-lives_ok {EVAL $aural-actions-code}, 'actions compilation';
+}, 't/CSS/Aural/Spec/Actions.pm');
+lives_ok {EVAL "use $actions-name"}, 'actions compilation';
 
 my $aural-interface-code = pipe( 'examples/css21-aural.txt', {
     CSS::Specification::Build::generate( 'interface', $interface-name );
-});
-ok $aural-interface-code, 'interface generation';
-lives_ok {EVAL $aural-interface-code}, 'interface compilation';
+}, 't/CSS/Aural/Spec/Interface.pm');
+lives_ok {EVAL "use $interface-name"}, 'interface compilation';
 
-# compose some classess
-
-use CSS::Grammar::CSS21;
-use CSS::Grammar::Actions;
-
-dies_ok {EVAL q:to"--END--"}, 'grammar composition, unimplemented interface - dies';
-grammar CSS::Aural::CrappyGrammar
-    is CSS::Aural::Spec::Grammar 
-    is CSS::Grammar::CSS21
-    does CSS::Aural::Spec::Interface {
-}
---END--
+dies_ok {EVAL slurp 'use CSS::Aural::BadGrammar'}, 'grammar composition, unimplemented interface - dies';
 
 my $aural-class;
-
-lives_ok {EVAL q:to"--END--"}, 'grammar composition - lives';
-grammar CSS::Aural::Grammar
-    is CSS::Aural::Spec::Grammar 
-    is CSS::Grammar::CSS21
-    does CSS::Aural::Spec::Interface {
-
-    rule module-declaration:sym<test> { <.ws>? <decl> <prio>? <any-arg>* <end-decl> }
-    proto rule decl {*}
-
-    token keyw        {<ident>}             # keyword (case insensitive)
-    token identifier  {<name>}              # identifier (case sensitive)
-    token number      {<num> <!before ['%'|\w]>}
-    token uri         {<url>}
-
-    rule generic-voice  {:i [ male | female | child ] & <keyw> }
-    rule specific-voice {:i <identifier> | <string> }
-}
-
-$aural-class = CSS::Aural::Grammar;
---END--
+lives_ok {EVAL "use CSS::Aural::Grammar; \$aural-class = CSS::Aural::Grammar"}, 'grammar composition - lives';
 
 my $aural-actions;
-
-lives_ok {EVAL q:to"--END--"}, 'class composition - lives';
-our class CSS::Aural::Actions
-    is CSS::Aural::Spec::Actions 
-    is CSS::Grammar::Actions
-    does CSS::Aural::Spec::Interface {
-
-    method module-declaration:sym<test>($/)  { make $<decl>.ast; }
-    method keyw($/)        { make $<ident>.ast }
-    method identifier($/)  { make $<name>.ast }
-    method number($/)      { make $<num>.ast }
-    method uri($/)         { make $<url>.ast }
-
-    method generic-voice($/) { make $.list($/) }
-    method specific-voice($/) { make $.list($/) }
-
-    method decl($/, $_synopsis) {
-	my $property = (~$0).trim.lc;
-        my @expr = @( $.list($<expr>) );
-        my %ast = property => $property, expr => @expr;
-
-        return %ast;
-    }
-
-}
-
-$aural-actions = CSS::Aural::Actions.new;
---END--
+lives_ok {EVAL "use CSS::Aural::Actions; \$aural-actions = CSS::Aural::Actions.new"}, 'class composition - lives';
 
 my %expected = ast => [{ruleset => {
     declarations => {

@@ -6,4 +6,11 @@ grammar CSS::Specification::_Base {
            <?{@*SEEN[$opt]++}>
     }
 
+
+    token usage($doco) {
+
+        <any-args> {$*USAGE = ~$doco}
+
+    }
+
 }

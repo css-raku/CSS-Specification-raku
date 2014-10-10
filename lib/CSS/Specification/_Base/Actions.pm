@@ -4,26 +4,21 @@ class CSS::Specification::_Base::Actions {
 
     has @._proforma;
 
-    method decl($/,
-                $synopsis is copy,
-                @proforma = @._proforma,
-                Bool :$boxed?, ) {
+    method decl($/, @proforma = @._proforma) {
 
 	my $property = (~$0).trim.lc;
-	$synopsis = $synopsis.contents.join(' ')
-	    if $synopsis.can('contents');
 
         my @expr;
 
-        if $<any-args> {
-            my $usage = 'usage ' ~ $synopsis.subst(/^ .*? ':' /, $property ~ ':'),;
-            $.warning( ($usage, @proforma).join: ' | ');
+        if $*USAGE {
+            my $synopsis := $*USAGE.subst(/^ .*? ':' /, $property ~ ':'),;
+            $.warning( ('usage ' ~ $synopsis, @proforma).join: ' | ');
             return Any;
         }
         elsif $<proforma> {
             @expr = ($<proforma>.ast);
         }
-        else {
+        elsif $<expr> {
             my $m = $<expr>;
             if $m &&
                 ($m.can('caps') && (!$m.caps || $m.caps.grep({! .value.ast.defined}))) {
@@ -35,7 +30,7 @@ class CSS::Specification::_Base::Actions {
 
         my %ast;
 
-        if $boxed {
+        if $<boxed> {
             #  expand to a list of properties. eg: margin => margin-top,
             #      margin-right margin-bottom margin-left
             warn "too many arguments: @expr"
