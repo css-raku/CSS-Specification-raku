@@ -112,6 +112,7 @@ sub generate-perl6-rules(@defs, :$proforma) {
             next if %seen{$prop}++;
             my $match = $prop.subst(/\-/, '\-'):g;
 
+            say "";
             say "    #| $prop: $synopsis";
             say "    rule decl:sym<{$prop}> \{:i ($match) ':'  {$boxed}[ {$proforma-str}<expr=.expr-{$prop}>$repeats || <usage(&?ROUTINE.WHY)> ] \}";
             say "    rule expr-$prop \{:i $perl6 \}";
