@@ -44,7 +44,7 @@ my $aural-interface-code = pipe( 'examples/css21-aural.txt', {
 }, 't/CSS/Aural/Spec/Interface.pm');
 lives_ok {EVAL "use $interface-name"}, 'interface compilation';
 
-dies_ok {EVAL slurp 'use CSS::Aural::BadGrammar'}, 'grammar composition, unimplemented interface - dies';
+dies_ok {EVAL 'use CSS::Aural::BadGrammar'}, 'grammar composition, unimplemented interface - dies';
 
 my $aural-class;
 lives_ok {EVAL "use CSS::Aural::Grammar; \$aural-class = CSS::Aural::Grammar"}, 'grammar composition - lives';
