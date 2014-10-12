@@ -10,7 +10,7 @@ class CSS::Aural::Actions
     is CSS::Specification::_Base::Actions
     does CSS::Aural::Spec::Interface {
 
-    method module-declaration:sym<test>($/)  { make $.decl( $<decl> ) }
+    method declaration($/)  { make $.decl( $<decl> ) }
     method keyw($/)        { make $<ident>.ast }
     method identifier($/)  { make $<name>.ast }
     method number($/)      { make $<num>.ast }

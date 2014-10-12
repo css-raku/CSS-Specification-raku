@@ -9,7 +9,7 @@ grammar CSS::Aural::Grammar
     is CSS::Specification::_Base
     does CSS::Aural::Spec::Interface {
 
-    rule module-declaration:sym<test> { <.ws>? <decl> <prio>? <any-arg>* <end-decl> }
+    rule declaration { <.ws>? <decl> <prio>? <any-arg>* <end-decl> }
     proto rule decl {*}
 
     token keyw        {<ident>}             # keyword (case insensitive)
