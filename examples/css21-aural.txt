@@ -1,4 +1,4 @@
-# css2.1 subset - aural properties only
+# css2.1 subset - aural properties only, see t/build.t, t/CSS/Aural/...
 'azimuth'	<angle> | [[ left-side | far-left | left | center-left | center | center-right | right | far-right | right-side ] || behind ] | leftwards | rightwards | inherit	center	 	yes	 	aural
 'cue-after'	<uri> | none | inherit	none	 	no	 	aural
 'cue-before'	<uri> | none | inherit	none	 	no	 	aural
