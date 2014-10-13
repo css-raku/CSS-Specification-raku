@@ -41,11 +41,10 @@ class CSS::Specification::_Base::Actions {
             %box<bottom> //= %box<top>;
             %box<left>   //= %box<right>;
 
-            my @properties;
-            for @Edges -> $edge {
+            my @properties = @Edges.map: -> $edge {
                 my $prop = $property ~ '-' ~ $edge;
                 my $val = %box{$edge};
-                @properties.push( {property => $prop, expr => [$val]} );
+                {property => $prop, expr => [$val]}
             }
             %ast<property-list> = @properties;
         }
