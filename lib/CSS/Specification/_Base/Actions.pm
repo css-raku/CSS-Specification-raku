@@ -10,8 +10,8 @@ class CSS::Specification::_Base::Actions {
 
         my @expr;
 
-        if $*USAGE {
-            my $synopsis := $*USAGE.subst(/^ .*? ':' /, $property ~ ':'),;
+        if $<usage> {
+            my $synopsis := $<usage>.ast.subst(/^ .*? ':' /, $property ~ ':'),;
             $.warning( ('usage ' ~ $synopsis, @proforma).join: ' | ');
             return Any;
         }
@@ -55,6 +55,10 @@ class CSS::Specification::_Base::Actions {
         }
 
         return %ast;
+    }
+
+    method usage($/) {
+        make ~ $*USAGE;
     }
 
 }
