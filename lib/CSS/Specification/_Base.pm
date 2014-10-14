@@ -8,6 +8,7 @@ grammar CSS::Specification::_Base {
 
 
     token usage($doco) {
+        :my $*USAGE;
         <any-args> {$*USAGE = ~$doco}
     }
 
