@@ -9,6 +9,8 @@ grammar CSS::Aural::Grammar
     is CSS::Specification::_Base
     does CSS::Aural::Spec::Interface {
 
+    rule proforma:sym<inherit> { <sym> }
+
     rule declaration { <.ws>? <decl> <prio>? <any-arg>* <end-decl> }
     proto rule decl {*}
 

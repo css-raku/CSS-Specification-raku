@@ -54,13 +54,15 @@ lives_ok {EVAL "use CSS::Aural::Actions; \$aural-actions = CSS::Aural::Actions.n
 
 my %expected = ast => [{ruleset => {
     declarations => {
+        stress => {expr => [{number => 42}]},
         speech-rate => {expr => [{keyw => "fast"}]},
-        stress => {expr => [{number => 42}]}},
+        volume => {expr => [{inherit => True}]},
+    },
     selectors => [{selector => [{simple-selector => [{class => "yay-it-works"}]}]}]
   }
 }];
 
-CSS::Grammar::Test::parse-tests($aural-class, '.yay-it-works { stress: 42; speech-rate: fast }',
+CSS::Grammar::Test::parse-tests($aural-class, '.yay-it-works { stress: 42; speech-rate: fast; volume: inherit; }',
                                 :actions($aural-actions), :%expected);
 
 done;

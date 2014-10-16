@@ -2,14 +2,19 @@ use v6;
 
 grammar CSS::Specification::_Base {
 
-    token seen($opt) {
-           <?{@*SEEN[$opt]++}>
+    proto rule proforma {*}
+
+    token val($rx,$doc='',$boxed=False) {
+        [$<boxed>=<?{$boxed}>]? [ <proforma> || <rx={$rx}>|| <usage($doc)> ]
     }
 
+    token seen($opt) {
+        <?{@*SEEN[$opt]++}>
+    }
 
-    token usage($doco) {
+    token usage($doc) {
         :my $*USAGE;
-        <any-args> {$*USAGE = ~$doco}
+        <any-args> {$*USAGE = ~$doc}
     }
 
 }

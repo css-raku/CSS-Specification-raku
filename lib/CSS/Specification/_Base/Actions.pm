@@ -10,16 +10,16 @@ class CSS::Specification::_Base::Actions {
 
         my @expr;
 
-        if $<usage> {
-            my $synopsis := $<usage>.ast.subst(/^ .*? ':' /, $property ~ ':'),;
+        if $<val><usage> {
+            my $synopsis := $<val><usage>.ast.subst(/^ .*? ':' /, $property ~ ':'),;
             $.warning( ('usage ' ~ $synopsis, @proforma).join: ' | ');
             return Any;
         }
-        elsif $<proforma> {
-            @expr = ($<proforma>.ast);
+        elsif $<val><proforma> {
+            @expr = ($<val><proforma>.ast);
         }
-        elsif $<expr> {
-            my $m = $<expr>;
+        else {
+            my $m = $<val><rx><expr>;
             if $m &&
                 ($m.can('caps') && (!$m.caps || $m.caps.grep({! .value.ast.defined}))) {
                     $.warning('dropping declaration', $property);
@@ -30,7 +30,7 @@ class CSS::Specification::_Base::Actions {
 
         my %ast;
 
-        if $<boxed> {
+        if $<val><boxed> {
             #  expand to a list of properties. eg: margin => margin-top,
             #      margin-right margin-bottom margin-left
             warn "too many arguments: @expr"

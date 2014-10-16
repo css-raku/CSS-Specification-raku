@@ -8,8 +8,8 @@ use CSS::Specification;
 use CSS::Specification::Actions;
 
 #= generate parsing grammar
-our proto sub generate(Str $type, Str $name, Str :$input-spec?, Bool :$proforma?) { * };
-multi sub generate('grammar', Str $grammar-name, Str :$input-spec?, Bool :$proforma?) {
+our proto sub generate(Str $type, Str $name, Str :$input-spec?) { * };
+multi sub generate('grammar', Str $grammar-name, Str :$input-spec?) {
 
     my $actions = CSS::Specification::Actions.new;
     my @defs = load-props($input-spec, $actions);
@@ -20,7 +20,7 @@ multi sub generate('grammar', Str $grammar-name, Str :$input-spec?, Bool :$profo
     say "";
     say "grammar {$grammar-name} \{";
 
-    generate-perl6-rules(@defs, :$proforma);
+    generate-perl6-rules(@defs);
 
     say '}';
 }
@@ -86,11 +86,9 @@ sub load-props ($properties-spec, $actions?) {
     return @props;
 }
 
-sub generate-perl6-rules(@defs, :$proforma) {
+sub generate-perl6-rules(@defs) {
 
     my %seen;
-
-    my $proforma-str = $proforma ?? '<proforma> || ' !! '';
 
     for @defs -> $def {
 
@@ -100,7 +98,7 @@ sub generate-perl6-rules(@defs, :$proforma) {
 
         # boxed repeating property. repeat the expr
         my $boxed = $synopsis ~~ / '{1,4}' $/
-            ?? '$<boxed>='
+            ?? ', :boxed'
             !! '';
         my $repeats = '';
         if $boxed {
@@ -114,7 +112,7 @@ sub generate-perl6-rules(@defs, :$proforma) {
 
             say "";
             say "    #| $prop: $synopsis";
-            say "    rule decl:sym<{$prop}> \{:i ($match) ':'  {$boxed}[ {$proforma-str}<expr=.expr-{$prop}>$repeats || <usage(&?ROUTINE.WHY)> ] \}";
+            say "    rule decl:sym<{$prop}> \{:i ($match) ':' <val( rx\{ <expr=.expr-{$prop}>$repeats \}, &?ROUTINE.WHY{$boxed})> \}";
             say "    rule expr-$prop \{:i $perl6 \}";
         }
     }
