@@ -12,9 +12,8 @@ grammar CSS::Specification::_Base {
         <?{@*SEEN[$opt]++}>
     }
 
-    token usage($doc) {
-        :my $*USAGE;
-        <any-args> {$*USAGE = ~$doc}
+    token usage($*USAGE) {
+        <any-args>
     }
 
 }
