@@ -4,9 +4,10 @@ class CSS::Specification::_Base::Actions {
 
     has @._proforma;
 
-    method decl($/, @proforma = @._proforma) {
+    method decl($/, :@proforma = @._proforma ) {
 
-	my $property = (~$0).trim.lc;
+	my $property = (~$0).trim.lc
+            if $0;
         my $expr;
 
         if $<val> {
@@ -27,7 +28,7 @@ class CSS::Specification::_Base::Actions {
 
         my %ast;
 
-        if $<val> && $<val><boxed> {
+        if $property && $<val> && $<val><boxed> {
             #  expand to a list of properties. eg: margin => margin-top,
             #      margin-right margin-bottom margin-left
             warn "too many arguments: @expr"
@@ -46,7 +47,8 @@ class CSS::Specification::_Base::Actions {
             %ast<property-list> = @properties;
         }
         else {
-            %ast<property> = $property;
+            %ast<property> = $property
+                if $property;
             %ast<expr> = $expr
                 if $expr;
         }
@@ -67,7 +69,7 @@ class CSS::Specification::_Base::Actions {
             my $m = $<rx><expr>;
             unless $m &&
                 ($m.can('caps') && (!$m.caps || $m.caps.grep({! .value.ast.defined}))) {
-                    %ast<expr> = @( $.list($m) );
+                    %ast<expr> = $.list($m);
             }
         }
 
