@@ -7,36 +7,33 @@ class CSS::Specification::_Base::Actions {
     method decl($/, @proforma = @._proforma) {
 
 	my $property = (~$0).trim.lc;
+        my $expr;
 
-        my @expr;
+        if $<val> {
+            my $val-ast = $<val>.ast;
 
-        if $<val><usage> {
-            my $synopsis := $<val><usage>.ast.subst(/^ .*? ':' /, $property ~ ':'),;
-            $.warning( ('usage ' ~ $synopsis, @proforma).join: ' | ');
-            return Any;
-        }
-        elsif $<val><proforma> {
-            @expr = ($<val><proforma>.ast);
-        }
-        else {
-            my $m = $<val><rx><expr>;
-            if $m &&
-                ($m.can('caps') && (!$m.caps || $m.caps.grep({! .value.ast.defined}))) {
-                    $.warning('dropping declaration', $property);
-                    return Any;
+            if $val-ast<usage> {
+                my $synopsis := $val-ast<usage>;
+                $.warning( ('usage ' ~ $synopsis, @proforma).join: ' | ');
+                return Any;
             }
-            @expr = @( $.list($m) );
-         }
+            elsif ! $val-ast<expr> {
+                $.warning('dropping declaration', $property);
+                return Any;
+            }
+
+            $expr = $val-ast<expr>;
+        }
 
         my %ast;
 
-        if $<val><boxed> {
+        if $<val> && $<val><boxed> {
             #  expand to a list of properties. eg: margin => margin-top,
             #      margin-right margin-bottom margin-left
             warn "too many arguments: @expr"
-                if @expr > 4;
+                if @$expr > 4;
             constant @Edges = <top right bottom left>;
-            my %box = @Edges Z=> @expr;
+            my %box = @Edges Z=> @$expr;
             %box<right>  //= %box<top>;
             %box<bottom> //= %box<top>;
             %box<left>   //= %box<right>;
@@ -50,11 +47,31 @@ class CSS::Specification::_Base::Actions {
         }
         else {
             %ast<property> = $property;
-            %ast<expr> = @expr
-                if @expr;
+            %ast<expr> = $expr
+                if $expr;
         }
 
         return %ast;
+    }
+
+    method val($/) {
+        my %ast;
+
+        if $<usage> {
+            %ast<usage> = $<usage>.ast;
+        }
+        elsif $<proforma> {
+            %ast<expr> = [$<proforma>.ast];
+        }
+        else {
+            my $m = $<rx><expr>;
+            unless $m &&
+                ($m.can('caps') && (!$m.caps || $m.caps.grep({! .value.ast.defined}))) {
+                    %ast<expr> = @( $.list($m) );
+            }
+        }
+
+        make %ast;
     }
 
     method usage($/) {
