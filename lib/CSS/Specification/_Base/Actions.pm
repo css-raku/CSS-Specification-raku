@@ -63,7 +63,9 @@ class CSS::Specification::_Base::Actions {
             %ast<usage> = $<usage>.ast;
         }
         elsif $<proforma> {
-            %ast<expr> = [$<proforma>.ast];
+            my $expr = $<proforma>.ast;
+            %ast<expr> = [$expr]
+                if $expr;
         }
         else {
             my $m = $<rx><expr>;
