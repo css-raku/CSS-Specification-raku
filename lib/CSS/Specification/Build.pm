@@ -127,9 +127,6 @@ sub generate-perl6-actions(@defs, %references) {
         my @props = @( $def<props> );
         my $synopsis = $def<synopsis>;
 
-        # automagical detection of 'boxed' properties, eg: margin: [ <length> | <percentage> | auto ]{1,4} 
-        my $boxed = $synopsis ~~ / '{1,4}' $/;
-
         for @props -> $prop {
             next if %seen{$prop}++;
 
