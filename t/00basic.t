@@ -16,8 +16,8 @@ for (
     'terms' => {input => '35 | 7 | 42?',
                 ast => "[ [ 35 | 7 ] & <number> | [ 42 & <number> ]? ]",
     },
-    'terms' => {'input' => "<unquoted-rule-ref> [, <'prop-ref-with-quotes'> ]*",
-                ast => "<unquoted-rule-ref> [ ',' <expr-prop-ref-with-quotes> ]*",
+    'terms' => {'input' => "<rule-ref> [, [ 'css21-prop-ref' | <'css3-prop-ref'> ] ]*",
+                ast => "<rule-ref> [ ',' [ [ <expr-css21-prop-ref> | <expr-css3-prop-ref> ] ] ]*",
     },
     # precedence tests taken from: https://developer.mozilla.org/en-US/docs/CSS/Value_definition_syntax
     'terms' => {input => 'bold thin && <length>',
