@@ -1,4 +1,8 @@
 # a grammar for parsing CSS property specifications in value definition syntax.
+# references:
+#  http://www.w3.org/TR/CSS21/about.html#property-defs
+#  http://dev.w3.org/csswg/css-values/#value-defs
+#  https://developer.mozilla.org/en-US/docs/Web/CSS/Value_definition_syntax
 
 grammar CSS::Specification:ver<000.04> {
     rule TOP { <property-spec> * }
@@ -37,7 +41,7 @@ grammar CSS::Specification:ver<000.04> {
     rule value:sym<num-quant>     { <digits><occurs> }
     rule value:sym<group>         { '[' ~ ']' <terms> }
     rule value:sym<rule>          { '<'~'>' <id> }
-    rule value:sym<punc>          { ',' | '/' }
+    rule value:sym<punc>          { < , / > }
     rule value:sym<prop-ref>      { <property-ref> }
 
     proto token property-ref      {*}
