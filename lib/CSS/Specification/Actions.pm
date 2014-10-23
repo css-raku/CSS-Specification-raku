@@ -37,22 +37,11 @@ class CSS::Specification::Actions {
     method keyw($/)      { make $<id>.subst(/\-/, '\-'):g }
     method digits($/)    { make $/.Int }
 
-    method values($/) {
-        make @<term>>>.ast.join(' ');
-    }
-    method term($/) {
-        my $value = $<value>.ast;
-        $value ~= $<occurs>.ast
-            if $<occurs>;
-
-        make $value;
-    }
-
     method terms($/) {
         make @<term>>>.ast.join(' ');
     }
 
-    method options($/) {
+    method term-options($/) {
         my @choices = @<term>>>.ast;
         return make @choices[0]
             unless @choices > 1;
@@ -65,18 +54,30 @@ class CSS::Specification::Actions {
         return '[:my @*SEEN; ' ~ @choices.map({[~] ($_, ' <!seen(', $n++, ')>')}).join(' | ') ~ ' ]';
     }
 
-    method combo($/) {
+    method term-combo($/) {
         my @choices = @<term>>>.ast;
         return make @choices[0]
             unless @choices > 1;
         make $._choose( @choices ) ~ '+';
     }
 
-    method required($/) {
+    method term-required($/) {
         my @choices = $<term>>>.ast;
         return make @choices[0]
             unless @choices > 1;
         make $._choose( @choices ) ~ '**' ~ @choices.Int
+    }
+
+    method term-values($/) {
+        make @<term>>>.ast.join(' ');
+    }
+
+    method term($/) {
+        my $value = $<value>.ast;
+        $value ~= $<occurs>.ast
+            if $<occurs>;
+
+        make $value;
     }
 
     method occurs:sym<maybe>($/)     { make '?' }

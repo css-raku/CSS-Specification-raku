@@ -19,12 +19,12 @@ grammar CSS::Specification:ver<000.04> {
     rule keyw        { <id> }
     rule digits      { \d+ }
 
-    rule terms       { <term=.options>+ }
-    rule options     { <term=.combo>    +% '|'  }
-    rule combo       { <term=.required> +% '||' }
-    rule required    { <term=.values>   +% '&&' }
-    rule values      { <term>+ }
-    rule term        { <value><occurs>? }
+    rule terms         { <term=.term-options>+ }
+    rule term-options  { <term=.term-combo>    +% '|'  }
+    rule term-combo    { <term=.term-required> +% '||' }
+    rule term-required { <term=.term-values>   +% '&&' }
+    rule term-values   { <term>+ }
+    rule term          { <value><occurs>? }
 
     proto token occurs {*}
     token occurs:sym<maybe>       {'?'}
