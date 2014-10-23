@@ -46,12 +46,13 @@ class CSS::Specification::Actions {
         return make @choices[0]
             unless @choices > 1;
         
-        make '[ ' ~ @choices.join(' | ') ~ ' ]';
+        make [~] '[ ', @choices.join(' | '), ' ]';
     }
 
     method _choose(@choices) {
         my $n = 0;
-        return '[:my @*SEEN; ' ~ @choices.map({[~] ($_, ' <!seen(', $n++, ')>')}).join(' | ') ~ ' ]';
+        my $choices := @choices.map({[~] ($_, ' <!seen(', $n++, ')>')}).join(' | ');
+        return [~] '[:my @*SEEN; ', $choices, ' ]';
     }
 
     method term-combo($/) {
@@ -65,7 +66,7 @@ class CSS::Specification::Actions {
         my @choices = $<term>>>.ast;
         return make @choices[0]
             unless @choices > 1;
-        make $._choose( @choices ) ~ '**' ~ @choices.Int
+        make [~] $._choose( @choices ), '**', @choices.Int
     }
 
     method term-values($/) {
@@ -85,49 +86,49 @@ class CSS::Specification::Actions {
     method occurs:sym<zero-plus>($/) { make '*' }
     method occurs:sym<list>($/)      { make " +% ','" }
     method occurs:sym<range>($/) {
-        make '**' ~ $<min>.ast ~ '..' ~ $<max>.ast;
+        make [~] '**', $<min>.ast, '..', $<max>.ast;
     }
 
     method value:sym<func>($/)     {
         # todo - save function prototype
-        make '<' ~ $<id>.ast ~ '>';
+        make [~] '<', $<id>.ast, '>';
     }
 
     method value:sym<keywords>($/) {
         my $keywords = @<keyw> > 1
-            ?? '[ ' ~ @<keyw>>>.ast.join(' | ') ~ ' ]'
+            ?? [~] '[ ', @<keyw>>>.ast.join(' | '), ' ]'
             !! @<keyw>[0].ast;
 
         make $keywords ~ ' & <keyw>';
     }
 
     method value:sym<keyw-quant>($/) {
-        make '[ ' ~ $<keyw>.ast ~ ' & <keyw> ]' ~ $<occurs>.ast
+        make [~] '[ ', $<keyw>.ast, ' & <keyw> ]', $<occurs>.ast
     }
 
     method value:sym<numbers>($/) {
         my $keywords = @<digits> > 1
-            ?? '[ ' ~ @<digits>>>.ast.join(' | ') ~ ' ]'
+            ?? [~] '[ ', @<digits>>>.ast.join(' | '), ' ]'
             !! @<digits>[0].ast;
 
         make $keywords ~ ' & <number>';
     }
 
     method value:sym<num-quant>($/) {
-        make '[ ' ~ $<digits>.ast ~ ' & <number> ]' ~ $<occurs>.ast
+        make [~] '[ ', $<digits>.ast, ' & <number> ]', $<occurs>.ast
     }
 
     method value:sym<group>($/) {
         my $val = $<terms>.ast;
-        make '[ ' ~ $val ~ ' ]';
+        make [~] '[ ', $val, ' ]';
     }
 
     method value:sym<rule>($/)     {
         %.prop-refs{ ~$<id> }++;
-        make '<' ~ $<id>.ast ~ '>'
+        make [~] '<', $<id>.ast, '>'
     }
 
-    method value:sym<punc>($/)     { make "'" ~ (~$/).trim ~ "'" }
+    method value:sym<punc>($/)     { make [~] "'", (~$/).trim, "'" }
 
     method property-ref:sym<css21>($/) { make $<id>.ast }
     method property-ref:sym<css3>($/)  { make $<id>.ast }
@@ -137,7 +138,7 @@ class CSS::Specification::Actions {
         make '<expr-' ~ $prop-ref ~ '>';
     }
 
-    method value:sym<literal>($/)  { make "'" ~ ~$0 ~ "'"}
+    method value:sym<literal>($/)  { make [~] "'", ~$0, "'" }
             
     method value:sym<num>($/)      { make ~$/ }
 
