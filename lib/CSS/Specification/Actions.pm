@@ -15,15 +15,23 @@ class CSS::Specification::Actions {
     method property-spec($/) {
         my @props = @($<prop-names>.ast);
 
-        my $terms = $<terms>.ast;
+        my $spec = $<spec>.ast;
 
         my %prop-def = (
             props    => @props,
-            synopsis => ~$<terms>,
-            perl6    => $terms,
+            synopsis => ~$<spec>,
+            perl6    => $spec,
             );
 
         make %prop-def;
+    }
+
+    method spec($/) {
+        my $spec = $<terms>.ast;
+        $spec = ':my @*SEEN; ' ~ $spec
+            if $*CHOICE;
+
+        make $spec;
     }
 
     method prop-names($/) {
@@ -50,9 +58,8 @@ class CSS::Specification::Actions {
     }
 
     method _choose(@choices) {
-        my $n = 0;
-        my $choices := @choices.map({[~] ($_, ' <!seen(', $n++, ')>')}).join(' | ');
-        return [~] '[:my @*SEEN; ', $choices, ' ]';
+        my $choices := @choices.map({[~] ($_, ' <!seen(', $*CHOICE++, ')>')}).join(' | ');
+        return [~] '[ ', $choices, ' ]';
     }
 
     method term-combo($/) {
@@ -84,9 +91,17 @@ class CSS::Specification::Actions {
     method occurs:sym<maybe>($/)     { make '?' }
     method occurs:sym<once-plus>($/) { make '+' }
     method occurs:sym<zero-plus>($/) { make '*' }
-    method occurs:sym<list>($/)      { make " +% ','" }
-    method occurs:sym<range>($/) {
-        make [~] '**', $<min>.ast, '..', $<max>.ast;
+    method occurs:sym<list>($/)      {
+        my $quant = $<range> ?? $<range>.ast !! '+';
+        make " {$quant}% ','"
+    }
+    method occurs:sym<range>($/)     { make $<range>.ast }
+    method range($/) {
+        my $range = '**' ~ $<min>.ast;
+        $range ~= '..' ~ $<max>.ast
+            if $<max>;
+
+        make $range;
     }
 
     method value:sym<func>($/)     {
@@ -135,7 +150,7 @@ class CSS::Specification::Actions {
     method value:sym<prop-ref>($/)        {
         my $prop-ref = $<property-ref>.ast;
         %.prop-refs{ 'expr-' ~ $prop-ref }++;
-        make '<expr-' ~ $prop-ref ~ '>';
+        make [~] '<expr-', $prop-ref, '>';
     }
 
     method value:sym<literal>($/)  { make [~] "'", ~$0, "'" }

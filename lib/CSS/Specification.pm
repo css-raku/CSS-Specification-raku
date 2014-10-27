@@ -7,14 +7,15 @@
 grammar CSS::Specification:ver<000.04> {
     rule TOP { <property-spec> * }
 
-    rule property-spec { <prop-names>[ \t | \: ] <terms> }
+    rule property-spec { <prop-names>[ \t | \: ] <spec> }
+    rule spec          { :my $*CHOICE; <terms> }
     # possibly tab delimited. Assume one spec per line.
     token ws {<!ww>' '*}
 
     token prop-sep   {<[\x20 \, \*]>+}
     token prop-names { [ <id=.id-quoted> | <id> ] +%% <.prop-sep> }
     token id         { <[a..z]>[\w|\-]* }
-    token quote      {<[\' \‘ \’]>}
+    token quote      {< ' ‘ ’ >}
     token id-quoted  { <.quote> <id> <.quote> }
     rule keyw        { <id> }
     rule digits      { \d+ }
@@ -30,8 +31,9 @@ grammar CSS::Specification:ver<000.04> {
     token occurs:sym<maybe>       {'?'}
     token occurs:sym<once-plus>   {'+'}
     token occurs:sym<zero-plus>   {'*'}
-    token occurs:sym<range>       {'{'~'}' [<min=.digits>','<max=.digits>] }
-    token occurs:sym<list>        {'#'}
+    token occurs:sym<range>       {<range>}
+    token occurs:sym<list>        {'#'<range>?}
+    token range                   {'{'~'}' [ <min=.digits> [',' <max=.digits>]? ] }
 
     proto rule value {*}
     rule value:sym<func>          { <id>'(' ~ ')' <.terms> }

@@ -6,7 +6,7 @@ grammar CSS::Aural::Spec::Grammar {
 
     #| azimuth: <angle> | [[ left-side | far-left | left | center-left | center | center-right | right | far-right | right-side ] || behind ] | leftwards | rightwards
     rule decl:sym<azimuth> {:i (azimuth) ':' <val( rx{ <expr=.expr-azimuth> }, &?ROUTINE.WHY)> }
-    rule expr-azimuth {:i [ <angle> | [ [:my @*SEEN; [ [ left\-side | far\-left | left | center\-left | center | center\-right | right | far\-right | right\-side ] & <keyw> ] <!seen(0)> | behind & <keyw> <!seen(1)> ]+ ] | [ leftwards | rightwards ] & <keyw> ] }
+    rule expr-azimuth {:i :my @*SEEN; [ <angle> | [ [ [ [ left\-side | far\-left | left | center\-left | center | center\-right | right | far\-right | right\-side ] & <keyw> ] <!seen(0)> | behind & <keyw> <!seen(1)> ]+ ] | [ leftwards | rightwards ] & <keyw> ] }
 
     #| cue-after: <uri> | none
     rule decl:sym<cue-after> {:i (cue\-after) ':' <val( rx{ <expr=.expr-cue-after> }, &?ROUTINE.WHY)> }
@@ -18,7 +18,7 @@ grammar CSS::Aural::Spec::Grammar {
 
     #| cue: [ 'cue-before' || 'cue-after' ]
     rule decl:sym<cue> {:i (cue) ':' <val( rx{ <expr=.expr-cue> }, &?ROUTINE.WHY)> }
-    rule expr-cue {:i [ [:my @*SEEN; <expr-cue-before> <!seen(0)> | <expr-cue-after> <!seen(1)> ]+ ] }
+    rule expr-cue {:i :my @*SEEN; [ [ <expr-cue-before> <!seen(0)> | <expr-cue-after> <!seen(1)> ]+ ] }
 
     #| elevation: <angle> | below | level | above | higher | lower
     rule decl:sym<elevation> {:i (elevation) ':' <val( rx{ <expr=.expr-elevation> }, &?ROUTINE.WHY)> }
@@ -46,7 +46,7 @@ grammar CSS::Aural::Spec::Grammar {
 
     #| play-during: <uri> [ mix || repeat ]? | auto | none
     rule decl:sym<play-during> {:i (play\-during) ':' <val( rx{ <expr=.expr-play-during> }, &?ROUTINE.WHY)> }
-    rule expr-play-during {:i [ <uri> [ [:my @*SEEN; mix & <keyw> <!seen(0)> | repeat & <keyw> <!seen(1)> ]+ ]? | [ auto | none ] & <keyw> ] }
+    rule expr-play-during {:i :my @*SEEN; [ <uri> [ [ mix & <keyw> <!seen(0)> | repeat & <keyw> <!seen(1)> ]+ ]? | [ auto | none ] & <keyw> ] }
 
     #| richness: <number>
     rule decl:sym<richness> {:i (richness) ':' <val( rx{ <expr=.expr-richness> }, &?ROUTINE.WHY)> }

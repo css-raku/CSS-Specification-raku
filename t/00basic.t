@@ -10,21 +10,27 @@ use CSS::Specification::Actions;
 my $actions = CSS::Specification::Actions.new;
 
 for (
-    'terms' => {input => 'thin?',
+    'spec' => {input => 'thin?',
                 ast => "[ thin & <keyw> ]?",
     },
-    'terms' => {input => '35 | 7 | 42?',
+    'spec' => {input => '35 | 7 | 42?',
                 ast => "[ [ 35 | 7 ] & <number> | [ 42 & <number> ]? ]",
     },
-    'terms' => {'input' => "<rule-ref> [, [ 'css21-prop-ref' | <'css3-prop-ref'> ] ]*",
+    'spec' => {input => "<rule-ref> [, [ 'css21-prop-ref' | <'css3-prop-ref'> ] ]*",
                 ast => "<rule-ref> [ ',' [ [ <expr-css21-prop-ref> | <expr-css3-prop-ref> ] ] ]*",
     },
-    # precedence tests taken from: https://developer.mozilla.org/en-US/docs/CSS/Value_definition_syntax
-    'terms' => {input => 'bold thin && <length>',
-                ast => "[:my @*SEEN; bold & <keyw> thin & <keyw> <!seen(0)> | <length> <!seen(1)> ]**2",
+    'spec' => {input => '<length>{4}',
+               ast => '<length>**4',
     },
-    'terms' => {input => 'bold || thin && <length>',
-                ast => "[:my @*SEEN; bold & <keyw> <!seen(0)> | [:my @*SEEN; thin & <keyw> <!seen(0)> | <length> <!seen(1)> ]**2 <!seen(1)> ]+",
+    'spec' => {input => '<length>#{1,4}',
+               ast => "<length> **1..4% ','",
+    },
+    # precedence tests taken from: https://developer.mozilla.org/en-US/docs/CSS/Value_definition_syntax
+    'spec' => {input => 'bold thin && <length>',
+                ast => ":my @*SEEN; [ bold & <keyw> thin & <keyw> <!seen(0)> | <length> <!seen(1)> ]**2",
+    },
+    'spec' => {input => 'bold || thin && <length>',
+                ast => ":my @*SEEN; [ bold & <keyw> <!seen(2)> | [ thin & <keyw> <!seen(0)> | <length> <!seen(1)> ]**2 <!seen(3)> ]+",
     },
     'property-spec' => {'input' => "'content'\tnormal | none | [ <string> | <uri> | <counter> | attr(<identifier>) | open-quote | close-quote | no-open-quote | no-close-quote ]+ | inherit",
                         ast => {"props" => ["content"],
@@ -37,15 +43,24 @@ for (
     },
     ) {
 
-    my $rule = .key;
-    my $test = .value;
-    my $input = $test<input>;
+    my $rule := .key;
+    my $test := .value;
+    my $input := $test<input>;
+    my $output := $test<ast>;
+    $output := $output<perl6>
+        if $output.isa('Hash');
 
     CSS::Grammar::Test::parse-tests( CSS::Specification, $input,
                                      :rule($rule),
                                      :actions($actions),
                                      :suite<spec>,
                                      :expected($test) );
+
+    if $output.defined {
+        my $rule-src := "rule \{ $output \}";
+        lives_ok {EVAL $rule-src}, "$rule compiles"
+            or diag "invalid rule: $rule-src";
+    }
 }
 
 done;
