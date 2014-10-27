@@ -46,9 +46,6 @@ for (
     my $rule := .key;
     my $test := .value;
     my $input := $test<input>;
-    my $output := $test<ast>;
-    $output := $output<perl6>
-        if $output.isa('Hash');
 
     CSS::Grammar::Test::parse-tests( CSS::Specification, $input,
                                      :rule($rule),
@@ -56,10 +53,14 @@ for (
                                      :suite<spec>,
                                      :expected($test) );
 
-    if $output.defined {
-        my $rule-src := "rule \{ $output \}";
-        lives_ok {EVAL $rule-src}, "$rule compiles"
-            or diag "invalid rule: $rule-src";
+    my $rule-body := $/.ast;
+    $rule-body := $rule-body<perl6>
+        if $rule-body.isa('Hash');
+
+    if $rule-body.defined {
+        my $anon-rule := "rule \{ $rule-body \}";
+        lives_ok {EVAL $anon-rule}, "$rule compiles"
+            or diag "invalid rule: $rule-body";
     }
 }
 
