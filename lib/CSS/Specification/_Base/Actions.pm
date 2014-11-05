@@ -6,7 +6,7 @@ class CSS::Specification::_Base::Actions {
 
     method decl($/, :@proforma = @._proforma ) {
 
-	my $property = (~$0).trim.lc
+	my $property = $0.trim.lc
             if $0;
         my $expr;
 

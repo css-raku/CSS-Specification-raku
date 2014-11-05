@@ -13,7 +13,7 @@ class CSS::Aural::Actions
     method proforma:sym<inherit>($/) { make {~$<sym> => True} }
 
     method declaration($/) { make $.decl( $<decl> ) }
-    method keyw($/)        { make $<ident>.ast }
+    method keyw($/)        { make $<Ident>.ast }
     method identifier($/)  { make $<name>.ast }
     method number($/)      { make $<num>.ast }
     method uri($/)         { make $<url>.ast }

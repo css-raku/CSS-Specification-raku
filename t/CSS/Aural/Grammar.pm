@@ -14,7 +14,7 @@ grammar CSS::Aural::Grammar
     rule declaration { <.ws>? <decl> <prio>? <any-arg>* <end-decl> }
     proto rule decl {*}
 
-    token keyw        {<ident>}             # keyword (case insensitive)
+    token keyw        {<Ident>}             # keyword (case insensitive)
     token identifier  {<name>}              # identifier (case sensitive)
     token number      {<num> <!before ['%'|\w]>}
     token uri         {<url>}
