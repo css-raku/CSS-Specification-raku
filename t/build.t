@@ -62,7 +62,7 @@ for ('.aural-test { stress: 42; speech-rate: fast; volume: inherit; }' => {ast =
                  selectors => [{selector => [{simple-selector => [{class => "aural-test"}]}]}]
           }
          }]},
-     '.boxed-test { border-color: #aaa }' => {:verbose, ast => [{"ruleset" => {"selectors" => [{"selector" => [{"simple-selector" => [{"class" => "boxed-test"}]}]}], "declarations" => {"type" => "property-list", "val" => [{"property" => "border-color", "expr" => {"trait" => "box", "val" => [{"color" => {"val" => {"g" => 170, "b" => 170, "r" => 170}, "type" => "color", "units" => "rgb"}}]}}]}}}]},
+     '.boxed-test { border-color: #aaa }' => {:verbose, ast => [{"ruleset" => {"selectors" => [{"selector" => [{"simple-selector" => [{"class" => "boxed-test"}]}]}], "declarations" => {"type" => "property-list", "val" => [{"property" => "border-color", "expr" => {"trait" => "box", "val" => [{"color" => {"val" => {"g" => {val => 170, type => "num"}, "b" => {val => 170, type => "num"}, "r" => {val => 170, type => "num"}}, "type" => "color", "units" => "rgb"}}]}}]}}}]},
     ) {
     my ($input, $expected) = .kv;
 
