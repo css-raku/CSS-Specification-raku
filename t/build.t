@@ -52,17 +52,21 @@ lives_ok {EVAL "use CSS::Aural::Grammar; \$aural-class = CSS::Aural::Grammar"}, 
 my $aural-actions;
 lives_ok {EVAL "use CSS::Aural::Actions; \$aural-actions = CSS::Aural::Actions.new"}, 'class composition - lives';
 
-my %expected = ast => [{ruleset => {
-    declarations => {
-        stress => {expr => [{number => 42}]},
-        speech-rate => {expr => [{keyw => "fast"}]},
-        volume => {expr => [{inherit => True}]},
-    },
-    selectors => [{selector => [{simple-selector => [{class => "yay-it-works"}]}]}]
-  }
-}];
+for ('.aural-test { stress: 42; speech-rate: fast; volume: inherit; }' => {ast => [
+         {ruleset => {
+             declarations => [
+                 { property => 'stress', expr => [{number => 42}] },
+                 { property => 'speech-rate', expr => [{keyw => "fast"}] },
+                 { property => 'volume', expr => [{inherit => True}] },
+                 ],
+                 selectors => [{selector => [{simple-selector => [{class => "aural-test"}]}]}]
+          }
+         }]},
+     '.boxed-test { border-color: #aaa }' => {:verbose, ast => [{"ruleset" => {"selectors" => [{"selector" => [{"simple-selector" => [{"class" => "boxed-test"}]}]}], "declarations" => {"type" => "property-list", "val" => [{"property" => "border-color", "expr" => {"trait" => "box", "val" => [{"color" => {"val" => {"g" => 170, "b" => 170, "r" => 170}, "type" => "color", "units" => "rgb"}}]}}]}}}]},
+    ) {
+    my ($input, $expected) = .kv;
 
-CSS::Grammar::Test::parse-tests($aural-class, '.yay-it-works { stress: 42; speech-rate: fast; volume: inherit; }',
-                                :actions($aural-actions), :%expected);
-
+    CSS::Grammar::Test::parse-tests($aural-class, $input, 
+                                    :actions($aural-actions), :$expected);
+}
 done;

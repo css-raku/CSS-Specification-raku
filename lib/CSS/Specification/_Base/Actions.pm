@@ -2,55 +2,31 @@ use v6;
 
 class CSS::Specification::_Base::Actions {
 
+    use CSS::Grammar::AST :CSSTrait;
+
     has @._proforma;
 
     method decl($/, :@proforma = @._proforma ) {
 
-	my $property = $0.trim.lc
+        my %ast;
+
+        %ast<property> = $0.trim.lc
             if $0;
-        my $expr;
 
         if $<val> {
-            my $val-ast = $<val>.ast;
+            my $val = $<val>.ast;
 
-            if $val-ast<usage> {
-                my $synopsis := $val-ast<usage>;
+            if $val<usage> {
+                my $synopsis := $val<usage>;
                 $.warning( ('usage ' ~ $synopsis, @proforma).join: ' | ');
                 return Any;
             }
-            elsif ! $val-ast<expr> {
-                $.warning('dropping declaration', $property);
+            elsif ! $val<expr> {
+                $.warning('dropping declaration', %ast<property>);
                 return Any;
             }
 
-            $expr = $val-ast<expr>;
-        }
-
-        my %ast;
-
-        if $property && $<val> && $<val><boxed> {
-            #  expand to a list of properties. eg: margin => margin-top,
-            #      margin-right margin-bottom margin-left
-            warn "too many arguments: @expr"
-                if @$expr > 4;
-            constant @Edges = <top right bottom left>;
-            my %box = @Edges Z=> @$expr;
-            %box<right>  //= %box<top>;
-            %box<bottom> //= %box<top>;
-            %box<left>   //= %box<right>;
-
-            my @properties = @Edges.map: -> $edge {
-                my $prop = $property ~ '-' ~ $edge;
-                my $val = %box{$edge};
-                {property => $prop, expr => [$val]}
-            }
-            %ast<property-list> = @properties;
-        }
-        else {
-            %ast<property> = $property
-                if $property;
-            %ast<expr> = $expr
-                if $expr;
+            %ast<expr> = $val<expr>;
         }
 
         return %ast;
@@ -71,7 +47,10 @@ class CSS::Specification::_Base::Actions {
             my $m = $<rx><expr>;
             unless $m &&
                 ($m.can('caps') && (!$m.caps || $m.caps.grep({! .value.ast.defined}))) {
-                    %ast<expr> = $.list($m);
+                    my $trait = CSSTrait::Box
+                        if $*BOXED;
+
+                    %ast<expr> = $.token( $.list($m), :$trait);
             }
         }
 

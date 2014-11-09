@@ -83,4 +83,8 @@ grammar CSS::Aural::Spec::Grammar {
     #| volume: <number> | <percentage> | silent | x-soft | soft | medium | loud | x-loud
     rule decl:sym<volume> {:i (volume) ':' <val( rx{ <expr=.expr-volume> }, &?ROUTINE.WHY)> }
     rule expr-volume {:i [ <number> | <percentage> | [ silent | x\-soft | soft | medium | loud | x\-loud ] & <keyw> ] }
+
+    #| border-color: [ <color> | transparent ]{1,4}
+    rule decl:sym<border-color> {:i (border\-color) ':' <val( rx{ <expr=.expr-border-color>**1..4 }, &?ROUTINE.WHY, :boxed)> }
+    rule expr-border-color {:i [ [ <color> | transparent & <keyw> ] ] }
 }

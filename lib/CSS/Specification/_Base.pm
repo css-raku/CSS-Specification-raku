@@ -4,8 +4,8 @@ grammar CSS::Specification::_Base {
 
     proto rule proforma {*}
 
-    token val( $*EXPR, $*USAGE='', $boxed=False ) {
-        [$<boxed>=<?{$boxed}>]? [ <proforma> || <rx={$*EXPR}>|| <usage($*USAGE)> ]
+    token val( $*EXPR, $*USAGE='', $*BOXED=False ) {
+        <proforma> || <rx={$*EXPR}> || <usage($*USAGE)>
     }
 
     token seen($opt) {
