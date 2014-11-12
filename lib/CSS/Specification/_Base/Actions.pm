@@ -47,10 +47,11 @@ class CSS::Specification::_Base::Actions {
             my $m = $<rx><expr>;
             unless $m &&
                 ($m.can('caps') && (!$m.caps || $m.caps.grep({! .value.ast.defined}))) {
-                    my $trait = CSSTrait::Box
+                    my $expr-ast = $.list($m);
+                    $expr-ast = $.token( $expr-ast, :trait(CSSTrait::Box))
                         if $*BOXED;
 
-                    %ast<expr> = $.token( $.list($m), :$trait);
+                    %ast<expr> = $expr-ast;
             }
         }
 

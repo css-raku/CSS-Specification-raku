@@ -57,12 +57,12 @@ for ('.aural-test { stress: 42; speech-rate: fast; volume: inherit; }' => {ast =
              declarations => [
                  { property => 'stress', expr => [{number => 42}] },
                  { property => 'speech-rate', expr => [{keyw => "fast"}] },
-                 { property => 'volume', expr => [{inherit => True}] },
+                 { property => 'volume', expr => [{keyw => "inherit"}] },
                  ],
                  selectors => [{selector => [{simple-selector => [{class => "aural-test"}]}]}]
           }
          }]},
-     '.boxed-test { border-color: #aaa }' => {:verbose, ast => [{"ruleset" => {"selectors" => [{"selector" => [{"simple-selector" => [{"class" => "boxed-test"}]}]}], "declarations" => {"type" => "property-list", "val" => [{"property" => "border-color", "expr" => {"trait" => "box", "val" => [{"color" => {"val" => {"g" => {val => 170, type => "num"}, "b" => {val => 170, type => "num"}, "r" => {val => 170, type => "num"}}, "type" => "color", "units" => "rgb"}}]}}]}}}]},
+     '.boxed-test { border-color: #aaa }' => {ast =>  [{"ruleset" => {"declarations" => [{"property" => "border-color", "expr" => [{"rgb" => {"b" => 170, "r" => 170, "g" => 170}}]}], "selectors" => [{"selector" => [{"simple-selector" => [{"class" => "boxed-test"}]}]}]}}]},
     ) {
     my ($input, $expected) = .kv;
 

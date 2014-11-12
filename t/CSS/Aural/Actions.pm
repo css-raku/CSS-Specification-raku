@@ -10,7 +10,7 @@ class CSS::Aural::Actions
     is CSS::Specification::_Base::Actions
     does CSS::Aural::Spec::Interface {
 
-    method proforma:sym<inherit>($/) { make {~$<sym> => True} }
+    method proforma:sym<inherit>($/) { make {'keyw' => ~$<sym>} }
 
     method declaration($/) { make $.decl( $<decl> ) }
     method keyw($/)        { make $<Ident>.ast }
