@@ -62,7 +62,12 @@ for ('.aural-test { stress: 42; speech-rate: fast; volume: inherit; }' => {ast =
                  selectors => [{selector => [{simple-selector => [{class => "aural-test"}]}]}]
           }
          }]},
-     '.boxed-test { border-color: #aaa }' => {ast =>  [{"ruleset" => {"declarations" => [{"property" => "border-color", "expr" => [{"rgb" => {"b" => 170, "r" => 170, "g" => 170}}]}], "selectors" => [{"selector" => [{"simple-selector" => [{"class" => "boxed-test"}]}]}]}}]},
+     '.boxed-test { border-color: #aaa }' => {ast =>  [{ruleset => 
+                                                        {selectors => [{selector => [{simple-selector => [{class => "boxed-test"}]}]}],
+                                                         declarations => [{
+                                                             property => "border-color",
+                                                             expr => [{"rgb" =>  [ 170, 170, 170 ]}]}],
+                                                  }}]},
     ) {
     my ($input, $expected) = .kv;
 
