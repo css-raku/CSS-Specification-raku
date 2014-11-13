@@ -10,7 +10,7 @@ class CSS::Specification::_Base::Actions {
 
         my %ast;
 
-        %ast<property> = $0.trim.lc
+        %ast<ident> = $0.trim.lc
             if $0;
 
         if $<val> {
@@ -22,7 +22,7 @@ class CSS::Specification::_Base::Actions {
                 return Any;
             }
             elsif ! $val<expr> {
-                $.warning('dropping declaration', %ast<property>);
+                $.warning('dropping declaration', %ast<ident>);
                 return Any;
             }
 

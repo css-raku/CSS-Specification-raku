@@ -55,9 +55,9 @@ lives_ok {EVAL "use CSS::Aural::Actions; \$aural-actions = CSS::Aural::Actions.n
 for ('.aural-test { stress: 42; speech-rate: fast; volume: inherit; }' => {ast => [
          {ruleset => {
              declarations => [
-                 { property => 'stress', expr => [{number => 42}] },
-                 { property => 'speech-rate', expr => [{keyw => "fast"}] },
-                 { property => 'volume', expr => [{keyw => "inherit"}] },
+                 { ident => 'stress', expr => [{number => 42}] },
+                 { ident => 'speech-rate', expr => [{keyw => "fast"}] },
+                 { ident => 'volume', expr => [{keyw => "inherit"}] },
                  ],
                  selectors => [{selector => [{simple-selector => [{class => "aural-test"}]}]}]
           }
@@ -65,7 +65,7 @@ for ('.aural-test { stress: 42; speech-rate: fast; volume: inherit; }' => {ast =
      '.boxed-test { border-color: #aaa }' => {ast =>  [{ruleset => 
                                                         {selectors => [{selector => [{simple-selector => [{class => "boxed-test"}]}]}],
                                                          declarations => [{
-                                                             property => "border-color",
+                                                             ident => "border-color",
                                                              expr => [{"rgb" =>  [ { num => 170}, { num => 170}, { num => 170} ]}]}],
                                                   }}]},
     ) {
