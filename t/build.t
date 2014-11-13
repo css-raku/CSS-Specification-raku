@@ -66,7 +66,7 @@ for ('.aural-test { stress: 42; speech-rate: fast; volume: inherit; }' => {ast =
                                                         {selectors => [{selector => [{simple-selector => [{class => "boxed-test"}]}]}],
                                                          declarations => [{
                                                              property => "border-color",
-                                                             expr => [{"rgb" =>  [ 170, 170, 170 ]}]}],
+                                                             expr => [{"rgb" =>  [ { num => 170}, { num => 170}, { num => 170} ]}]}],
                                                   }}]},
     ) {
     my ($input, $expected) = .kv;
