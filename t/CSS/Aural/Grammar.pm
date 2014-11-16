@@ -19,6 +19,7 @@ grammar CSS::Aural::Grammar
     token number      {<num> <!before ['%'|\w]>}
     token uri         {<url>}
 
+    rule expr-voice-family {:i [ [ <generic-voice> || <specific-voice> ] ] +% ',' }
     rule generic-voice  {:i [ male | female | child ] & <keyw> }
-    rule specific-voice {:i <identifier> | <string> }
+    rule specific-voice {:i <voice=.identifier> | <voice=.string> }
 }

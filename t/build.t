@@ -49,15 +49,16 @@ dies_ok {EVAL 'use CSS::Aural::BadGrammar'}, 'grammar composition, unimplemented
 my $aural-class;
 lives_ok {EVAL "use CSS::Aural::Grammar; \$aural-class = CSS::Aural::Grammar"}, 'grammar composition - lives';
 
-my $aural-actions;
-lives_ok {EVAL "use CSS::Aural::Actions; \$aural-actions = CSS::Aural::Actions.new"}, 'class composition - lives';
+my $actions;
+lives_ok {EVAL "use CSS::Aural::Actions; \$actions = CSS::Aural::Actions.new"}, 'class composition - lives';
 
-for ('.aural-test { stress: 42; speech-rate: fast; volume: inherit; }' => {ast => [
+for ('.aural-test { stress: 42; speech-rate: fast; volume: inherit; voice-family: female; }' => {ast => [
          {ruleset => {
              declarations => [
-                 { ident => 'stress', expr => [{number => 42}] },
+                 { ident => 'stress', expr => [{num => 42}] },
                  { ident => 'speech-rate', expr => [{keyw => "fast"}] },
                  { ident => 'volume', expr => [{keyw => "inherit"}] },
+                 { ident => 'voice-family', expr => [{keyw => "female"}] },
                  ],
                  selectors => [{selector => [{simple-selector => [{class => "aural-test"}]}]}]
           }
@@ -66,12 +67,12 @@ for ('.aural-test { stress: 42; speech-rate: fast; volume: inherit; }' => {ast =
                                                         {selectors => [{selector => [{simple-selector => [{class => "boxed-test"}]}]}],
                                                          declarations => [{
                                                              ident => "border-color",
-                                                             expr => [{"rgb" =>  [ { num => 170}, { num => 170}, { num => 170} ]}]}],
+                                                             expr => [{"rgb" =>  [ {num => 170}, {num => 170}, {num => 170} ]}]}],
                                                   }}]},
     ) {
     my ($input, $expected) = .kv;
 
     CSS::Grammar::Test::parse-tests($aural-class, $input, 
-                                    :actions($aural-actions), :$expected);
+                                    :$actions, :$expected);
 }
 done;

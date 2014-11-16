@@ -13,11 +13,11 @@ class CSS::Aural::Actions
     method proforma:sym<inherit>($/) { make {'keyw' => ~$<sym>} }
 
     method declaration($/) { make $.decl( $<decl> ) }
-    method keyw($/)        { make $<Ident>.ast }
-    method identifier($/)  { make $<name>.ast }
-    method number($/)      { make $<num>.ast }
-    method uri($/)         { make $<url>.ast }
+    method keyw($/)        { make $.token( $<Ident>.ast, :type<keyw> ) }
+    method identifier($/)  { make $.token( $<name>.ast, :type<ident> ) }
+    method number($/)      { make $.token( $<num>.ast, :type<num> ) }
+    method uri($/)         { make $.token( $<url>.ast, :type<url> ) }
 
-    method generic-voice($/) { make $.list($/) }
-    method specific-voice($/) { make $.list($/) }
+    method generic-voice($/)  { make $<keyw>.ast }
+    method specific-voice($/) { make $<voice>.ast }
 }
