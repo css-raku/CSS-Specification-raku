@@ -143,7 +143,7 @@ class CSS::Specification::Actions {
         make [~] '<', $<id>.ast, '>'
     }
 
-    method value:sym<punc>($/)     { make [~] "'", (~$/).trim, "'" }
+    method value:sym<op>($/)     { make [~] "<op('", $/.trim, "')>" }
 
     method property-ref:sym<css21>($/) { make $<id>.ast }
     method property-ref:sym<css3>($/)  { make $<id>.ast }

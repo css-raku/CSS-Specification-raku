@@ -43,7 +43,7 @@ grammar CSS::Specification:ver<000.04> {
     rule value:sym<num-quant>     { <digits><occurs> }
     rule value:sym<group>         { '[' ~ ']' <terms> }
     rule value:sym<rule>          { '<'~'>' <id> }
-    rule value:sym<punc>          { < , / > }
+    rule value:sym<op>            { < , / = > }
     rule value:sym<prop-ref>      { <property-ref> }
 
     proto token property-ref      {*}

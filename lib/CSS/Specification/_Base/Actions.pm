@@ -62,4 +62,8 @@ class CSS::Specification::_Base::Actions {
         make ~ $*USAGE;
     }
 
+    method op($/) {
+        make ~$/
+    }
+
 }
