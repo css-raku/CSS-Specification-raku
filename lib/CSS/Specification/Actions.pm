@@ -106,6 +106,7 @@ class CSS::Specification::Actions {
 
     method value:sym<func>($/)     {
         # todo - save function prototype
+        %.prop-refs{ ~$<id>.ast }++;
         make [~] '<', $<id>.ast, '>';
     }
 
@@ -139,7 +140,7 @@ class CSS::Specification::Actions {
     }
 
     method value:sym<rule>($/)     {
-        %.prop-refs{ ~$<id> }++;
+        %.prop-refs{ ~$<id>.ast }++;
         make [~] '<', $<id>.ast, '>'
     }
 
