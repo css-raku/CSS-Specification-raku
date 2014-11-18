@@ -63,7 +63,7 @@ class CSS::Specification::_Base::Actions {
     }
 
     method op($/) {
-        make ~$/
+        make $/.lc
     }
 
 }
