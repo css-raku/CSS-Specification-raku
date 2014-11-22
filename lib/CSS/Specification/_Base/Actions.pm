@@ -2,7 +2,7 @@ use v6;
 
 class CSS::Specification::_Base::Actions {
 
-    use CSS::Grammar::AST :CSSTrait;
+    use CSS::AST :CSSTrait;
 
     has @._proforma;
 
