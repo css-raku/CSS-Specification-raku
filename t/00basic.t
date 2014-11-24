@@ -23,7 +23,7 @@ for (
                ast => '<length>**4',
     },
     'spec' => {input => '<length>#{1,4}',
-               ast => "<length> **1..4% ','",
+               ast => "<length> **1..4% <op(',')>",
     },
     # precedence tests taken from: https://developer.mozilla.org/en-US/docs/CSS/Value_definition_syntax
     'spec' => {input => 'bold thin && <length>',

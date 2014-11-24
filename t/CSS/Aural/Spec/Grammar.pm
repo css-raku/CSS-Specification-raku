@@ -78,7 +78,7 @@ grammar CSS::Aural::Spec::Grammar {
 
     #| voice-family: [<specific-voice> | <generic-voice> ]#
     rule decl:sym<voice-family> {:i (voice\-family) ':' <val( rx{ <expr=.expr-voice-family> }, &?ROUTINE.WHY)> }
-    rule expr-voice-family {:i [ [ <specific-voice> | <generic-voice> ] ] +% ',' }
+    rule expr-voice-family {:i [ [ <specific-voice> | <generic-voice> ] ] +% <op(',')> }
 
     #| volume: <number> | <percentage> | silent | x-soft | soft | medium | loud | x-loud
     rule decl:sym<volume> {:i (volume) ':' <val( rx{ <expr=.expr-volume> }, &?ROUTINE.WHY)> }

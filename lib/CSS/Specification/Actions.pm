@@ -93,7 +93,7 @@ class CSS::Specification::Actions {
     method occurs:sym<zero-plus>($/) { make '*' }
     method occurs:sym<list>($/)      {
         my $quant = $<range> ?? $<range>.ast !! '+';
-        make " {$quant}% ','"
+        make " {$quant}% <op(',')>"
     }
     method occurs:sym<range>($/)     { make $<range>.ast }
     method range($/) {
