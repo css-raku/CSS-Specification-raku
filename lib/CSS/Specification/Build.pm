@@ -88,8 +88,6 @@ sub load-props ($properties-spec, $actions?) {
 
 sub generate-perl6-rules(@defs) {
 
-    my %seen;
-
     for @defs -> $def {
 
         my @props = @( $def<props> );
@@ -107,7 +105,6 @@ sub generate-perl6-rules(@defs) {
         }
 
         for @props -> $prop {
-            next if %seen{$prop}++;
             my $match = $prop.subst(/\-/, '\-'):g;
 
             say "";
@@ -120,15 +117,12 @@ sub generate-perl6-rules(@defs) {
 
 sub generate-perl6-actions(@defs, %references) {
 
-    my %seen;
-
     for @defs -> $def {
 
         my @props = @( $def<props> );
         my $synopsis = $def<synopsis>;
 
         for @props -> $prop {
-            next if %seen{$prop}++;
 
             say "    method expr-{$prop}(\$/) \{ make \$.list(\$/) \}"
                 if %references{'expr-' ~ $prop}:exists;
