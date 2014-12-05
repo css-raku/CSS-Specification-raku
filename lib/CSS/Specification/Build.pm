@@ -95,12 +95,12 @@ sub generate-perl6-rules(@defs) {
         my $synopsis = $def<synopsis>;
 
         # boxed repeating property. repeat the expr
-        my $boxed = $synopsis ~~ / '{1,4}' $/
+        my $boxed = $perl6 ~~ / '**1..4' $/
             ?? ', :boxed'
             !! '';
         my $repeats = '';
         if $boxed {
-            $perl6 ~~ s/('**1..4') $//;
+            $perl6 ~~ s/ '**1..4' $//;
             $repeats = '**1..4';
         }
 
