@@ -109,7 +109,7 @@ sub generate-perl6-rules(@defs) {
 
             say "";
             say "    #| $prop: $synopsis";
-            say "    rule decl:sym<{$prop}> \{:i ($match) ':' <val( rx\{ <expr=.expr-{$prop}>$repeats \}, &?ROUTINE.WHY{$boxed})> \}";
+            say "    rule decl:sym<{$prop}> \{:i ($match) ':' <val( rx\{ <expr=.expr-{$prop}>$repeats \}, &?ROUTINE.WHY)> \}";
             say "    rule expr-$prop \{:i $perl6 \}";
         }
     }

@@ -4,7 +4,7 @@ grammar CSS::Specification::_Base {
 
     proto rule proforma {*}
 
-    token val( $*EXPR, $*USAGE='', $*BOXED=False ) {
+    token val( $*EXPR, $*USAGE='' ) {
         <proforma> || <rx={$*EXPR}> || <usage($*USAGE)>
     }
 

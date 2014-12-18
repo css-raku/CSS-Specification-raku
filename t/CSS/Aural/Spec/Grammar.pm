@@ -85,6 +85,6 @@ grammar CSS::Aural::Spec::Grammar {
     rule expr-volume {:i [ <number> | <percentage> | [ silent | x\-soft | soft | medium | loud | x\-loud ] & <keyw> ] }
 
     #| border-color: [ <color> | transparent ]{1,4}
-    rule decl:sym<border-color> {:i (border\-color) ':' <val( rx{ <expr=.expr-border-color>**1..4 }, &?ROUTINE.WHY, :boxed)> }
+    rule decl:sym<border-color> {:i (border\-color) ':' <val( rx{ <expr=.expr-border-color>**1..4 }, &?ROUTINE.WHY)> }
     rule expr-border-color {:i [ [ <color> | transparent & <keyw> ] ] }
 }
