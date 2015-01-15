@@ -16,8 +16,4 @@ grammar CSS::Specification::_Base {
         <any-args>
     }
 
-    token op($chr) {
-        $chr
-    }
-
 }

@@ -66,10 +66,10 @@ for ('.aural-test { stress: 42; speech-rate: fast; volume: inherit; voice-family
                }]}
       },
      '.boxed-test { border-color: #aaa }' => {ast =>  { :stylesheet[{ruleset => 
-                                                        {selectors => [{selector => [{simple-selector => [{class => "boxed-test"}]}]}],
+                                                        {selectors => [:selector[{simple-selector => [{:class<boxed-test>}]}]],
                                                          declarations => [{
                                                              :ident<border-color>,
-                                                             :expr[{ :rgb[ {num => 170}, {num => 170}, {num => 170} ]}]}],
+                                                             :expr[{ :rgb[ :num(170), :num(170), :num(170) ]}]}],
                                                   }}]}
      },
     ) {
