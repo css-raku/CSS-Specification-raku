@@ -1,6 +1,6 @@
 perl6-CSS-Specification
 =======================
-This is a Perl 6 module for parsing sets of CSS property definitions.
+This is a Perl 6 module for parsing CSS property definitions.
 
 These are widely used throughout the W3C CSS Specifications to describe properties.
 The syntax is described in http://www.w3.org/TR/CSS21/about.html#property-defs.
