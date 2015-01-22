@@ -1,23 +1,15 @@
 use CSS::Aural::Spec::Grammar;
 use CSS::Aural::Spec::Interface;
 use CSS::Grammar::CSS21;
-use CSS::Specification::_Base;
+use CSS::Specification::Terms;
 
 grammar CSS::Aural::Grammar
     is CSS::Aural::Spec::Grammar 
+    is CSS::Specification::Terms
     is CSS::Grammar::CSS21
-    is CSS::Specification::_Base
     does CSS::Aural::Spec::Interface {
 
     rule proforma:sym<inherit> { <sym> }
-
-    rule declaration { <.ws>? <decl> <prio>? <any-arg>* <end-decl> }
-    proto rule decl {*}
-
-    token keyw        {<Ident>}             # keyword (case insensitive)
-    token identifier  {<name>}              # identifier (case sensitive)
-    token number      {<num> <!before ['%'|\w]>}
-    token uri         {<url>}
 
     rule expr-voice-family {:i [ [ <generic-voice> || <specific-voice> ] ] +% ',' }
     rule generic-voice  {:i [ male | female | child ] & <keyw> }

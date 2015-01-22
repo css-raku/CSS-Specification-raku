@@ -54,23 +54,26 @@ lives_ok {EVAL "use CSS::Aural::Actions; \$actions = CSS::Aural::Actions.new"}, 
 
 for ('.aural-test { stress: 42; speech-rate: fast; volume: inherit; voice-family: female; }' =>
      {ast => { :stylesheet[
-               {ruleset => {
-                   declarations => [
-                       { :ident<stress>, :expr[{ :num(42) }] },
-                       { :ident<speech-rate>, :expr[{ :keyw<fast> }] },
-                       { :ident<volume>, :expr[{ :keyw<inherit> }] },
-                       { :ident<voice-family>, :expr[{ :keyw<female> }] },
+               :ruleset{
+                   :selectors[ :selector[ :simple-selector[ :class<aural-test> ] ] ],
+                   :declarations[
+                       :property{ :ident<stress>, :expr[{ :num(42) }] },
+                       :property{ :ident<speech-rate>, :expr[{ :keyw<fast> }] },
+                       :property{ :ident<volume>, :expr[{ :keyw<inherit> }] },
+                       :property{ :ident<voice-family>, :expr[{ :keyw<female> }] },
                        ],
-                       selectors => [{selector => [{simple-selector => [{class => "aural-test"}]}]}]
-                }
-               }]}
+                    }
+                   ]}
       },
-     '.boxed-test { border-color: #aaa }' => {ast =>  { :stylesheet[{ruleset => 
-                                                        {selectors => [:selector[{simple-selector => [{:class<boxed-test>}]}]],
-                                                         declarations => [{
-                                                             :ident<border-color>,
-                                                             :expr[{ :rgb[ :num(170), :num(170), :num(170) ]}]}],
-                                                  }}]}
+     '.boxed-test { border-color: #aaa }' =>
+     {ast => { :stylesheet[
+                    :ruleset{
+                        :selectors[ :selector[ :simple-selector[{:class<boxed-test>}] ]],
+                        :declarations[ :property{
+                            :ident<border-color>,
+                            :expr[{ :rgb[ :num(170), :num(170), :num(170) ]}]}],
+                    }
+                   ]}
      },
     ) {
     my ($input, $expected) = .kv;
