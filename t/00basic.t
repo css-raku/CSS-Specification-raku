@@ -59,7 +59,7 @@ for (
 
     if $rule-body.defined {
         my $anon-rule := "rule \{ $rule-body \}";
-        lives_ok {EVAL $anon-rule}, "$rule compiles"
+        lives-ok {EVAL $anon-rule}, "$rule compiles"
             or diag "invalid rule: $rule-body";
     }
 }
