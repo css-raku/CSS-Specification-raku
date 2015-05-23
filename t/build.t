@@ -29,17 +29,22 @@ my $grammar-name = $base-name ~ '::Grammar';
 my $actions-name = $base-name ~ '::Actions';
 my $interface-name = $base-name ~ '::Interface';
 
-pipe( 'examples/css21-aural.txt', {
+my $input-path = $*SPEC.catfile('examples', 'css21-aural.txt' );
+my @summary = CSS::Specification::Build::summary( :$input-path );
+is +@summary, 21, 'number of summary items';
+is-deeply [@summary.grep({ .<boxed> })], [{:boxed, :name<border-color>, :synopsis("[ <color> | transparent ]\{1,4}")}], 'summary item';
+
+pipe( $input-path, {
     CSS::Specification::Build::generate( 'grammar', $grammar-name );
 }, 't/CSS/Aural/Spec/Grammar.pm');
 lives-ok {EVAL "use $grammar-name"}, 'grammar compilation';
 
-pipe( 'examples/css21-aural.txt', {
+pipe( $input-path, {
     CSS::Specification::Build::generate( 'actions', $actions-name );
 }, 't/CSS/Aural/Spec/Actions.pm');
 lives-ok {EVAL "use $actions-name"}, 'actions compilation';
 
-my $aural-interface-code = pipe( 'examples/css21-aural.txt', {
+my $aural-interface-code = pipe( $input-path, {
     CSS::Specification::Build::generate( 'interface', $interface-name );
 }, 't/CSS/Aural/Spec/Interface.pm');
 lives-ok {EVAL "use $interface-name"}, 'interface compilation';

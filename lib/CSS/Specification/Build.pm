@@ -8,11 +8,11 @@ module CSS::Specification::Build {
     use CSS::Specification::Actions;
 
     #= generate parsing grammar
-    our proto sub generate(Str $type, Str $name, Str :$input-spec?) { * };
-    multi sub generate('grammar', Str $grammar-name, Str :$input-spec?) {
+    our proto sub generate(Str $type, Str $name, Str :$input-path?) { * };
+    multi sub generate('grammar', Str $grammar-name, Str :$input-path?) {
 
         my $actions = CSS::Specification::Actions.new;
-        my @defs = load-props($input-spec, $actions);
+        my @defs = load-props($input-path, $actions);
 
         say "use v6;";
         say "#  -- DO NOT EDIT --";
@@ -26,10 +26,10 @@ module CSS::Specification::Build {
     }
 
     #= generate actions class
-    multi sub generate('actions', Str $class-name, Str :$input-spec?) {
+    multi sub generate('actions', Str $class-name, Str :$input-path?) {
 
         my $actions = CSS::Specification::Actions.new;
-        my @defs = load-props($input-spec, $actions);
+        my @defs = load-props($input-path, $actions);
 
         say "use v6;";
         say "#  -- DO NOT EDIT --";
@@ -44,10 +44,10 @@ module CSS::Specification::Build {
     }
 
     #= generate interface roles.
-    multi sub generate('interface', Str $role-name, Str :$input-spec?) {
+    multi sub generate('interface', Str $role-name, Str :$input-path?) {
 
         my $actions = CSS::Specification::Actions.new;
-        my @defs = load-props($input-spec, $actions);
+        my @defs = load-props($input-path, $actions);
 
         say "use v6;";
         say "#  -- DO NOT EDIT --";
@@ -60,6 +60,32 @@ module CSS::Specification::Build {
         generate-perl6-interface(@defs, %prop-refs, %prop-names);
 
         say '}';
+    }
+
+    our sub summary(Str :$input-path? ) {
+
+        my $actions = CSS::Specification::Actions.new;
+        my @defs = load-props($input-path, $actions);
+        my @summary;
+
+        for @defs -> $def {
+
+            my @props = @( $def<props> );
+            my $perl6 = $def<perl6>;
+            my $synopsis = $def<synopsis>;
+
+            # boxed repeating property. repeat the expr
+            my $boxed = $perl6 ~~ / '**1..4' $/;
+
+            for @props -> $prop {
+                my %details = :name($prop), :$synopsis;
+                %details<boxed> = True
+                    if $boxed;
+                @summary.push: %details.item;
+            }
+        }
+
+        return @summary;
     }
 
     sub load-props ($properties-spec, $actions?) {
@@ -77,7 +103,7 @@ module CSS::Specification::Build {
 
             my $/ = CSS::Specification.subparse($spec, :rule('property-spec'), :actions($actions) );
             die "unable to parse: $prop-spec"
-                unless $/.ast;
+                unless $/;
             my $prop-defn = $/.ast;
 
             @props.push: $prop-defn;
