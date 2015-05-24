@@ -75,12 +75,16 @@ module CSS::Specification::Build {
             my $synopsis = $def<synopsis>;
 
             # boxed repeating property. repeat the expr
-            my $boxed = $perl6 ~~ / '**1..4' $/;
+            my $box = $perl6 ~~ / '**1..4' $/;
 
             for @props -> $prop {
                 my %details = :name($prop), :$synopsis;
-                %details<boxed> = True
-                    if $boxed;
+                %details<default> = $def<default>
+                    if $def<default>:exists;
+                %details<inherit> = $def<inherit>
+                    if $def<inherit>:exists;
+                %details<box> = True
+                    if $box;
                 @summary.push: %details.item;
             }
         }
@@ -102,7 +106,7 @@ module CSS::Specification::Build {
             my $spec = $prop-spec.subst(/\s* '|' \s* [inherit|initial]/, ''):g;
 
             my $/ = CSS::Specification.subparse($spec, :rule('property-spec'), :actions($actions) );
-            die "unable to parse: $prop-spec"
+            die "unable to parse: $spec"
                 unless $/;
             my $prop-defn = $/.ast;
 
@@ -121,11 +125,11 @@ module CSS::Specification::Build {
             my $synopsis = $def<synopsis>;
 
             # boxed repeating property. repeat the expr
-            my $boxed = $perl6 ~~ / '**1..4' $/
-                ?? ', :boxed'
+            my $box = $perl6 ~~ / '**1..4' $/
+                ?? ', :box'
                 !! '';
             my $repeats = '';
-            if $boxed {
+            if $box {
                 $perl6 ~~ s/ '**1..4' $//;
                 $repeats = '**1..4';
             }
