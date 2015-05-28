@@ -11,7 +11,7 @@ grammar CSS::Specification:ver<000.04> {
 
     rule property-spec { <prop-names>
                          \t <spec>
-                         \t [:i 'n/a' | <-[ \t ]>*? properties || $<default>=<-[ \t ]>* ]
+                         \t [:i 'n/a' | ua specific | <-[ \t ]>*? properties || $<default>=<-[ \t ]>* ]
                          [ \t <-[ \t ]>*? # applies to
                            \t [<inherit=.yes>|<inherit=.no>]? ]?
     }
