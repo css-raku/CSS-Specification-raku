@@ -1,5 +1,6 @@
 #!/usr/bin/env perl6
 
+use lib 't';
 use Test;
 use CSS::Grammar::Test;
 use CSS::Specification::Build;
@@ -21,8 +22,6 @@ sub pipe($input-path, $code, $output-path?) {
 
     return $output-path // $output;
 }
-
-use lib 't';
 
 my $base-name = 'CSS::Aural::Spec';
 my $grammar-name = $base-name ~ '::Grammar';
