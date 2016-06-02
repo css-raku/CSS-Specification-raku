@@ -126,7 +126,7 @@ module CSS::Specification::Build {
                 $default;
             };
 
-            $value<default> = @defaults.unique.join
+            $value<default> = @defaults.join(' ')
                 if $found-defaults;
         } 
         return @summary;
