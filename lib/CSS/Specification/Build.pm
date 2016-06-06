@@ -95,8 +95,8 @@ module CSS::Specification::Build {
             my $key = .key;
             next if $key ~~ / top|right|bottom|left /;
             my $value = .value;
-            my Bool $found-defaults;
-            my @defaults = <top right bottom left>.map: -> $side {
+            # see if the property has any children
+            for <top right bottom left> -> $side {
                 my $prop;
                 # find child. could be xxxx-side (e.g. margin-left)
                 # or xxx-yyy-side (e.g. border-left-width);
@@ -106,28 +106,14 @@ module CSS::Specification::Build {
                         $prop = %properties{$child-prop};
                         $prop<parent> = $key;
                         $value<children>.push: $child-prop;
+                        $value<box> ||= True;
                         last;
                     }
                 }
+            }
+            # we can get defaults from the children
+            $value<default>:delete if $value<children>:exists;
 
-                without $prop {
-                    warn "missing $side for $key" if $value<box>;
-                    next;
-                }
-
-                $value<box> ||= True;
-                my $default = $prop<default>;
-                with $default {
-                    $found-defaults //= True;
-                }
-                else {
-                    $found-defaults = False;
-                }
-                $default;
-            };
-
-            $value<default> = @defaults.join(' ')
-                if $found-defaults;
         } 
         return @summary;
     }
