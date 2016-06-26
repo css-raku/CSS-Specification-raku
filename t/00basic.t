@@ -61,8 +61,8 @@ for (
     $rule-body := $rule-body<perl6>
         if $rule-body.isa('Hash');
 
-    if $rule-body.defined {
-        my $anon-rule := "rule \{ $rule-body \}";
+    with $rule-body {
+        my $anon-rule := "rule \{ $_ \}";
         lives-ok {EVAL $anon-rule}, "$rule compiles"
             or diag "invalid rule: $rule-body";
     }
