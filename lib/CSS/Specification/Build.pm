@@ -100,29 +100,30 @@ module CSS::Specification::Build {
                 for <top right bottom left> -> $side {
                     # find child. could be xxxx-side (e.g. margin-left)
                     # or xxx-yyy-side (e.g. border-left-width);
-                    for $key ~ '-' ~ $side, $key.subst("-", [~] '-', $side, '-') -> $child-prop {
-                        if $child-prop ne $key
-                        && (%properties{$child-prop}:exists) {
-                            my $prop = %properties{$child-prop};
-                            $prop<parent> = $key;
-                            $value<children>.push: $child-prop;
+                    for $key ~ '-' ~ $side, $key.subst("-", [~] '-', $side, '-') -> $edge {
+                        if $edge ne $key
+                        && (%properties{$edge}:exists) {
+                            my $prop = %properties{$edge};
+                            $prop<edge> = $key;
+                            $value<edges>.push: $edge;
                             $value<box> ||= True;
                             last;
                         }
                     }
                 }
             }
-            # we can get defaults from the children
-            $value<default>:delete if $value<children>:exists;
-            unless %properties{$key}<box> {
-                with %child-props{$key} {
-                    for .keys.sort -> $child-prop {
-                         my $prop = %properties{$child-prop};
-                         # property has multiple parents
-                         $value<children>.push: $child-prop;
-                    }
+            with %child-props{$key} {
+                for .keys.sort -> $child-prop {
+                    next if $value<edges> && $value<edges>{$child-prop};
+                    my $prop = %properties{$child-prop};
+                    # property may have multiple parents
+                    $value<children>.push: $child-prop;
                 }
             }
+            # we can get defaults from the children
+            $value<default>:delete
+                if ($value<edges>:exists)
+                || ($value<children>:exists);
         }
         return @summary;
     }
