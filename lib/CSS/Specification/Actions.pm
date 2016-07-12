@@ -163,7 +163,7 @@ class CSS::Specification::Actions {
     method value:sym<prop-ref>($/)        {
         my $prop-ref = $<property-ref>.ast;
         %.prop-refs{ 'expr-' ~ $prop-ref }++;
-        %.child-props{$_}{$prop-ref}++ for @*PROP-NAMES; 
+        %.child-props{$_}.push: $prop-ref for @*PROP-NAMES; 
         make [~] '<expr-', $prop-ref, '>';
     }
 

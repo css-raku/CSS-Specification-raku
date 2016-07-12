@@ -113,7 +113,7 @@ module CSS::Specification::Build {
                 }
             }
             with %child-props{$key} {
-                for .keys.sort -> $child-prop {
+                for .unique -> $child-prop {
                     next if $value<edges> && $value<edges>{$child-prop};
                     my $prop = %properties{$child-prop};
                     # property may have multiple parents
