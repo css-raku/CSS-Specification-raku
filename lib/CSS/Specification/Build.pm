@@ -62,35 +62,7 @@ module CSS::Specification::Build {
         say '}';
     }
 
-    our sub summary(Str :$input-path? ) {
-
-        my $actions = CSS::Specification::Actions.new;
-        my @defs = load-props($input-path, $actions);
-        my %child-props = $actions.child-props;
-        my @summary;
-        my %properties;
-
-        for @defs -> $def {
-
-            my @props = @( $def<props> );
-            my $perl6 = $def<perl6>;
-            my $synopsis = $def<synopsis>;
-            my $box = $perl6 ~~ / '**1..4' $/;
-            
-            for @props -> $name {
-                my %details = :$name, :$synopsis;
-                %details<default> = $_
-                    with $def<default>;
-                %details<inherit> = $_
-                    with $def<inherit>;
-                %details<box> = True
-                    if $box;
-                %properties{$name} = %details;
-                @summary.push: %details;
-            }
-
-        }
-
+    sub find-edges(%properties, %child-props) {
         # match boxed properties with children
         for %properties.pairs {
             my $key = .key;
@@ -125,6 +97,57 @@ module CSS::Specification::Build {
                 if ($value<edges>:exists)
                 || ($value<children>:exists);
         }
+    }
+
+    sub check-edges(%properties) {
+        for %properties.pairs {
+            my $key = .key;
+            my $value = .value;
+            my $edges = $value<edges>;
+ 
+            note "box property doesn't have four edges $key: $edges"
+                if $edges && +$edges != 4;
+
+            my $children = $value<children>;
+            if $value<edge> && $children {
+                my $non-edges = $children.grep: { ! %properties{$_}<edge> };
+                note "edge property $key has non-edge properties: $non-edges"
+                    if $non-edges;
+            }
+        }
+    }
+
+    our sub summary(Str :$input-path? ) {
+
+        my $actions = CSS::Specification::Actions.new;
+        my @defs = load-props($input-path, $actions);
+        my @summary;
+        my %properties;
+
+        for @defs -> $def {
+
+            my @props = @( $def<props> );
+            my $perl6 = $def<perl6>;
+            my $synopsis = $def<synopsis>;
+            my $box = $perl6 ~~ / '**1..4' $/;
+            
+            for @props -> $name {
+                my %details = :$name, :$synopsis;
+                %details<default> = $_
+                    with $def<default>;
+                %details<inherit> = $_
+                    with $def<inherit>;
+                %details<box> = True
+                    if $box;
+                %properties{$name} = %details;
+                @summary.push: %details;
+            }
+
+        }
+
+        find-edges(%properties, $actions.child-props);
+        check-edges(%properties);
+
         return @summary;
     }
 

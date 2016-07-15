@@ -1,3 +1,6 @@
+0.3.2 Starting adding property checks:
+- If a property has edges, there should be exactly four
+- All children of an edge property, should also be edges
 0.3.1 Preserve declaration order of child properties in metadata
 0.3.0 Distinguish 'edge' and 'child' properties
 - A four sided propert has 'edges'. E.g. 'border' has
