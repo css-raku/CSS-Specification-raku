@@ -109,8 +109,4 @@ grammar CSS::Aural::Spec::Grammar {
     #| border-left-color: <color> | transparent
     rule decl:sym<border-left-color> {:i (border\-left\-color) ':' <val( rx{ <expr=.expr-border-left-color> }, &?ROUTINE.WHY)> }
     rule expr-border-left-color {:i [ <color> || transparent & <keyw> ] }
-
-    #| font-family: [ <generic-family> | <family-name> ]#
-    rule decl:sym<font-family> {:i (font\-family) ':' <val( rx{ <expr=.expr-font-family> }, &?ROUTINE.WHY)> }
-    rule expr-font-family {:i [ [ <generic-family> || <family-name> ] ] +% <op(',')> }
 }

@@ -16,8 +16,7 @@ class CSS::Specification::Terms::Actions {
         with $<val> {
             my Hash $val = .ast;
 
-            if $val<usage> {
-                my $synopsis := $val<usage>;
+            with $val<usage> -> $synopsis {
                 $.warning( ('usage ' ~ $synopsis, @proforma).flat.join: ' | ');
                 return Any;
             }
@@ -35,24 +34,26 @@ class CSS::Specification::Terms::Actions {
     method val($/) {
         my %ast;
 
-        if $<usage> {
-            %ast<usage> = $<usage>.ast;
-        }
-        elsif $<proforma> {
-            %ast<expr> = [$_]
-                with $<proforma>.ast;
+        with $<usage> {
+            %ast<usage> = .ast;
         }
         else {
-            my $m = $<rx><expr>;
-            unless $m &&
-                ($m.can('caps') && (!$m.caps || $m.caps.grep({! .value.ast.defined}))) {
-                    my $expr-ast = $.list($m);
-
-                    %ast<expr> = $expr-ast;
+            with $<proforma> {
+                %ast<expr> = [.ast]
+            }
+            else {
+                with $<rx><expr> {
+                    %ast<expr> = $.list($_)
+                        unless .can('caps') && (!.caps || .caps.first({! .value.ast.defined}));
+                }
             }
         }
 
         make %ast;
+    }
+
+    method rule($/) {
+        $.node($/).pairs[0];
     }
 
     method usage($/) {

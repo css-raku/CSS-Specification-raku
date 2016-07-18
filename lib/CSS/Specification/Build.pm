@@ -228,7 +228,7 @@ module CSS::Specification::Build {
             }
             else {
                 my $rule = $def<rule>;
-                say "    method $rule\(\$/\) \{ make \$.node(\$/).pairs[0] \}"
+                say "    method $rule\(\$/\) \{ make \$.rule(\$/) \}"
             }
         }
     }
