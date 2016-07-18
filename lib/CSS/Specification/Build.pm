@@ -12,7 +12,7 @@ module CSS::Specification::Build {
     multi sub generate('grammar', Str $grammar-name, Str :$input-path?) {
 
         my $actions = CSS::Specification::Actions.new;
-        my @defs = load-props($input-path, $actions);
+        my @defs = load-defs($input-path, $actions);
 
         say "use v6;";
         say "#  -- DO NOT EDIT --";
@@ -29,7 +29,7 @@ module CSS::Specification::Build {
     multi sub generate('actions', Str $class-name, Str :$input-path?) {
 
         my $actions = CSS::Specification::Actions.new;
-        my @defs = load-props($input-path, $actions);
+        my @defs = load-defs($input-path, $actions);
 
         say "use v6;";
         say "#  -- DO NOT EDIT --";
@@ -47,7 +47,7 @@ module CSS::Specification::Build {
     multi sub generate('interface', Str $role-name, Str :$input-path?) {
 
         my $actions = CSS::Specification::Actions.new;
-        my @defs = load-props($input-path, $actions);
+        my @defs = load-defs($input-path, $actions);
 
         say "use v6;";
         say "#  -- DO NOT EDIT --";
@@ -56,8 +56,9 @@ module CSS::Specification::Build {
         say "role {$role-name} \{";
 
         my %prop-refs = $actions.prop-refs;
-        my %prop-names = $actions.props;
-        generate-perl6-interface(@defs, %prop-refs, %prop-names);
+        my %props = $actions.props;
+        my %rules = $actions.rules;
+        generate-perl6-interface(@defs, %prop-refs, %props, %rules);
 
         say '}';
     }
@@ -120,29 +121,29 @@ module CSS::Specification::Build {
     our sub summary(Str :$input-path? ) {
 
         my $actions = CSS::Specification::Actions.new;
-        my @defs = load-props($input-path, $actions);
+        my @defs = load-defs($input-path, $actions);
         my @summary;
         my %properties;
 
         for @defs -> $def {
 
-            my @props = @( $def<props> );
-            my $perl6 = $def<perl6>;
-            my $synopsis = $def<synopsis>;
-            my $box = $perl6 ~~ / '**1..4' $/;
+            with $def<props> -> @props {
+                my $perl6 = $def<perl6>;
+                my $synopsis = $def<synopsis>;
+                my $box = $perl6 ~~ / '**1..4' $/;
             
-            for @props -> $name {
-                my %details = :$name, :$synopsis;
-                %details<default> = $_
-                    with $def<default>;
-                %details<inherit> = $_
-                    with $def<inherit>;
-                %details<box> = True
-                    if $box;
-                %properties{$name} = %details;
-                @summary.push: %details;
+                for @props -> $name {
+                    my %details = :$name, :$synopsis;
+                    %details<default> = $_
+                        with $def<default>;
+                    %details<inherit> = $_
+                        with $def<inherit>;
+                    %details<box> = True
+                        if $box;
+                    %properties{$name} = %details;
+                    @summary.push: %details;
+                }
             }
-
         }
 
         find-edges(%properties, $actions.child-props);
@@ -151,12 +152,12 @@ module CSS::Specification::Build {
         return @summary;
     }
 
-    sub load-props ($properties-spec, $actions?) {
+    sub load-defs ($properties-spec, $actions?) {
         my $fh = $properties-spec
             ?? open $properties-spec, :r
             !! $*IN;
 
-        my @props;
+        my @defs;
 
         for $fh.lines -> $prop-spec {
             # handle full line comments
@@ -164,42 +165,50 @@ module CSS::Specification::Build {
             # '| inherit' and '| initial' are implied anyway; get rid of them
             my $spec = $prop-spec.subst(/\s* '|' \s* [inherit|initial]/, ''):g;
 
-            my $/ = CSS::Specification.subparse($spec, :rule('property-spec'), :actions($actions) );
+            my $/ = CSS::Specification.subparse($spec, :actions($actions) );
             die "unable to parse: $spec"
                 unless $/;
-            my $prop-defn = $/.ast;
-
-            @props.push: $prop-defn;
+            my $defs = $/.ast;
+            @defs.append: @$defs;
         }
 
-        return @props;
+        return @defs;
     }
 
     sub generate-perl6-rules(@defs) {
 
         for @defs -> $def {
 
-            my @props = @( $def<props> );
-            my $perl6 = $def<perl6>;
-            my $synopsis = $def<synopsis>;
+            with $def<props> -> @props {
+                my $perl6 = $def<perl6>;
+                my $synopsis = $def<synopsis>;
 
-            # boxed repeating property. repeat the expr
-            my $box = $perl6 ~~ / '**1..4' $/
-                ?? ', :box'
-                !! '';
-            my $repeats = '';
-            if $box {
-                $perl6 ~~ s/ '**1..4' $//;
-                $repeats = '**1..4';
+                # boxed repeating property. repeat the expr
+                my $box = $perl6 ~~ / '**1..4' $/
+                    ?? ', :box'
+                    !! '';
+                my $repeats = '';
+                if $box {
+                    $perl6 ~~ s/ '**1..4' $//;
+                    $repeats = '**1..4';
+                }
+
+                for @props -> $prop {
+                    my $match = $prop.subst(/\-/, '\-'):g;
+
+                    say "";
+                    say "    #| $prop: $synopsis";
+                    say "    rule decl:sym<{$prop}> \{:i ($match) ':' <val( rx\{ <expr=.expr-{$prop}>$repeats \}, &?ROUTINE.WHY)> \}";
+                    say "    rule expr-$prop \{:i $perl6 \}";
+                }
             }
-
-            for @props -> $prop {
-                my $match = $prop.subst(/\-/, '\-'):g;
-
+            else {
+                my $rule = $def<rule>;
+                my $perl6 = $def<perl6>;
+                my $synopsis = $def<synopsis>;
                 say "";
-                say "    #| $prop: $synopsis";
-                say "    rule decl:sym<{$prop}> \{:i ($match) ':' <val( rx\{ <expr=.expr-{$prop}>$repeats \}, &?ROUTINE.WHY)> \}";
-                say "    rule expr-$prop \{:i $perl6 \}";
+                say "    #| $rule: $synopsis";
+                say "    rule $rule \{:i $perl6 \}";
             }
         }
     }
@@ -208,23 +217,30 @@ module CSS::Specification::Build {
 
         for @defs -> $def {
 
-            my @props = @( $def<props> );
             my $synopsis = $def<synopsis>;
 
-            for @props -> $prop {
+            with $def<props> -> @props {
+                for @props -> $prop {
 
-                say "    method expr-{$prop}(\$/) \{ make \$.list(\$/) \}"
-                    if %references{'expr-' ~ $prop}:exists;
+                    say "    method expr-{$prop}(\$/) \{ make \$.list(\$/) \}"
+                        if %references{'expr-' ~ $prop}:exists;
+                }
+            }
+            else {
+                my $rule = $def<rule>;
+                say "    method $rule\(\$/\) \{ make \$.node(\$/).pairs[0] \}"
             }
         }
     }
 
     #= generate an interface class for all unresolved terms.
-    sub generate-perl6-interface(@defs, %references, %prop-names) {
+    sub generate-perl6-interface(@defs, %references, %prop-names, %rule-names) {
 
         my %unresolved = %references;
         %unresolved{'expr-' ~ $_}:delete
             for %prop-names.keys;
+        %unresolved{$_}:delete
+            for %rule-names.keys;
 
         for %unresolved.keys.sort -> $sym {
             say "    method {$sym}(\$/) \{ ... \}";

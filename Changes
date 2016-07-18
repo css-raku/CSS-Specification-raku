@@ -1,3 +1,12 @@
+0.4.0
+- Added rule declarations.
+  It's now possible to define rules for sharing between properties. For example
+      <voice-family> := male | female | child
+
+- Choices are now left-associative
+  for example: 'font-family'	[ <generic-family> | <family-name> ]#
+  will resolve as a generic-family in preference to a family name
+
 0.3.2 Starting adding property checks:
 - If a property has edges, there should be exactly four
 - All children of an edge property, should also be edges
