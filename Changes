@@ -1,9 +1,10 @@
-0.4.0
-- Added rule declarations.
-  It's now possible to define rules for sharing between properties. For example
+0.4.1 Output a specific unit for zero quantities.
+- For example the as for length '0' is now :px(0) rather than :length(0).
+0.4.0 Added rule declarations.
+- It's now possible to define rules for sharing between properties. For example
       <voice-family> := male | female | child
 
-- Choices are now left-associative
+- Choices now have left-precedence
   for example: 'font-family'	[ <generic-family> | <family-name> ]#
   will resolve as a generic-family in preference to a family name
 

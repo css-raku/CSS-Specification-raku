@@ -112,19 +112,19 @@ class CSS::Specification::Terms::Actions {
     #---- Language Extensions ----#
 
     method length:sym<zero>($/) {
-        make $.token(0, :type(CSSValue::LengthComponent))
+        make $.token(0, :type<px>)
     }
 
     method angle:sym<zero>($/) {
-        make $.token(0, :type(CSSValue::AngleComponent))
+        make $.token(0, :type<deg>)
     }
 
     method time:sym<zero>($/) {
-        make $.token(0, :type(CSSValue::TimeComponent))
+        make $.token(0, :type<s>)
     }
 
     method frequency:sym<zero>($/) {
-        make $.token(0, :type(CSSValue::FrequencyComponent))
+        make $.token(0, :type<hz>)
     }
 
     method colors { state Hash $colors //= %CSS::Grammar::AST::CSS21-Colors };
