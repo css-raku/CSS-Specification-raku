@@ -2,6 +2,7 @@
 
 use Test;
 use CSS::Grammar::Test;
+use CSS::Grammar::CSS21;
 use CSS::Specification::Build;
 
 sub capture($code, $output-path?) {
@@ -26,7 +27,7 @@ my $grammar-name = $base-name ~ '::Grammar';
 my $actions-name = $base-name ~ '::Actions';
 my $interface-name = $base-name ~ '::Interface';
 
-my $input-path = $*SPEC.catfile('examples', 'css21-aural.txt' );
+my $input-path = 'examples'.IO.add('css21-aural.txt');
 my @summary = CSS::Specification::Build::summary( :$input-path );
 is +@summary, 25, 'number of summary items';
 is-deeply [@summary.grep({ .<box> })], [{:box, :!inherit, :name<border-color>, :edges["border-top-color", "border-right-color", "border-bottom-color", "border-left-color"], :synopsis("[ <color> | transparent ]\{1,4}")},], 'summary item';
@@ -50,8 +51,7 @@ dies-ok {require ::("t::CSS::Aural::BadGrammar")}, 'grammar composition, unimple
 
 my $aural-class;
 lives-ok {$aural-class = (require ::("t::CSS::Aural::Grammar"))}, 'grammar composition - lives';
-todo "failing under latest rakudo";
-isa-ok $aural-class, ::("t::CSS::Aural::Grammar");
+isa-ok $aural-class, CSS::Grammar::CSS21;
 
 my $actions;
 lives-ok {$actions = (require ::("t::CSS::Aural::Actions")).new}, 'class composition - lives';
