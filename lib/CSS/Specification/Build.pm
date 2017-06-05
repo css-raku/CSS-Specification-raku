@@ -6,10 +6,11 @@ module CSS::Specification::Build {
 
     use CSS::Specification;
     use CSS::Specification::Actions;
+    my subset Path where Str|IO::Path;
 
     #= generate parsing grammar
-    our proto sub generate(Str $type, Str $name, Str :$input-path?) { * };
-    multi sub generate('grammar', Str $grammar-name, Str :$input-path?) {
+    our proto sub generate(Str $type, Str $name, Path :$input-path?) { * };
+    multi sub generate('grammar', Str $grammar-name, Path :$input-path?) {
 
         my $actions = CSS::Specification::Actions.new;
         my @defs = load-defs($input-path, $actions);
@@ -26,7 +27,7 @@ module CSS::Specification::Build {
     }
 
     #= generate actions class
-    multi sub generate('actions', Str $class-name, Str :$input-path?) {
+    multi sub generate('actions', Str $class-name, Path :$input-path?) {
 
         my $actions = CSS::Specification::Actions.new;
         my @defs = load-defs($input-path, $actions);
@@ -44,7 +45,7 @@ module CSS::Specification::Build {
     }
 
     #= generate interface roles.
-    multi sub generate('interface', Str $role-name, Str :$input-path?) {
+    multi sub generate('interface', Str $role-name, Path :$input-path?) {
 
         my $actions = CSS::Specification::Actions.new;
         my @defs = load-defs($input-path, $actions);
@@ -118,7 +119,7 @@ module CSS::Specification::Build {
         }
     }
 
-    our sub summary(Str :$input-path? ) {
+    our sub summary(Path :$input-path? ) {
 
         my $actions = CSS::Specification::Actions.new;
         my @defs = load-defs($input-path, $actions);
@@ -152,7 +153,7 @@ module CSS::Specification::Build {
         return @summary;
     }
 
-    sub load-defs ($properties-spec, $actions?) {
+    sub load-defs (Path $properties-spec, $actions?) {
         my $fh = $properties-spec
             ?? open $properties-spec, :r
             !! $*IN;
