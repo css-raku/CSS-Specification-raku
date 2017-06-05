@@ -4,7 +4,7 @@
     "version"     : "0.4.4",
     "description" : "CSS Property definition grammar and generation tools",
     "depends"     : [ "CSS::Grammar" ],
-    "source-url"  : "git://github.com/p6-css/perl6-CSS-Specification.git",
+    "source-url"  : "git://github.com/p6-css/CSS-Specification-p6.git",
     "provides"    : {
         "CSS::Specification" : "lib/CSS/Specification.pm",
         "CSS::Specification::Build" : "lib/CSS/Specification/Build.pm",
