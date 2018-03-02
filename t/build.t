@@ -83,7 +83,7 @@ for ('.aural-test { stress: 42; speech-rate: fast; volume: inherit; voice-family
     ) {
     my ($input, $expected) = .kv;
 
-    CSS::Grammar::Test::parse-tests($aural-class, $input, 
-                                    :$actions, :$expected);
+    &CSS::Grammar::Test::parse-tests($aural-class, $input, 
+                                     :$actions, :$expected);
 }
 done-testing;
