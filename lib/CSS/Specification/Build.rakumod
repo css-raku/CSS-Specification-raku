@@ -6,7 +6,7 @@ module CSS::Specification::Build {
 
     use CSS::Specification;
     use CSS::Specification::Actions;
-    my subset Path where { $_ ~~ Str|IO::Path || !.defined };
+    my subset Path where { ($_//Str) ~~ Str|IO::Path };
 
     #= generate parsing grammar
     our proto sub generate(Str $type, Str $name, Path :$input-path?) { * };

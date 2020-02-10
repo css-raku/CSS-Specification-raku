@@ -1,10 +1,10 @@
 #!/usr/bin/env perl6
 
-#= translates w3c property definitions to basic Perl 6 roles, grammars or actions.
+#= translates w3c property definitions to Raku roles, grammars or actions.
 
 use CSS::Specification::Build;
 
-#| e.g. cat /examples/css21-aural.txt | css-gen-properties grammar MyCSS::Grammar > MyCSS/Grammar.pm
+#| e.g. cat examples/css21-aural.txt | css-gen-properties grammar MyCSS::Grammar > MyCSS/Grammar.raku
 multi sub MAIN('grammar', Str $class-name ) {
     CSS::Specification::Build::generate('grammar', $class-name);
 }

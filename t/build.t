@@ -6,21 +6,11 @@ use CSS::Grammar::CSS21;
 use CSS::Specification::Build;
 use lib 't/lib';
 
-sub capture($code, $output-path?) {
-    my $output;
-
-    my $*OUT = $output-path
-        ?? open $output-path, :w
-        !! class {
-            method print(*@args) {
-                $output ~= @args.join;
-            }
-            method write($, Buf $b){$output ~= $b.decode}
-        }
-
+sub capture($code, $output-path) {
+    my $*OUT = open $output-path, :w;
     $code();
     $*OUT.close;
-    return $output-path // $output;
+    $output-path;
 }
 
 my $base-name = 'Test::CSS::Aural::Spec';
@@ -35,17 +25,17 @@ is-deeply [@summary.grep({ .<box> })], [{:box, :!inherit, :name<border-color>, :
 
 capture({
     CSS::Specification::Build::generate( 'grammar', $grammar-name, :$input-path );
-}, 't/lib/Test/CSS/Aural/Spec/Grammar.pm');
+}, 't/lib/Test/CSS/Aural/Spec/Grammar.rakumod');
 lives-ok {require ::($grammar-name)}, "$grammar-name compilation";
 
 capture({
     CSS::Specification::Build::generate( 'actions', $actions-name, :$input-path );
-}, 't/lib/Test/CSS/Aural/Spec/Actions.pm');
+}, 't/lib/Test/CSS/Aural/Spec/Actions.rakumod');
 lives-ok {require ::($actions-name)}, "$actions-name compilation";
 
 capture({
     CSS::Specification::Build::generate( 'interface', $interface-name, :$input-path );
-}, 't/lib/Test/CSS/Aural/Spec/Interface.pm');
+}, 't/lib/Test/CSS/Aural/Spec/Interface.rakumod');
 lives-ok {require ::($interface-name)}, "$interface-name compilation";
 
 dies-ok {require ::("Test::CSS::Aural::BadGrammar")}, 'grammar composition, unimplemented interface - dies';
