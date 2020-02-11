@@ -4,7 +4,7 @@ use Test;
 use CSS::Grammar::Test;
 use CSS::Grammar::CSS21;
 use CSS::Specification::Build;
-use lib 't/lib';
+use lib 't';
 
 sub capture($code, $output-path) {
     my $*OUT = open $output-path, :w;
