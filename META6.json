@@ -15,5 +15,5 @@
     "CSS::Specification::Terms::Actions": "lib/CSS/Specification/Terms/Actions.rakumod"
   },
   "source-url": "git://github.com/css-raku/CSS-Specification-raku.git",
-  "version": "0.4.7"
+  "version": "0.4.8"
 }
