@@ -1,6 +1,6 @@
 {
   "depends": [
-    "CSS::Grammar:ver<0.3.4+>",
+    "CSS::Grammar:ver<0.3.5+>",
     "Color::Names"
   ],
   "description": "CSS Property definition grammar and generation tools",
