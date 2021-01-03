@@ -2,7 +2,7 @@ use v6;
 
 class CSS::Specification::Terms::Actions {
 
-    use CSS::Grammar::AST :CSSValue;
+    use CSS::Grammar::Defs :CSSValue;
 
     method decl($/, :@proforma = [] ) {
 
