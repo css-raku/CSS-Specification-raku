@@ -1,4 +1,9 @@
 {
+  "authors": [
+    "David Warring"
+  ],
+  "build-depends": [
+  ],
   "depends": [
     "CSS::Grammar:ver<0.3.5+>",
     "Color::Names"
@@ -14,6 +19,12 @@
     "CSS::Specification::Terms": "lib/CSS/Specification/Terms.rakumod",
     "CSS::Specification::Terms::Actions": "lib/CSS/Specification/Terms/Actions.rakumod"
   },
+  "resources": [
+  ],
   "source-url": "git://github.com/css-raku/CSS-Specification-raku.git",
+  "tags": [
+  ],
+  "test-depends": [
+  ],
   "version": "0.4.8"
 }
