@@ -63,11 +63,13 @@ class CSS::Specification::Terms::Actions {
     method any-function($/)             {
 	##        nextsame if $.lax;
 	if $.lax {
-	    return $<any-args>
+	    $<any-args>
 	        ?? $.warning('skipping function arguments', ~$<any-args>)
 		!! make $.node($/);
 	}
-        $.warning('ignoring function', $<Ident>.ast.lc);
+        else {
+            $.warning('ignoring function', $<Ident>.ast.lc);
+        }
     }
 
     method declaration($/)  {
@@ -77,7 +79,7 @@ class CSS::Specification::Terms::Actions {
             with $ast {
                 my ($key, $value) = .kv;
                 if $.lax {
-                    make {($key ~ ':unknown') => $value}
+                    make $key => $value;
                 }
                 else {
                     $.warning('dropping unknown property',
