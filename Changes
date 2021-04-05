@@ -1,4 +1,6 @@
 {{$NEXT}}
+
+0.4.9  2021-04-06T07:10:48+12:00
   - Don't special-case unknown properties in `:lax` mode - let the
     caller handle this.
 
