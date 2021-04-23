@@ -1,6 +1,6 @@
 use v6;
 
-grammar CSS::Specification::Terms {
+grammar CSS::Specification::Defs {
 
     proto rule proforma {*}
 

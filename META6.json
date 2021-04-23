@@ -1,4 +1,5 @@
 {
+  "auth": "cpan:WARRINGD",
   "authors": [
     "David Warring"
   ],
@@ -16,8 +17,8 @@
     "CSS::Specification": "lib/CSS/Specification.rakumod",
     "CSS::Specification::Actions": "lib/CSS/Specification/Actions.rakumod",
     "CSS::Specification::Build": "lib/CSS/Specification/Build.rakumod",
-    "CSS::Specification::Terms": "lib/CSS/Specification/Terms.rakumod",
-    "CSS::Specification::Terms::Actions": "lib/CSS/Specification/Terms/Actions.rakumod"
+    "CSS::Specification::Defs": "lib/CSS/Specification/Defs.rakumod",
+    "CSS::Specification::Defs::Actions": "lib/CSS/Specification/Defs/Actions.rakumod"
   },
   "resources": [
   ],

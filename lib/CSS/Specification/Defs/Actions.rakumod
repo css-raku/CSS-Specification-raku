@@ -1,6 +1,6 @@
 use v6;
 
-class CSS::Specification::Terms::Actions {
+class CSS::Specification::Defs::Actions {
 
     use CSS::Grammar::Defs :CSSValue;
 
