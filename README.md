@@ -1,5 +1,10 @@
-perl6-CSS-Specification
+[[Raku CSS Project]](https://css-raku.github.io)
+ / [[CSS-Specification]](https://css-raku.github.io/CSS-Specification-raku)
+
+
+CSS-Specification-raku
 =======================
+
 This is a Raku module for parsing CSS property definitions.
 
 These are widely used throughout the W3C CSS Specifications to describe properties.
@@ -27,4 +32,4 @@ This module provides `css-gen-properties`. A program for translating property de
 to grammars, actions or interface classes.
 
 ## See Also
-See [make-modules.pl](https://github.com/css-raku/CSS-Module-raku/blob/master/make-modules.pl) in [CSS::Module](https://github.com/css-raku/CSS-Module-raku).
+See [make-modules.raku](https://github.com/css-raku/CSS-Module-raku/blob/master/make-modules.raku) in [CSS::Module](https://css-raku.github.io/CSS-Module-raku).

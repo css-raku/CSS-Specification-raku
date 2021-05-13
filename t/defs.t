@@ -49,8 +49,10 @@ for :number<123.45>        => :num(123.45),
     :uri("url(foo.jpg)")   => :url<foo.jpg>,
     :keyw<Abc>             => :keyw<abc>,
     :identifier<Foo>       => :ident<Foo>,
-    :identifiers("Aaa bb") => :ident("Aaa bb") {
-
+    :identifier("Foo  \n") => :ident<Foo>,
+    :identifiers("Aaa bb") => :ident("Aaa bb"),
+    :identifiers("Aaa  bb") => :ident("Aaa bb"),
+    :identifiers("Aaa\r\nbb") => :ident("Aaa bb") {
     my ($in, $ast) = .kv;
     my ($rule, $input) = $in.kv;
 
