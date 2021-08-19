@@ -15,8 +15,8 @@
   "perl": "6.c",
   "provides": {
     "CSS::Specification": "lib/CSS/Specification.rakumod",
-    "CSS::Specification::Actions": "lib/CSS/Specification/Actions.rakumod",
     "CSS::Specification::AST": "lib/CSS/Specification/AST.rakumod",
+    "CSS::Specification::Actions": "lib/CSS/Specification/Actions.rakumod",
     "CSS::Specification::Build": "lib/CSS/Specification/Build.rakumod",
     "CSS::Specification::Defs": "lib/CSS/Specification/Defs.rakumod",
     "CSS::Specification::Defs::Actions": "lib/CSS/Specification/Defs/Actions.rakumod"
@@ -28,5 +28,5 @@
   ],
   "test-depends": [
   ],
-  "version": "0.4.10"
+  "version": "0.4.11"
 }
