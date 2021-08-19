@@ -3,31 +3,9 @@ use v6;
 class CSS::Specification::Defs::Actions {
 
     use CSS::Grammar::Defs :CSSValue;
+    use CSS::Specification::AST;
 
-    method decl($/, :@proforma = [] ) {
-
-        my %ast;
-
-        %ast<ident> = .trim.lc
-            with $0;
-
-        with $<val> {
-            my Hash $val = .ast;
-
-            with $val<usage> -> $synopsis {
-                $.warning( ('usage ' ~ $synopsis, @proforma).flat.join: ' | ');
-                return Any;
-            }
-            elsif ! $val<expr> {
-                $.warning('dropping declaration', %ast<ident>);
-                return Any;
-            }
-
-            %ast<expr> = $val<expr>;
-        }
-
-        return %ast;
-    }
+    method build { CSS::Specification::AST }
 
     method val($/) {
         my %ast;
@@ -41,17 +19,13 @@ class CSS::Specification::Defs::Actions {
             }
             else {
                 with $<rx><expr> {
-                    %ast<expr> = $.list($_)
+                    %ast<expr> = $.build.list($_)
                         unless .can('caps') && (!.caps || .caps.first({! .value.ast.defined}));
                 }
             }
         }
 
         make %ast;
-    }
-
-    method rule($/) {
-        $.node($/).pairs[0];
     }
 
     method usage($/) {
@@ -65,7 +39,7 @@ class CSS::Specification::Defs::Actions {
 	if $.lax {
 	    $<any-args>
 	        ?? $.warning('skipping function arguments', ~$<any-args>)
-		!! make $.node($/);
+		!! make $.build.node($/);
 	}
         else {
             $.warning('ignoring function', $<Ident>.ast.lc);
@@ -89,9 +63,8 @@ class CSS::Specification::Defs::Actions {
             return;
         }
 
-        my %ast = %( $.decl( $<decl> ) );
-        return Any
-            unless +%ast;
+        my %ast = %( $.build.decl($<decl>, :obj(self)) )
+           || return;
 
         if $<any-arg> {
             return $.warning("extra terms following '{%ast<ident>}' declaration",
@@ -102,7 +75,7 @@ class CSS::Specification::Defs::Actions {
             %ast<prio> = $prio;
         }
 
-        make $.token( %ast, :type(CSSValue::Property) );
+        make $.build.token( %ast, :type(CSSValue::Property) );
     }
 
     method proforma:sym<inherit>($/) { make (:keyw<inherit>) }
@@ -111,7 +84,7 @@ class CSS::Specification::Defs::Actions {
     #---- Language Extensions ----#
 
     method length:sym<zero>($/) {
-        make $.token(0, :type<px>)
+        make $.build.token(0, :type<px>)
     }
 
     method length:sym<percent>($/) {
@@ -119,15 +92,15 @@ class CSS::Specification::Defs::Actions {
     }
 
     method angle:sym<zero>($/) {
-        make $.token(0, :type<deg>)
+        make $.build.token(0, :type<deg>)
     }
 
     method time:sym<zero>($/) {
-        make $.token(0, :type<s>)
+        make $.build.token(0, :type<s>)
     }
 
     method frequency:sym<zero>($/) {
-        make $.token(0, :type<hz>)
+        make $.build.token(0, :type<hz>)
     }
 
     use Color::Names::CSS3 :colors;
@@ -153,21 +126,21 @@ class CSS::Specification::Defs::Actions {
 
         my @color = @rgb.map: { (CSSValue::NumberComponent) => $_ };
 
-        make $.token(@color, :type<rgb>);
+        make $.build.token(@color, :type<rgb>);
     }
 
     method integer($/)     {
         my Int $val = $<uint>.ast;
         $val = -$val
             if $<sign> && $<sign> eq '-';
-        make $.token($val, :type(CSSValue::IntegerComponent))
+        make $.build.token($val, :type(CSSValue::IntegerComponent))
     }
 
-    method number($/)      { make $.token($<num>.ast, :type(CSSValue::NumberComponent)) }
+    method number($/)      { make $.build.token($<num>.ast, :type(CSSValue::NumberComponent)) }
     method uri($/)         { make $<url>.ast }
-    method keyw($/)        { make $.token($<id>.lc, :type(CSSValue::KeywordComponent)) }
+    method keyw($/)        { make $.build.token($<id>.lc, :type(CSSValue::KeywordComponent)) }
     # case sensitive identifiers
-    method identifier($/)  { make $.token($<name>.ast, :type(CSSValue::IdentifierComponent)) }
+    method identifier($/)  { make $.build.token($<name>.ast, :type(CSSValue::IdentifierComponent)) }
     # identifiers strung-together, e.g New Century Schoolbook
-    method identifiers($/) { make $.token( $<identifier>.map({ .ast.value }).join(' '), :type(CSSValue::IdentifierComponent)) }
+    method identifiers($/) { make $.build.token( $<identifier>.map({ .ast.value }).join(' '), :type(CSSValue::IdentifierComponent)) }
 }
