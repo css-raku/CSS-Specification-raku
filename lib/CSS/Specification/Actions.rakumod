@@ -2,7 +2,7 @@ use v6;
 
 class CSS::Specification::Actions {
 
-    # these actions translate a CSS property specification to Perl 6
+    # these actions translate a CSS property specification to Raku
     # rules or actions.
     has %.prop-refs is rw;
     has %.props is rw;
@@ -20,7 +20,7 @@ class CSS::Specification::Actions {
         my %prop-def = (
             props    => @props,
             synopsis => ~$<spec>,
-            perl6    => $spec,
+            raku    => $spec,
             );
 
         %prop-def<inherit> = .ast with $<inherit>;
@@ -34,12 +34,12 @@ class CSS::Specification::Actions {
     method rule-spec($/) {
 
         my $rule = $<rule>.ast,
-        my $perl6 = $<spec>.ast;
+        my $raku = $<spec>.ast;
         my $synopsis = ~$<spec>;
         %.props{$rule}++;
 
         my %rule-def = (
-            :$rule, :$synopsis, :$perl6
+            :$rule, :$synopsis, :$raku
             );
 
         make %rule-def;

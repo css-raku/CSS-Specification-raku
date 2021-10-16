@@ -1,6 +1,6 @@
-#!/usr/bin/env perl6
+#!/usr/bin/env raku
 
-#= translates w3c property definitions to basic Perl 6 roles, grammars or actions.
+#= translates w3c property definitions to basic Raku roles, grammars or actions.
 
 module CSS::Specification::Build {
 
@@ -21,7 +21,7 @@ module CSS::Specification::Build {
         say "";
         say "grammar {$grammar-name} \{";
 
-        generate-perl6-rules(@defs);
+        generate-raku-rules(@defs);
 
         say '}';
     }
@@ -39,7 +39,7 @@ module CSS::Specification::Build {
         say "class {$class-name} \{";
 
         my %prop-refs = $actions.prop-refs;
-        generate-perl6-actions(@defs, %prop-refs);
+        generate-raku-actions(@defs, %prop-refs);
 
         say '}';
     }
@@ -59,7 +59,7 @@ module CSS::Specification::Build {
         my %prop-refs = $actions.prop-refs;
         my %props = $actions.props;
         my %rules = $actions.rules;
-        generate-perl6-interface(%prop-refs, %props, %rules);
+        generate-raku-interface(%prop-refs, %props, %rules);
 
         say '}';
     }
@@ -129,9 +129,9 @@ module CSS::Specification::Build {
         for @defs -> $def {
 
             with $def<props> -> @props {
-                my $perl6 = $def<perl6>;
+                my $raku = $def<raku>;
                 my $synopsis = $def<synopsis>;
-                my $box = $perl6 ~~ /:s '**' '1..4' $/;
+                my $box = $raku ~~ /:s '**' '1..4' $/;
 
                 for @props -> $name {
                     my %details = :$name, :$synopsis;
@@ -176,21 +176,21 @@ module CSS::Specification::Build {
         return @defs;
     }
 
-    sub generate-perl6-rules(@defs) {
+    sub generate-raku-rules(@defs) {
 
         for @defs -> $def {
 
             with $def<props> -> @props {
-                my $perl6 = $def<perl6>;
+                my $raku = $def<raku>;
                 my $synopsis = $def<synopsis>;
 
                 # boxed repeating property. repeat the expr
-                my $box = $perl6 ~~ /:s '**' '1..4' $/
+                my $box = $raku ~~ /:s '**' '1..4' $/
                     ?? ', :box'
                     !! '';
                 my $repeats = '';
                 if $box {
-                    $perl6 ~~ s/:s '**' '1..4' $//;
+                    $raku ~~ s/:s '**' '1..4' $//;
                     $repeats = ' ** 1..4';
                 }
 
@@ -200,21 +200,21 @@ module CSS::Specification::Build {
                     say "";
                     say "    #| $prop: $synopsis";
                     say "    rule decl:sym<{$prop}> \{:i ($match) ':' <val( rx\{ <expr=.expr-{$prop}>$repeats \}, &?ROUTINE.WHY)> \}";
-                    say "    rule expr-$prop \{:i $perl6 \}";
+                    say "    rule expr-$prop \{:i $raku \}";
                 }
             }
             else {
                 my $rule = $def<rule>;
-                my $perl6 = $def<perl6>;
+                my $raku = $def<raku>;
                 my $synopsis = $def<synopsis>;
                 say "";
                 say "    #| $rule: $synopsis";
-                say "    rule $rule \{:i $perl6 \}";
+                say "    rule $rule \{:i $raku \}";
             }
         }
     }
 
-    sub generate-perl6-actions(@defs, %references) {
+    sub generate-raku-actions(@defs, %references) {
 
         for @defs -> $def {
 
@@ -235,7 +235,7 @@ module CSS::Specification::Build {
     }
 
     #= generate an interface class for all unresolved terms.
-    sub generate-perl6-interface(%references, %prop-names, %rule-names) {
+    sub generate-raku-interface(%references, %prop-names, %rule-names) {
 
         my %unresolved = %references;
         %unresolved{'expr-' ~ $_}:delete

@@ -37,9 +37,9 @@ for (
     'property-spec' => {input => "'content'\tnormal | none | [ <string> | <uri> | <counter> | attr(<identifier>) | open-quote | close-quote | no-open-quote | no-close-quote ]+ | inherit	normal	:before and :after pseudo-elements	no",
                         ast => {:props['content'],
                                 :default<normal>,
-                                :perl6('[ [ normal | none ] & <keyw> || [ [ <string> || <uri> || <counter> || <attr> || [ open\\-quote | close\\-quote | no\\-open\\-quote | no\\-close\\-quote ] & <keyw> ] ]+ || inherit & <keyw> ]'),
+                                :raku('[ [ normal | none ] & <keyw> || [ [ <string> || <uri> || <counter> || <attr> || [ open\\-quote | close\\-quote | no\\-open\\-quote | no\\-close\\-quote ] & <keyw> ] ]+ || inherit & <keyw> ]'),
                                 :synopsis('normal | none | [ <string> | <uri> | <counter> | attr(<identifier>) | open-quote | close-quote | no-open-quote | no-close-quote ]+ | inherit'),
-                                :inherit(False),
+                                :!inherit,
                         },
     },
     # css1 spec with property name and '*' junk
@@ -54,13 +54,16 @@ for (
 
     my @*PROP-NAMES = [];
 
-    CSS::Grammar::Test::parse-tests( CSS::Specification, $input,
-                                     :$rule,
-                                     :$actions,
-                                     :suite<spec>,
-                                     :$expected );
+    CSS::Grammar::Test::parse-tests(
+        CSS::Specification, $input,
+        :$rule,
+        :$actions,
+        :suite<spec>,
+        :$expected
+    )
+;
     my $rule-body := $/.ast;
-    $rule-body := $rule-body<perl6>
+    $rule-body := $rule-body<raku>
         if $rule-body.isa('Hash');
 
     with $rule-body {
