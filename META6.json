@@ -1,5 +1,5 @@
 {
-  "auth": "zeff:dwarring",
+  "auth": "zef:dwarring",
   "authors": [
     "David Warring"
   ],
@@ -28,5 +28,5 @@
   ],
   "test-depends": [
   ],
-  "version": "0.4.11"
+  "version": "0.4.12"
 }
