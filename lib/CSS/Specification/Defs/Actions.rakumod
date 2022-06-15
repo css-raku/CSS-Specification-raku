@@ -46,23 +46,19 @@ class CSS::Specification::Defs::Actions {
         }
     }
 
-    method declaration($/)  {
-
-        if $<any-declaration> {
-            my $ast = $<any-declaration>.ast;
-            with $ast {
-                my ($key, $value) = .kv;
-                if $.lax {
-                    make $key => $value;
-                }
-                else {
-                    $.warning('dropping unknown property',
-                              $value<at-keyw> ?? '@'~$value<at-keyw> !! $value<ident>);
-                }
+    multi method declaration($/ where $<any-declaration>)  {
+        with $<any-declaration>.ast -> $ast {
+            my ($key, $value) = $ast.kv;
+            if $.lax {
+                make $key => $value;
             }
-            return;
+            else {
+                $.warning('dropping unknown property',
+                          $value<at-keyw> ?? '@'~$value<at-keyw> !! $value<ident>);
+            }
         }
-
+    }
+    multi method declaration($/)  {
         my %ast = %( $.build.decl($<decl>, :obj(self)) )
            || return;
 
@@ -71,10 +67,9 @@ class CSS::Specification::Defs::Actions {
                              ~$<any-arg>, 'dropped');
         }
 
-        if (my $prio = $<prio> && $<prio>.ast) {
-            %ast<prio> = $prio;
+        if $<prio> && (my $prio = $<prio>.ast) {
+            %ast ,= :$prio;
         }
-
         make $.build.token( %ast, :type(CSSValue::Property) );
     }
 
