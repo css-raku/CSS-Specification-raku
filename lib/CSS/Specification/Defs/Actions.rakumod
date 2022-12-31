@@ -99,9 +99,10 @@ class CSS::Specification::Defs::Actions {
     }
 
     use Color::Names::CSS3 :colors;
+    constant CSS3-Colors = %( COLORS.map: { .key.subst(/'-'.*/, '') => .value } );
     my constant %Colors = do {
         my %v;
-        for COLORS.pairs {
+        for CSS3-Colors.pairs {
             my (Str $name, Hash $val) = .kv;
             my List $rgb = $val<rgb>;
             %v{$name} = $rgb;
