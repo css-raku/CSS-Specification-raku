@@ -1,10 +1,9 @@
-#!/usr/bin/env perl6
-
 use Test;
 use CSS::Grammar::Test;
 use CSS::Grammar::CSS21;
 use CSS::Specification::Build;
 use lib 't';
+use experimental :rakuast;
 
 sub capture($code, $output-path) {
     my $*OUT = open $output-path, :w;
@@ -13,10 +12,11 @@ sub capture($code, $output-path) {
     $output-path;
 }
 
-my $base-name = 'Test::CSS::Aural::Spec';
+my @base-id = qw<Test CSS Aural Spec>;
+my $base-name = @base-id.join: '::';
 my $grammar-name = $base-name ~ '::Grammar';
 my $actions-name = $base-name ~ '::Actions';
-my $interface-name = $base-name ~ '::Interface';
+my @role-id = @base-id.Slip, 'Interface';
 
 my $input-path = $*SPEC.catfile('examples', 'css21-aural.txt');
 my @summary = CSS::Specification::Build::summary( :$input-path );
@@ -33,10 +33,10 @@ capture({
 }, 't/lib/Test/CSS/Aural/Spec/Actions.rakumod');
 lives-ok {require ::($actions-name)}, "$actions-name compilation";
 
-capture({
-    CSS::Specification::Build::generate( 'interface', $interface-name, :$input-path );
-}, 't/lib/Test/CSS/Aural/Spec/Interface.rakumod');
-lives-ok {require ::($interface-name)}, "$interface-name compilation";
+my RakuAST::Package $interface-package = CSS::Specification::Build::generate( 'interface', @role-id, :$input-path );
+'t/lib/Test/CSS/Aural/Spec/Interface.rakumod'.IO.spurt: $interface-package.DEPARSE;
+my $role-name = @role-id.join: '::';
+lives-ok {require ::($role-name)}, "$role-name compilation";
 
 dies-ok {require ::("Test::CSS::Aural::BadGrammar")}, 'grammar composition, unimplemented interface - dies';
 
