@@ -46,19 +46,7 @@ multi sub generate('interface', @role-id, Path :$input-path? --> RakuAST::Packag
 
     my CSS::Specification::Actions $actions .= new;
     my @defs = load-defs($input-path, $actions);
-
-    my %prop-refs = $actions.prop-refs;
-    my %props = $actions.props;
-    my %rules = $actions.rules;
-    my RakuAST::Method @methods = generate-raku-interface-methods(%prop-refs, %props, %rules);
-    my @expression = @methods.map(-> $expression { RakuAST::Statement::Expression.new: :$expression });
-    my RakuAST::Blockoid $body .= new: RakuAST::StatementList.new(|@expression);
-    my RakuAST::Name $name .= from-identifier-parts(|@role-id);
-    RakuAST::Package.new(
-        :declarator<role>,
-        :$name,
-        :body(RakuAST::Block.new: :$body),
-    );
+    $actions.role-ast(@role-id);
 }
 
 sub find-edges(%properties, %child-props) {
@@ -231,34 +219,4 @@ sub generate-raku-actions(@defs, %references) {
     }
 }
 
-#= generate an interface class for all unresolved terms.
-sub generate-raku-interface-methods(%references, %prop-names, %rule-names) {
-
-    my %unresolved = %references;
-    %unresolved{'expr-' ~ $_}:delete
-        for %prop-names.keys;
-    %unresolved{$_}:delete
-        for %rule-names.keys;
-
-    my Str @stubs = %unresolved.keys.sort;
-    @stubs.map: -> $id {
-        my RakuAST::Method $method .= new(
-            name      => RakuAST::Name.from-identifier($id),
-            signature => RakuAST::Signature.new(
-                parameters => (
-                    RakuAST::Parameter.new(
-                        target => RakuAST::ParameterTarget::Var.new("\$/")
-                    ),
-                )
-            ),
-            body      => RakuAST::Blockoid.new(
-                RakuAST::StatementList.new(
-                    RakuAST::Statement::Expression.new(
-                        expression => RakuAST::Stub::Fail.new
-                    )
-                )
-            )
-        );
-    }
-}
 
