@@ -2,6 +2,7 @@ unit module CSS::Specification::Build;
 
 use CSS::Specification;
 use CSS::Specification::Actions;
+use CSS::Specification::Builder;
 my subset Path where Str|IO::Path;
 use experimental :rakuast;
 
@@ -10,7 +11,8 @@ our proto sub generate(|) { * };
 multi sub generate('grammar', Str $grammar-name, Path :$input-path?) {
 
     my CSS::Specification::Actions $actions .= new;
-    my @defs = load-defs($input-path, $actions);
+    my CSS::Specification::Builder $parser .= new: :$actions;
+    my @defs = $parser.load-defs($input-path);
 
     say qq:to<END-HDR>;
     use v6;
@@ -27,7 +29,8 @@ multi sub generate('grammar', Str $grammar-name, Path :$input-path?) {
 multi sub generate('actions', Str $class-name, Path :$input-path?) {
 
     my CSS::Specification::Actions $actions .= new;
-    my @defs = load-defs($input-path, $actions);
+    my CSS::Specification::Builder $parser .= new: :$actions;
+    my @defs = $parser.load-defs($input-path);
 
     say qq:to<END-HDR>;
     use v6;
@@ -45,8 +48,9 @@ multi sub generate('actions', Str $class-name, Path :$input-path?) {
 multi sub generate('interface', @role-id, Path :$input-path? --> RakuAST::Package:D) {
 
     my CSS::Specification::Actions $actions .= new;
-    my @defs = load-defs($input-path, $actions);
-    $actions.role-ast(@role-id);
+    my CSS::Specification::Builder $parser .= new: :$actions;
+    $parser.load-defs($input-path);
+    $parser.role-ast(@role-id);
 }
 
 sub find-edges(%properties, %child-props) {
@@ -107,7 +111,8 @@ sub check-edges(%properties) {
 our sub summary(Path :$input-path? ) {
 
     my CSS::Specification::Actions $actions .= new;
-    my @defs = load-defs($input-path, $actions);
+    my CSS::Specification::Builder $parser .= new: :$actions;
+    my @defs = $parser.load-defs($input-path);
     my @summary;
     my %properties;
 
@@ -138,28 +143,6 @@ our sub summary(Path :$input-path? ) {
     return @summary;
 }
 
-sub load-defs (Path $properties-spec, $actions?) {
-    my $fh = $properties-spec
-        ?? open $properties-spec, :r
-        !! $*IN;
-
-    my @defs;
-
-    for $fh.lines -> $prop-spec {
-        # handle full line comments
-        next if $prop-spec ~~ /^'#'/ || $prop-spec eq '';
-        # '| inherit' and '| initial' are implied anyway; get rid of them
-        my $spec = $prop-spec.subst(/\s* '|' \s* [inherit|initial]/, ''):g;
-
-        my $/ = CSS::Specification.subparse($spec, :actions($actions) );
-        die "unable to parse: $spec"
-            unless $/;
-        my $defs = $/.ast;
-        @defs.append: @$defs;
-    }
-
-    return @defs;
-}
 
 sub generate-raku-rules(@defs) {
 

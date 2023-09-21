@@ -1,6 +1,5 @@
 unit class CSS::Specification::Actions;
 
-use experimental :rakuast;
 # these actions translate a CSS property specification to Raku
 # rules or actions.
 has %.prop-refs is rw;
@@ -185,44 +184,3 @@ method value:sym<num>($/)      { make ~$/ }
 
 method value:sym<keyw>($/)     { make ~$/ }
 
-method role-ast($actions: @role-id) {
-    my RakuAST::Method @methods = self!interface-methods;
-    my @expression = @methods.map(-> $expression { RakuAST::Statement::Expression.new: :$expression });
-    my RakuAST::Blockoid $body .= new: RakuAST::StatementList.new(|@expression);
-    my RakuAST::Name $name .= from-identifier-parts(|@role-id);
-    RakuAST::Package.new(
-        :declarator<role>,
-        :$name,
-        :body(RakuAST::Block.new: :$body),
-    );
-}
-
-#= generate an interface class for all unresolved terms.
-method !interface-methods {
-    my %unresolved = %!prop-refs;
-    %unresolved{'expr-' ~ $_}:delete
-        for %!props.keys;
-    %unresolved{$_}:delete
-        for %!rules.keys;
-
-    my Str @stubs = %unresolved.keys.sort;
-    @stubs.map: -> $id {
-        my RakuAST::Method $method .= new(
-            name      => RakuAST::Name.from-identifier($id),
-            signature => RakuAST::Signature.new(
-                parameters => (
-                    RakuAST::Parameter.new(
-                        target => RakuAST::ParameterTarget::Var.new("\$/")
-                    ),
-                )
-            ),
-            body      => RakuAST::Blockoid.new(
-                RakuAST::StatementList.new(
-                    RakuAST::Statement::Expression.new(
-                        expression => RakuAST::Stub::Fail.new
-                    )
-                )
-            )
-        );
-    }
-}
