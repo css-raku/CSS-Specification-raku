@@ -2,7 +2,7 @@ unit module CSS::Specification::Build;
 
 use CSS::Specification;
 use CSS::Specification::Actions;
-use CSS::Specification::Builder;
+use CSS::Specification::Compiler;
 my subset Path where Str|IO::Path;
 use experimental :rakuast;
 
@@ -11,8 +11,8 @@ our proto sub generate(|) { * };
 multi sub generate('grammar', Str $grammar-name, Path :$input-path?) {
 
     my CSS::Specification::Actions $actions .= new;
-    my CSS::Specification::Builder $parser .= new: :$actions;
-    my @defs = $parser.load-defs($input-path);
+    my CSS::Specification::Compiler $compiler .= new: :$actions;
+    my @defs = $compiler.load-defs($input-path);
 
     say qq:to<END-HDR>;
     use v6;
@@ -29,8 +29,8 @@ multi sub generate('grammar', Str $grammar-name, Path :$input-path?) {
 multi sub generate('actions', Str $class-name, Path :$input-path?) {
 
     my CSS::Specification::Actions $actions .= new;
-    my CSS::Specification::Builder $parser .= new: :$actions;
-    my @defs = $parser.load-defs($input-path);
+    my CSS::Specification::Compiler $compiler .= new: :$actions;
+    my @defs = $compiler.load-defs($input-path);
 
     say qq:to<END-HDR>;
     use v6;
@@ -48,9 +48,9 @@ multi sub generate('actions', Str $class-name, Path :$input-path?) {
 multi sub generate('interface', @role-id, Path :$input-path? --> RakuAST::Package:D) {
 
     my CSS::Specification::Actions $actions .= new;
-    my CSS::Specification::Builder $parser .= new: :$actions;
-    $parser.load-defs($input-path);
-    $parser.role-ast(@role-id);
+    my CSS::Specification::Compiler $compiler .= new: :$actions;
+    $compiler.load-defs($input-path);
+    $compiler.role-ast(@role-id);
 }
 
 sub find-edges(%properties, %child-props) {
@@ -111,8 +111,8 @@ sub check-edges(%properties) {
 our sub summary(Path :$input-path? ) {
 
     my CSS::Specification::Actions $actions .= new;
-    my CSS::Specification::Builder $parser .= new: :$actions;
-    my @defs = $parser.load-defs($input-path);
+    my CSS::Specification::Compiler $compiler .= new: :$actions;
+    my @defs = $compiler.load-defs($input-path);
     my @summary;
     my %properties;
 

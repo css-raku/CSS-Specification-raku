@@ -1,7 +1,8 @@
-unit class CSS::Specification::Builder;
+unit class CSS::Specification::Compiler;
 use CSS::Specification;
-use CSS::Specification::Actions;
-has CSS::Specification::Actions:D $.actions is required;
+##use CSS::Specification::Actions;
+##has CSS::Specification::Actions:D $.actions is required;
+has $.actions is required;
 has @.defs;
 
 use experimental :rakuast;
@@ -67,4 +68,19 @@ method !interface-methods {
             )
         );
     }
+}
+
+our proto sub compile (|) {*}
+
+multi sub compile(:@occurs! [$quant!, :$keyw!]) {
+    my $atom = compile(:$keyw);
+    my $quantifier = do given $quant {
+        when '?' { RakuAST::Regex::Quantifier::ZeroOrOne.new }
+        default { die "ubnknown quant: $quant" }
+    }
+    RakuAST::Regex::QuantifiedAtom.new: :$atom, :$quantifier;
+}
+
+multi sub compile(Str:D :$keyw!) {
+    RakuAST::Regex::Literal.new($keyw);
 }
