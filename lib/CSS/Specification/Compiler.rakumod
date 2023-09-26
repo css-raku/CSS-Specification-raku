@@ -81,6 +81,46 @@ multi sub compile(:@occurs! [$quant!, :$keyw!]) {
     RakuAST::Regex::QuantifiedAtom.new: :$atom, :$quantifier;
 }
 
-multi sub compile(Str:D :$keyw!) {
-    RakuAST::Regex::Literal.new($keyw);
+sub assertion(Str:D $id) {
+    RakuAST::Regex::Assertion::Named.new(
+        name      => RakuAST::Name.from-identifier($id),
+        :capturing
+    )
 }
+
+sub ws($r) {
+    RakuAST::Regex::WithWhitespace.new($r);
+}
+
+sub lit(Str:D $s) {
+    RakuAST::Regex::Literal.new($s);
+}
+
+sub seq($r) { RakuAST::Regex::Sequence.new($r) }
+
+sub group($g) { RakuAST::Regex::Group.new: $g }
+
+sub alt(@elems) { RakuAST::Regex::Alternation.new: |@elems; }
+
+sub conjunct($t1, $t2) {
+    RakuAST::Regex::Conjunction.new($t1, $t2);
+}
+
+
+sub literal(Str:D $s) {
+    $s.&lit.&ws.&seq;
+}
+
+multi sub compile(:@keywords!) {
+    my $keyw := 'keyw'.&assertion;
+    my @lits = @keywords.map(&literal);
+    if @keywords == 1 {
+        conjunct(@lits[0], $keyw); 
+    }
+    else {
+        conjunct(@lits.&alt.&group, $keyw);
+    }
+}
+
+multi sub compile($arg) { compile |$arg }
+

@@ -12,8 +12,14 @@ lives-ok {require CSS::Grammar:ver(v0.3.0..*) }, "CSS::Grammar version";
 my CSS::Specification::Actions $actions .= new;
 
 for (
+    'spec' => {input => 'thin',
+                ast => 'thin & <keyw>',
+    },
     'spec' => {input => 'thin?',
                 ast => '[ thin & <keyw> ]?',
+    },
+    'spec' => {input => 'thick | thin',
+                ast => '[ thick | thin ] & <keyw>',
     },
     'spec' => {input => '35 | 7 | 42?',
                 ast => '[ [ 35 | 7 ] & <number> || [ 42 & <number> ]? ]',

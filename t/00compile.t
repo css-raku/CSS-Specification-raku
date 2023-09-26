@@ -1,7 +1,6 @@
 #!/usr/bin/env perl6
 
 use Test;
-
 use CSS::Grammar::Test;
 
 use CSS::Specification;
@@ -13,29 +12,41 @@ lives-ok {require CSS::Grammar:ver(v0.3.0..*) }, "CSS::Grammar version";
 my CSS::Specification::Compiler::Actions $actions .= new;
 
 for (
-    'spec' => {input => 'thin?',
-               ast   => :occurs['?', :keyw<thin>],
-               rule  => 'value',
-               deparse => 'thin?',
+    'spec' => {
+        input => 'thin',
+        ast   => :keywords['thin'],
+        deparse => 'thin & <keyw>',
     },
-##    'spec' => {input => '35 | 7 | 42?',
-##                ast => '[ [ 35 | 7 ] & <number> || [ 42 & <number> ]? ]',
+##    'spec' => {
+##        input => 'thin?',
+##        ast   => :occurs['?', :keyw<thin>],
+##        deparse => '[ thin & <keyw> ]?',
+##    },
+    'spec' => {
+        input => 'thick | thin',
+        ast => :keywords[ 'thick', 'thin' ],
+        deparse => '[thick | thin ]& <keyw>',
+    },
+##    'spec' => {
+##        input => '35 | 7 | 42?',
+##        ast => :alt[ :alt([:num(35), :num(7)]), :occurs["?", :num(42)]],
+##        deparse => '[ [ 35 | 7 ] & <number> || [ 42 & <number> ]? ]',
 ##    },
 ##    'spec' => {input => "<rule-ref> [, [ 'css21-prop-ref' | <'css3-prop-ref'> ] ]*",
-##                ast => "<rule-ref> [ <op(',')> [ [ <expr-css21-prop-ref> || <expr-css3-prop-ref> ] ] ]*",
+##                deparse => "<rule-ref> [ <op(',')> [ [ <expr-css21-prop-ref> || <expr-css3-prop-ref> ] ] ]*",
 ##    },
 ##    'spec' => {input => '<length>{4}',
-##               ast => '<length> ** 4',
+##               deparse => '<length> ** 4',
 ##    },
 ##    'spec' => {input => '<length>#{1,4}',
-##               ast => "<length> ** 1..4% <op(',')>",
+##               deparse => "<length> ** 1..4% <op(',')>",
 ##    },
 ##    # precedence tests taken from: https://developer.mozilla.org/en-US/docs/CSS/Value_definition_syntax
 ##    'spec' => {input => 'bold thin && <length>',
-##               ast => ':my @*SEEN; [ bold & <keyw> thin & <keyw> <!seen(0)> | <length> <!seen(1)> ]**2',
+##               deparse => ':my @*SEEN; [ bold & <keyw> thin & <keyw> <!seen(0)> | <length> <!seen(1)> ]**2',
 ##    },
 ##    'spec' => {input => 'bold || thin && <length>',
-##               ast => ':my @*SEEN; [ bold & <keyw> <!seen(2)> | [ thin & <keyw> <!seen(0)> | <length> <!seen(1)> ]**2 <!seen(3)> ]+',
+##               deparse => ':my @*SEEN; [ bold & <keyw> <!seen(2)> | [ thin & <keyw> <!seen(0)> | <length> <!seen(1)> ]**2 <!seen(3)> ]+',
 ##    },
 ##    'property-spec' => {input => "'content'\tnormal | none | [ <string> | <uri> | <counter> | attr(<identifier>) | open-quote | close-quote | no-open-quote | no-close-quote ]+ | inherit	normal	:before and :after pseudo-elements	no",
 ##                        ast => {:props['content'],

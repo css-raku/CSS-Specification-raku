@@ -74,11 +74,11 @@ method terms($/) {
 }
 
 method term-options($/) {
-    my @choices = @<term>>>.ast;
+    my @alt = @<term>>>.ast;
 
-    make @choices == 1
-        ?? @choices[0]
-        !! ('options' => @choices);
+    make @alt == 1
+        ?? @alt[0]
+        !! :@alt;
 }
 
 method term-combo($/) {
@@ -115,7 +115,7 @@ method term($/) {
 method occurs:sym<maybe>($/)     { make '?' }
 method occurs:sym<once-plus>($/) is DEPRECATED { make '+' }
 method occurs:sym<zero-plus>($/) is DEPRECATED { make '*' }
-method occurs:sym<list>($/)      {
+method occurs:sym<list>($/) is DEPRECATED {
     my $quant = $<range> ?? $<range>.ast !! '+';
     make "{$quant}% <op(',')>"
 }
@@ -135,23 +135,19 @@ method value:sym<func>($/) is DEPRECATED {
 }
 
 method value:sym<keywords>($/) {
-    make  @<keyw>>>.ast
+    make 'keywords' => @<keyw>.map: {.ast.value};
 }
 
 method value:sym<keyw-quant>($/) {
     make 'occurs' => [$<occurs>.ast, $<keyw>.ast];
 }
 
-method value:sym<numbers>($/) is DEPRECATED {
-    my $keywords = @<digits> > 1
-        ?? [~] '[ ', @<digits>>>.ast.join(' | '), ' ]'
-        !! @<digits>[0].ast;
-
-    make $keywords ~ ' & <number>';
+method value:sym<numbers>($/) {
+    make 'numbers' => @<digits>.map: {.ast.value};
 }
 
-method value:sym<num-quant>($/) is DEPRECATED {
-    make [~] '[ ', $<digits>.ast, ' & <number> ]', $<occurs>.ast
+method value:sym<num-quant>($/) {
+    make 'occurs' => [$<occurs>.ast, $<digits>.ast];
 }
 
 method value:sym<group>($/) is DEPRECATED {

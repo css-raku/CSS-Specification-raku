@@ -44,6 +44,15 @@ multi sub generate('actions', Str $class-name, Path :$input-path?) {
     generate-raku-actions(@defs, %prop-refs);
 }
 
+multi sub generate('interface', $role-name, :$input-path? --> RakuAST::Package:D) is DEPRECATED {
+
+    my CSS::Specification::Actions $actions .= new;
+    my CSS::Specification::Compiler $compiler .= new: :$actions;
+    my @role-id = $role-name.split('::');
+    $compiler.load-defs($input-path);
+    $compiler.role-ast(@role-id);
+}
+
 #= generate interface roles.
 multi sub generate('interface', @role-id, Path :$input-path? --> RakuAST::Package:D) {
 
