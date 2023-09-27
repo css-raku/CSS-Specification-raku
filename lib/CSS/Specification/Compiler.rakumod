@@ -72,8 +72,8 @@ method !interface-methods {
 
 our proto sub compile (|) {*}
 
-multi sub compile(:@occurs! [$quant!, :$keyw!]) {
-    my $atom = compile(:$keyw);
+multi sub compile(:@occurs! ($quant!, *%term)) {
+    my $atom = compile(|%term).&group;
     my $quantifier = do given $quant {
         when '?' { RakuAST::Regex::Quantifier::ZeroOrOne.new }
         default { die "ubnknown quant: $quant" }
@@ -81,45 +81,58 @@ multi sub compile(:@occurs! [$quant!, :$keyw!]) {
     RakuAST::Regex::QuantifiedAtom.new: :$atom, :$quantifier;
 }
 
-sub assertion(Str:D $id) {
+sub assertion(Str:D $id, Bool :$capturing = True) {
+    my RakuAST::Name $name .= from-identifier($id);
     RakuAST::Regex::Assertion::Named.new(
-        name      => RakuAST::Name.from-identifier($id),
-        :capturing
-    )
+        :$name, :$capturing
+    );
 }
 
-sub ws($r) {
-    RakuAST::Regex::WithWhitespace.new($r);
+sub ws(RakuAST::Regex $r) { RakuAST::Regex::WithWhitespace.new($r) }
+
+sub lit(Str:D $s) { RakuAST::Regex::Literal.new($s) }
+
+sub seq(RakuAST::Regex $r) { RakuAST::Regex::Sequence.new($r) }
+
+sub group(RakuAST::Regex $r) { RakuAST::Regex::Group.new: $r }
+
+sub alt(@choices) {
+    RakuAST::Regex::Alternation.new: |@choices;
 }
 
-sub lit(Str:D $s) {
-    RakuAST::Regex::Literal.new($s);
+sub conjunct(RakuAST::Regex $r1, RakuAST::Regex $r2) {
+    RakuAST::Regex::Conjunction.new($r1, $r2);
 }
 
-sub seq($r) { RakuAST::Regex::Sequence.new($r) }
+sub literal(Str:D() $_) { .&lit.&ws.&seq }
 
-sub group($g) { RakuAST::Regex::Group.new: $g }
-
-sub alt(@elems) { RakuAST::Regex::Alternation.new: |@elems; }
-
-sub conjunct($t1, $t2) {
-    RakuAST::Regex::Conjunction.new($t1, $t2);
+sub _choose(@lits, RakuAST::Regex $rule) {
+    if @lits == 1 {
+        conjunct(@lits[0], $rule);
+    }
+    else {
+        conjunct(@lits.&alt.&group, $rule);
+    }
 }
 
+multi sub compile(Str:D :$keyw!) {
+    conjunct $keyw.&lit, 'keyw'.&assertion;
+}
 
-sub literal(Str:D $s) {
-    $s.&lit.&ws.&seq;
+multi sub compile(Str:D() :$num!) {
+    conjunct $num.&lit, 'number'.&assertion;
 }
 
 multi sub compile(:@keywords!) {
-    my $keyw := 'keyw'.&assertion;
-    my @lits = @keywords.map(&literal);
-    if @keywords == 1 {
-        conjunct(@lits[0], $keyw); 
-    }
-    else {
-        conjunct(@lits.&alt.&group, $keyw);
-    }
+    _choose @keywords.map(&literal), 'keyw'.&assertion;
+}
+
+multi sub compile(:@numbers!) {
+    _choose @numbers.map(&literal), 'number'.&assertion;
+}
+
+multi sub compile(:@alt!) {
+    alt @alt.map(&compile);
 }
 
 multi sub compile($arg) { compile |$arg }

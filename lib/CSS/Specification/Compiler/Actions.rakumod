@@ -75,7 +75,6 @@ method terms($/) {
 
 method term-options($/) {
     my @alt = @<term>>>.ast;
-
     make @alt == 1
         ?? @alt[0]
         !! :@alt;
@@ -143,7 +142,8 @@ method value:sym<keyw-quant>($/) {
 }
 
 method value:sym<numbers>($/) {
-    make 'numbers' => @<digits>.map: {.ast.value};
+    my @numbers = @<digits>.map: {.ast.value};
+    make (:@numbers);
 }
 
 method value:sym<num-quant>($/) {

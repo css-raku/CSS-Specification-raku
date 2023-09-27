@@ -17,21 +17,26 @@ for (
         ast   => :keywords['thin'],
         deparse => 'thin & <keyw>',
     },
-##    'spec' => {
-##        input => 'thin?',
-##        ast   => :occurs['?', :keyw<thin>],
-##        deparse => '[ thin & <keyw> ]?',
-##    },
+    'spec' => {
+        input => 'thin?',
+        ast   => :occurs['?', :keyw<thin>],
+        deparse => '[thin& <keyw>]?',
+    },
     'spec' => {
         input => 'thick | thin',
         ast => :keywords[ 'thick', 'thin' ],
         deparse => '[thick | thin ]& <keyw>',
     },
-##    'spec' => {
-##        input => '35 | 7 | 42?',
-##        ast => :alt[ :alt([:num(35), :num(7)]), :occurs["?", :num(42)]],
-##        deparse => '[ [ 35 | 7 ] & <number> || [ 42 & <number> ]? ]',
-##    },
+    'spec' => {
+        input => '35 | 7',
+        ast => :numbers[ 35, 7 ],
+        deparse => '[35 | 7 ]& <number>',
+    },
+    'spec' => {
+        input => '35 | 7 | 42?',
+        ast => :alt[:numbers[35, 7], :occurs["?", :num(42)]],
+        deparse => '[35 | 7 ]& <number>| [42& <number>]?',
+    },
 ##    'spec' => {input => "<rule-ref> [, [ 'css21-prop-ref' | <'css3-prop-ref'> ] ]*",
 ##                deparse => "<rule-ref> [ <op(',')> [ [ <expr-css21-prop-ref> || <expr-css3-prop-ref> ] ] ]*",
 ##    },
