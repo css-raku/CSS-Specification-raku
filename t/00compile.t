@@ -15,7 +15,7 @@ for (
     'spec' => {
         input => 'thin',
         ast   => :keywords['thin'],
-        deparse => 'thin & <keyw>',
+        deparse => '[thin & <keyw>]',
     },
     'spec' => {
         input => 'thin?',
@@ -25,24 +25,26 @@ for (
     'spec' => {
         input => 'thick | thin',
         ast => :keywords[ 'thick', 'thin' ],
-        deparse => '[thick | thin ]& <keyw>',
+        deparse => '[[thick | thin ]& <keyw>]',
     },
     'spec' => {
         input => '35 | 7',
         ast => :numbers[ 35, 7 ],
-        deparse => '[35 | 7 ]& <number>',
+        deparse => '[[35 | 7 ]& <number>]',
     },
     'spec' => {
         input => '35 | 7 | 42?',
         ast => :alt[:numbers[35, 7], :occurs["?", :num(42)]],
-        deparse => '[35 | 7 ]& <number>| [42& <number>]?',
+        deparse => '[[35 | 7 ]& <number>]| [42& <number>]?',
     },
 ##    'spec' => {input => "<rule-ref> [, [ 'css21-prop-ref' | <'css3-prop-ref'> ] ]*",
 ##                deparse => "<rule-ref> [ <op(',')> [ [ <expr-css21-prop-ref> || <expr-css3-prop-ref> ] ] ]*",
 ##    },
-##    'spec' => {input => '<length>{4}',
-##               deparse => '<length> ** 4',
-##    },
+    'spec' => {
+        input => '<length>{4}',
+        ast => :occurs[[4,4], :rule<length>],
+        deparse => '<length>** 4',
+    },
 ##    'spec' => {input => '<length>#{1,4}',
 ##               deparse => "<length> ** 1..4% <op(',')>",
 ##    },

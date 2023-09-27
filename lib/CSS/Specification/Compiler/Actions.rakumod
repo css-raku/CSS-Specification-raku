@@ -55,12 +55,12 @@ method spec($/) {
     make $spec;
 }
 
-method prop-names($/) is DEPRECATED {
+method prop-names($/) {
     my @prop-names = $<id>>>.ast;
     make @prop-names;
 }
 
-method id($/)        { make 'ident' => ~$/ }
+method id($/)        { make ~$/ }
 method id-quoted($/) is DEPRECATED { make $<id>.ast }
 method keyw($/)      { make 'keyw' => ~$<id> }
 method digits($/)    { make 'num' => $/.Int }
@@ -104,11 +104,10 @@ method term-values($/) {
 
 method term($/) {
     my $value = $<value>.ast;
-    warn "todo: handle occurs" with $<occurs>;
-##    $value ~= .ast
-##        with $<occurs>;
 
-    make $value;
+    make $<occurs>
+        ?? :occurs[$<occurs>.ast, $value]
+        !! $value;
 }
 
 method occurs:sym<maybe>($/)     { make '?' }
@@ -119,12 +118,9 @@ method occurs:sym<list>($/) is DEPRECATED {
     make "{$quant}% <op(',')>"
 }
 method occurs:sym<range>($/)     { make $<range>.ast }
-method range($/) is DEPRECATED {
-    my $range = ' ** ' ~ $<min>.ast;
-    $range ~= '..' ~ $<max>.ast
-        if $<max>;
-
-    make $range;
+method range($/) {
+    my @range = $<min>.ast.value, ($<max> // $<min>).ast.value;
+    make @range;
 }
 
 method value:sym<func>($/) is DEPRECATED {
@@ -155,10 +151,10 @@ method value:sym<group>($/) is DEPRECATED {
     make [~] '[ ', $val, ' ]';
 }
 
-method value:sym<rule>($/) is DEPRECATED {
-    my $val = ~$<rule>.ast;
-    %.prop-refs{ $val }++;
-    make [~] '<', $val, '>'
+method value:sym<rule>($/) {
+    my $rule = ~$<rule>.ast;
+    %.prop-refs{ $rule }++;
+    make (:$rule);
 }
 
 method value:sym<op>($/) is DEPRECATED { make [~] "<op('", $/.trim, "')>" }

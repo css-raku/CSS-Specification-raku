@@ -73,10 +73,17 @@ method !interface-methods {
 our proto sub compile (|) {*}
 
 multi sub compile(:@occurs! ($quant!, *%term)) {
-    my $atom = compile(|%term).&group;
-    my $quantifier = do given $quant {
-        when '?' { RakuAST::Regex::Quantifier::ZeroOrOne.new }
-        default { die "ubnknown quant: $quant" }
+    my $atom = compile(|%term);
+    my RakuAST::Regex::Quantifier $quantifier = do given $quant {
+        when '?' {
+            RakuAST::Regex::Quantifier::ZeroOrOne.new
+        }
+        when Array {
+            my $min = .[0];
+            my $max = .[1];
+            RakuAST::Regex::Quantifier::Range.new: :$min, :$max;
+        }
+        default { die "unknown quant: $quant" }
     }
     RakuAST::Regex::QuantifiedAtom.new: :$atom, :$quantifier;
 }
@@ -101,19 +108,10 @@ sub alt(@choices) {
 }
 
 sub conjunct(RakuAST::Regex $r1, RakuAST::Regex $r2) {
-    RakuAST::Regex::Conjunction.new($r1, $r2);
+    RakuAST::Regex::Conjunction.new($r1, $r2).&group;
 }
 
 sub literal(Str:D() $_) { .&lit.&ws.&seq }
-
-sub _choose(@lits, RakuAST::Regex $rule) {
-    if @lits == 1 {
-        conjunct(@lits[0], $rule);
-    }
-    else {
-        conjunct(@lits.&alt.&group, $rule);
-    }
-}
 
 multi sub compile(Str:D :$keyw!) {
     conjunct $keyw.&lit, 'keyw'.&assertion;
@@ -123,12 +121,21 @@ multi sub compile(Str:D() :$num!) {
     conjunct $num.&lit, 'number'.&assertion;
 }
 
+sub _choice(@lits, RakuAST::Regex $term2) {
+    my $term1 = @lits == 1 ?? @lits[0] !! @lits.&alt.&group;
+    conjunct($term1, $term2);
+}
+
+multi sub compile(Str:D :$rule) {
+    $rule.&assertion;
+}
+
 multi sub compile(:@keywords!) {
-    _choose @keywords.map(&literal), 'keyw'.&assertion;
+    _choice @keywords.map(&literal), 'keyw'.&assertion;
 }
 
 multi sub compile(:@numbers!) {
-    _choose @numbers.map(&literal), 'number'.&assertion;
+    _choice @numbers.map(&literal), 'number'.&assertion;
 }
 
 multi sub compile(:@alt!) {
