@@ -20,7 +20,7 @@ grammar CSS::Specification:ver<0.4.13> {
     rule rule-spec {
         \t? <rule> ':=' <spec>
     }
-    rule spec          { :my $*CHOICE; <terms> }
+    rule spec          { :my $*CHOICE; <seq> }
     # possibly tab delimited. Assume one spec per line.
     token ws {<!ww>' '*}
 
@@ -41,11 +41,11 @@ grammar CSS::Specification:ver<0.4.13> {
     rule digits      { \d+ }
     rule rule        { '<'~'>' <id> }
 
-    rule terms         { <term=.term-options>+ }
+    rule seq         { <term=.term-options>+ }
     rule term-options  { <term=.term-combo>    +% '|'  }
     rule term-combo    { <term=.term-required> +% '||' }
-    rule term-required { <term=.term-values>   +% '&&' }
-    rule term-values   { <term>+ }
+    rule term-required { <term=.term-seq>      +% '&&' }
+    rule term-seq      { <term>+ }
     rule term          { <value><occurs>? }
 
     proto token occurs {*}
@@ -57,12 +57,12 @@ grammar CSS::Specification:ver<0.4.13> {
     token range                   {'{'~'}' [ <min=.digits> [',' <max=.digits>]? ] }
 
     proto rule value {*}
-    rule value:sym<func>          { <id>'(' ~ ')' <.terms> }
+    rule value:sym<func>          { <id>'(' ~ ')' <.seq> }
     rule value:sym<keywords>      { [<keyw><!before <occurs>>] +% '|' }
     rule value:sym<numbers>       { [<digits><!before <occurs>>] +% '|' }
     rule value:sym<keyw-quant>    { <keyw><occurs> }
     rule value:sym<num-quant>     { <digits><occurs> }
-    rule value:sym<group>         { '[' ~ ']' <terms> }
+    rule value:sym<group>         { '[' ~ ']' <seq> }
     rule value:sym<rule>          { <rule> }
     rule value:sym<op>            { < , / = > }
     rule value:sym<prop-ref>      { <property-ref> }

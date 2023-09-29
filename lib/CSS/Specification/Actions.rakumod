@@ -47,7 +47,7 @@ method yes($/) { make True }
 method no($/)  { make False }
 
 method spec($/) {
-    my $spec = $<terms>.ast;
+    my $spec = $<seq>.ast;
     $spec = ':my @*SEEN; ' ~ $spec
         if $*CHOICE;
 
@@ -65,7 +65,7 @@ method keyw($/)      { make $<id>.subst(/\-/, '\-'):g }
 method digits($/)    { make $/.Int }
 method rule($/)      { make $<id>.ast }
 
-method terms($/) {
+method seq($/) {
     make @<term>>>.ast.join(' ');
 }
 
@@ -98,7 +98,7 @@ method term-required($/) {
         !! @choices[0];
 }
 
-method term-values($/) {
+method term-seq($/) {
     make @<term>>>.ast.join(' ');
 }
 
@@ -157,7 +157,7 @@ method value:sym<num-quant>($/) {
 }
 
 method value:sym<group>($/) {
-    my $val = $<terms>.ast;
+    my $val = $<seq>.ast;
     make [~] '[ ', $val, ' ]';
 }
 

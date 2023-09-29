@@ -47,7 +47,7 @@ method yes($/) is DEPRECATED { make True }
 method no($/)  { make False }
 
 method spec($/) {
-    my $spec = $<terms>.ast;
+    my $spec = $<seq>.ast;
     warn "todo CHOICE" if $*CHOICE;
 ##    $spec = ':my @*SEEN; ' ~ $spec
 ##        if $*CHOICE;
@@ -61,16 +61,16 @@ method prop-names($/) {
 }
 
 method id($/)        { make ~$/ }
-method id-quoted($/) is DEPRECATED { make $<id>.ast }
+method id-quoted($/) { make $<id>.ast }
 method keyw($/)      { make 'keyw' => ~$<id> }
 method digits($/)    { make 'num' => $/.Int }
 method rule($/)      { make $<id>.ast }
 
-method terms($/) {
-    my @terms = @<term>>>.ast;
-    make @terms == 1
-         ?? @terms[0]
-         !! ('terms' => @terms);
+method seq($/) {
+    my @seq = @<term>>>.ast;
+    make @seq == 1
+         ?? @seq[0]
+         !! (:@seq);
 }
 
 method term-options($/) {
@@ -96,10 +96,11 @@ method term-required($/) {
         !! [~] ('required' => @choices)
 }
 
-method term-values($/) {
-    make @<term> == 1
-        ?? @<term>[0].ast
-        !! ('values' => @<term>>>.ast);
+method term-seq($/) {
+    my @seq = @<term>>>.ast;
+    make @seq == 1
+        ?? @seq[0]
+        !! (:@seq);
 }
 
 method term($/) {
@@ -146,9 +147,9 @@ method value:sym<num-quant>($/) {
     make 'occurs' => [$<occurs>.ast, $<digits>.ast];
 }
 
-method value:sym<group>($/) is DEPRECATED {
-    my $val = $<terms>.ast;
-    make [~] '[ ', $val, ' ]';
+method value:sym<group>($/) {
+    my $group = $<seq>.ast;
+    make (:$group);
 }
 
 method value:sym<rule>($/) {
@@ -159,13 +160,14 @@ method value:sym<rule>($/) {
 
 method value:sym<op>($/) is DEPRECATED { make [~] "<op('", $/.trim, "')>" }
 
-method property-ref:sym<css21>($/) is DEPRECATED { make $<id>.ast }
-method property-ref:sym<css3>($/) is DEPRECATED { make $<id>.ast }
+method property-ref:sym<css21>($/) { make $<id>.ast }
+method property-ref:sym<css3>($/) { make $<id>.ast }
 method value:sym<prop-ref>($/)        {
     my $prop-ref = $<property-ref>.ast;
-    %.prop-refs{ 'expr-' ~ $prop-ref }++;
-    %.child-props{$_}.push: $prop-ref for @*PROP-NAMES; 
-    make [~] '<expr-', $prop-ref, '>';
+    my $rule = 'expr-' ~ $prop-ref;
+    %.prop-refs{ $rule; }++;
+    %.child-props{$_}.push: $prop-ref for @*PROP-NAMES;
+    make (:$rule);
 }
 
 method value:sym<literal>($/)  { make 'string' => ~$0 }

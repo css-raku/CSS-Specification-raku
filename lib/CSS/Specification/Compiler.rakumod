@@ -99,19 +99,19 @@ sub ws(RakuAST::Regex $r) { RakuAST::Regex::WithWhitespace.new($r) }
 
 sub lit(Str:D $s) { RakuAST::Regex::Literal.new($s) }
 
-sub seq(RakuAST::Regex $r) { RakuAST::Regex::Sequence.new($r) }
-
 sub group(RakuAST::Regex $r) { RakuAST::Regex::Group.new: $r }
 
 sub alt(@choices) {
     RakuAST::Regex::Alternation.new: |@choices;
 }
 
+sub seq(@seq) { RakuAST::Regex::Sequence.new: |@seq }
+
 sub conjunct(RakuAST::Regex $r1, RakuAST::Regex $r2) {
     RakuAST::Regex::Conjunction.new($r1, $r2).&group;
 }
 
-sub literal(Str:D() $_) { .&lit.&ws.&seq }
+sub literal(Str:D() $_) { .&lit.&ws }
 
 multi sub compile(Str:D :$keyw!) {
     conjunct $keyw.&lit, 'keyw'.&assertion;
@@ -138,9 +138,10 @@ multi sub compile(:@numbers!) {
     _choice @numbers.map(&literal), 'number'.&assertion;
 }
 
-multi sub compile(:@alt!) {
-    alt @alt.map(&compile);
-}
+multi sub compile(:@alt!) { alt @alt.map(&compile) }
+
+multi sub compile(:@seq!) { seq @seq.map(&compile) }
+multi sub compile(:$group) { group compile($group) }
 
 multi sub compile($arg) { compile |$arg }
 

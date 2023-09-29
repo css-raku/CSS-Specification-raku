@@ -33,6 +33,14 @@ for (
         ast => '[ [ 35 | 7 ] & <number> || [ 42 & <number> ]? ]',
     },
     'spec' => {
+        input => "<rule-ref>",
+        ast => "<rule-ref>",
+    },
+    'spec' => {
+        input => "<rule-ref> [ 'css21-prop-ref' <'css3-prop-ref'> ]?",
+        ast => "<rule-ref> [ <expr-css21-prop-ref> <expr-css3-prop-ref> ]?",
+    },
+    'spec' => {
         input => "<rule-ref> [, [ 'css21-prop-ref' | <'css3-prop-ref'> ] ]*",
         ast => "<rule-ref> [ <op(',')> [ [ <expr-css21-prop-ref> || <expr-css3-prop-ref> ] ] ]*",
     },
