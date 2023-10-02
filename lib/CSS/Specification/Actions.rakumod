@@ -36,11 +36,7 @@ method rule-spec($/) {
     my $synopsis = ~$<spec>;
     %.props{$rule}++;
 
-    my %rule-def = (
-        :$rule, :$synopsis, :$raku
-        );
-
-    make %rule-def;
+    make %( :$rule, :$synopsis, :$raku );
 }
 
 method yes($/) { make True }

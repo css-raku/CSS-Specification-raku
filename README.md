@@ -21,7 +21,7 @@ An example, from http://www.w3.org/TR/CSS21/propidx.html:
 
 ## Grammars and Classes
 
-- `CSS::Specification::Build` is class for generating Raku grammar, actions or roles from sets of CSS property definitions.
+- `CSS::Specification::Build` is a class for generating Raku grammar, actions or roles from sets of CSS property definitions.
 
 This module also provides some mixin grammars and actions as follows:
 

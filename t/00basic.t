@@ -49,6 +49,10 @@ for (
         ast => '<length> ** 4',
     },
     'spec' => {
+        input => '<length>#',
+        ast => "<length>+% <op(',')>",
+    },
+    'spec' => {
         input => '<length>#{1,4}',
         ast => "<length> ** 1..4% <op(',')>",
     },

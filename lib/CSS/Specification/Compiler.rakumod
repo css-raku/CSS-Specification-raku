@@ -72,26 +72,48 @@ method !interface-methods {
 
 our proto sub compile (|) {*}
 
-multi sub compile(:@occurs! ($quant!, *%term)) {
+multi sub compile(:@occurs! ($quant! is copy, *%term)) {
+    my RakuAST::Regex $separator;
     my $atom = compile(|%term);
+    if $quant[0] ~~ '#' {
+        $separator = compile(:op<,>);
+    }
     my RakuAST::Regex::Quantifier $quantifier = do given $quant {
         when '?' {
             RakuAST::Regex::Quantifier::ZeroOrOne.new
         }
+        when '*' {
+            RakuAST::Regex::Quantifier::ZeroOrMore.new
+        }
+        when '+'|'#' {
+            RakuAST::Regex::Quantifier::OneOrMore.new
+        }
         when Array {
-            my $min = .[0];
-            my $max = .[1];
+            my $min  = .[1];
+            my $max  = .[2];
             RakuAST::Regex::Quantifier::Range.new: :$min, :$max;
         }
         default { die "unknown quant: $quant" }
     }
-    RakuAST::Regex::QuantifiedAtom.new: :$atom, :$quantifier;
+    RakuAST::Regex::QuantifiedAtom.new: :$atom, :$quantifier, :$separator;
 }
 
+sub id(Str:D $id) {  RakuAST::Name.from-identifier($id) }
+
 sub assertion(Str:D $id, Bool :$capturing = True) {
-    my RakuAST::Name $name .= from-identifier($id);
+    my $name := $id.&id;
     RakuAST::Regex::Assertion::Named.new(
         :$name, :$capturing
+    );
+}
+
+sub assertion-arg(Str:D $id, Str:D $arg, Bool :$capturing = True) {
+    my $name := $id.&id;
+    my @segments = RakuAST::StrLiteral.new($arg);
+    my $args = RakuAST::ArgList.new: RakuAST::QuotedString.new(:@segments);
+
+    RakuAST::Regex::Assertion::Named::Args.new(
+        :$name, :$args :$capturing
     );
 }
 
@@ -138,10 +160,13 @@ multi sub compile(:@numbers!) {
     _choice @numbers.map(&literal), 'number'.&assertion;
 }
 
-multi sub compile(:@alt!) { alt @alt.map(&compile) }
+multi sub compile(Str:D :$op!) {
+    assertion-arg 'op', $op;
+}
 
-multi sub compile(:@seq!) { seq @seq.map(&compile) }
-multi sub compile(:$group) { group compile($group) }
+multi sub compile(:@alt!)   { alt @alt.map(&compile) }
+multi sub compile(:@seq!)   { seq @seq.map(&compile) }
+multi sub compile(:$group!) { group compile($group) }
 
 multi sub compile($arg) { compile |$arg }
 

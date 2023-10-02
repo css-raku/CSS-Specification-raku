@@ -75,17 +75,13 @@ method seq($/) {
 
 method term-options($/) {
     my @alt = @<term>>>.ast;
-    make @alt == 1
-        ?? @alt[0]
-        !! :@alt;
+    make @alt == 1 ?? @alt[0] !! :@alt;
 }
 
 method term-combo($/) {
-    my @choices = @<term>>>.ast;
+    my @combo = @<term>>>.ast;
 
-    make @choices == 1
-        ?? @choices[0]
-        !! ('combo' => @choices)
+    make @combo == 1 ?? @combo[0] !! (:@combo)
 }
 
 method term-required($/) {
@@ -113,15 +109,22 @@ method term($/) {
 
 method occurs:sym<maybe>($/)     { make '?' }
 method occurs:sym<once-plus>($/) is DEPRECATED { make '+' }
-method occurs:sym<zero-plus>($/) is DEPRECATED { make '*' }
-method occurs:sym<list>($/) is DEPRECATED {
-    my $quant = $<range> ?? $<range>.ast !! '+';
-    make "{$quant}% <op(',')>"
+method occurs:sym<zero-plus>($/) { make '*' }
+method occurs:sym<list>($/) {
+    my @list = 'list';
+    with $<range> {
+        given .ast {
+            make ['#', .[1],  .[2] ];
+        }
+    }
+    else {
+        make '#';
+    }
 }
 method occurs:sym<range>($/)     { make $<range>.ast }
 method range($/) {
-    my @range = $<min>.ast.value, ($<max> // $<min>).ast.value;
-    make @range;
+    my @seq = 'seq', $<min>.ast.value, ($<max> // $<min>).ast.value;
+    make @seq;
 }
 
 method value:sym<func>($/) is DEPRECATED {
@@ -158,7 +161,7 @@ method value:sym<rule>($/) {
     make (:$rule);
 }
 
-method value:sym<op>($/) is DEPRECATED { make [~] "<op('", $/.trim, "')>" }
+method value:sym<op>($/) { my $op = $/.trim; make (:$op); }
 
 method property-ref:sym<css21>($/) { make $<id>.ast }
 method property-ref:sym<css3>($/) { make $<id>.ast }

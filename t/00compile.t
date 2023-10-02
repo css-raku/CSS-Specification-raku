@@ -52,17 +52,26 @@ for (
         ast => :seq[:rule<rule-ref>, :occurs["?", :group( :seq[:rule<expr-css21-prop-ref>, :rule<expr-css3-prop-ref> ]) ] ],
         deparse => "<rule-ref>[<expr-css21-prop-ref><expr-css3-prop-ref>]?",
     },
- ##    'spec' => {input => "<rule-ref> [, [ 'css21-prop-ref' | <'css3-prop-ref'> ] ]*",
-##                deparse => "<rule-ref> [ <op(',')> [ [ <expr-css21-prop-ref> || <expr-css3-prop-ref> ] ] ]*",
-##    },
+    'spec' => {
+        input => "<rule-ref> [, [ 'css21-prop-ref' | <'css3-prop-ref'> ] ]*",
+        ast => :seq[ :rule<rule-ref>, :occurs["*", :group( :seq[:op<,>, :group(:alt[:rule<expr-css21-prop-ref>, :rule<expr-css3-prop-ref>])])]],
+        deparse => '<rule-ref>[<op(",")>[<expr-css21-prop-ref>| <expr-css3-prop-ref>]]*',
+    },
     'spec' => {
         input => '<length>{4}',
-        ast => :occurs[[4,4], :rule<length>],
+        ast => :occurs[['seq',4,4], :rule<length>],
         deparse => '<length>** 4',
     },
-##    'spec' => {input => '<length>#{1,4}',
-##               deparse => "<length> ** 1..4% <op(',')>",
-##    },
+    'spec' => {
+        input => '<length>#',
+        ast => :occurs['#', :rule<length>],
+               deparse => '<length>+% <op(",")>',
+    },
+    'spec' => {
+        input => '<length>#{1,4}',
+        ast => :occurs[['#', 1, 4], :rule<length>],
+        deparse => '<length>** 1..4% <op(",")>',
+    },
 ##    # precedence tests taken from: https://developer.mozilla.org/en-US/docs/CSS/Value_definition_syntax
 ##    'spec' => {input => 'bold thin && <length>',
 ##               deparse => ':my @*SEEN; [ bold & <keyw> thin & <keyw> <!seen(0)> | <length> <!seen(1)> ]**2',
