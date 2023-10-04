@@ -80,16 +80,14 @@ method term-options($/) {
 
 method term-combo($/) {
     my @combo = @<term>>>.ast;
-
+warn @combo.elems;
     make @combo == 1 ?? @combo[0] !! (:@combo)
 }
 
 method term-required($/) {
-    my @choices = $<term>>>.ast;
+    my @required = $<term>>>.ast;
 
-    make @choices == 1
-        ?? @choices[0]
-        !! [~] ('required' => @choices)
+    make @required == 1 ?? @required[0] !! (:@required);
 }
 
 method term-seq($/) {
@@ -134,7 +132,8 @@ method value:sym<func>($/) is DEPRECATED {
 }
 
 method value:sym<keywords>($/) {
-    make 'keywords' => @<keyw>.map: {.ast.value};
+    my @keywords = @<keyw>.map: {.ast.value};
+    make (:@keywords);
 }
 
 method value:sym<keyw-quant>($/) {

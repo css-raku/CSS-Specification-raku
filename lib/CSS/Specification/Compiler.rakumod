@@ -73,11 +73,10 @@ method !interface-methods {
 our proto sub compile (|) {*}
 
 multi sub compile(:@occurs! ($quant! is copy, *%term)) {
-    my RakuAST::Regex $separator;
-    my $atom = compile(|%term);
-    if $quant[0] ~~ '#' {
-        $separator = compile(:op<,>);
-    }
+    my RakuAST::Regex $atom = compile(|%term);
+    my RakuAST::Regex $separator = compile(:op<,>)
+        if $quant[0] ~~ '#';
+
     my RakuAST::Regex::Quantifier $quantifier = do given $quant {
         when '?' {
             RakuAST::Regex::Quantifier::ZeroOrOne.new
@@ -100,21 +99,32 @@ multi sub compile(:@occurs! ($quant! is copy, *%term)) {
 
 sub id(Str:D $id) {  RakuAST::Name.from-identifier($id) }
 
-sub assertion(Str:D $id, Bool :$capturing = True) {
-    my $name := $id.&id;
-    RakuAST::Regex::Assertion::Named.new(
-        :$name, :$capturing
+sub look-ahead(RakuAST::Regex::Assertion $assertion, Bool :$negated = False, Bool :$capturing = False) {
+    RakuAST::Regex::Assertion::Lookahead.new(
+        :$assertion, :$negated
     );
 }
 
-sub assertion-arg(Str:D $id, Str:D $arg, Bool :$capturing = True) {
+multi sub assertion(Str:D $id, Bool :$capturing = True, RakuAST::ArgList :$args!) {
     my $name := $id.&id;
-    my @segments = RakuAST::StrLiteral.new($arg);
-    my $args = RakuAST::ArgList.new: RakuAST::QuotedString.new(:@segments);
-
     RakuAST::Regex::Assertion::Named::Args.new(
-        :$name, :$args :$capturing
+        :$name, :$capturing, :$args,
     );
+}
+
+multi sub assertion(Str:D $id, Bool :$capturing = True) {
+    my $name := $id.&id;
+    RakuAST::Regex::Assertion::Named.new(
+        :$name, :$capturing,
+    );
+}
+
+multi sub arg(Str:D $arg) {
+    RakuAST::ArgList.new: RakuAST::StrLiteral.new($arg);
+}
+
+multi sub arg(Int:D $arg) {
+    RakuAST::ArgList.new: RakuAST::IntLiteral.new($arg);
 }
 
 sub ws(RakuAST::Regex $r) { RakuAST::Regex::WithWhitespace.new($r) }
@@ -161,12 +171,26 @@ multi sub compile(:@numbers!) {
 }
 
 multi sub compile(Str:D :$op!) {
-    assertion-arg 'op', $op;
+    my $args = ','.&arg;
+    'op'.&assertion(:$args);
 }
 
 multi sub compile(:@alt!)   { alt @alt.map(&compile) }
 multi sub compile(:@seq!)   { seq @seq.map(&compile) }
 multi sub compile(:$group!) { group compile($group) }
+
+multi sub compile(:@required) {
+    my $id = 0;
+    my $atom = alt @required.map: {
+        my $args = ($id++).&arg;
+        my $seen = 'seen'.&assertion(:$args).&look-ahead(:negated);
+        my $term = compile($_);
+        [$term, $seen].&seq;
+    }
+    $atom .= &group;
+    my RakuAST::Regex::Quantifier::Range $quantifier .= new: :min($id), :max($id);
+    RakuAST::Regex::QuantifiedAtom.new: :$atom, :$quantifier;
+}
 
 multi sub compile($arg) { compile |$arg }
 

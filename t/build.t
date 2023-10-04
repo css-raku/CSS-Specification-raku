@@ -33,9 +33,11 @@ capture({
 }, 't/lib/Test/CSS/Aural/Spec/Actions.rakumod');
 lives-ok {require ::($actions-name)}, "$actions-name compilation";
 
-my RakuAST::Package $interface-package = CSS::Specification::Build::generate( 'interface', @role-id, :$input-path );
-'t/lib/Test/CSS/Aural/Spec/Interface.rakumod'.IO.spurt: $interface-package.DEPARSE;
 my $role-name = @role-id.join: '::';
+
+capture({
+    CSS::Specification::Build::generate( 'interface', $role-name, :$input-path );
+}, 't/lib/Test/CSS/Aural/Spec/Interface.rakumod');
 lives-ok {require ::($role-name)}, "$role-name compilation";
 
 dies-ok {require ::("Test::CSS::Aural::BadGrammar")}, 'grammar composition, unimplemented interface - dies';
