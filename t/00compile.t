@@ -76,7 +76,7 @@ for (
     'spec' => {
         input => 'bold thin && <length>',
         ast => :required[:seq[:keywords["bold"], :keywords["thin"]], :rule("length")],
-        deparse => ':my @S; [ bold & <keyw> thin & <keyw> <!{@S[0]++}> | <length>  <!{@S[1]++}> ]**2',
+        deparse => '[:my @S; [bold & <keyw>][thin & <keyw>]<!@S[0]++>| :my @S; <length><!@S[1]++>]** 2',
     },
 ##    'spec' => {input => 'bold || thin && <length>',
 ##               deparse => ':my @S; [ bold & <keyw> <!{@S[2]++}> | [ thin & <keyw> <!{@S[0]++}> | <length> <!{@S[1]++}> ]**2 <!{@S[3]++}> ]+',

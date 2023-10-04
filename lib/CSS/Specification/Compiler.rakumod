@@ -145,6 +145,28 @@ sub conjunct(RakuAST::Regex $r1, RakuAST::Regex $r2) {
 
 sub literal(Str:D() $_) { .&lit.&ws }
 
+sub seen(Int:D $id) {
+    my $expression = $id.&arg;
+    RakuAST::Regex::Assertion::PredicateBlock.new(
+        :negated,
+        block   =>  RakuAST::Statement::Expression.new(
+            expression => RakuAST::ApplyPostfix.new(
+                operand => RakuAST::ApplyPostfix.new(
+                    operand => RakuAST::Var::Lexical.new("\@S"),
+                    postfix => RakuAST::Postcircumfix::ArrayIndex.new(
+                        index => RakuAST::SemiList.new(
+                            RakuAST::Statement::Expression.new(
+                                :$expression
+                            )
+                        )
+                    )
+                ),
+                postfix => RakuAST::Postfix.new("++")
+            )
+        )
+    )
+ }
+
 multi sub compile(Str:D :$keyw!) {
     conjunct $keyw.&lit, 'keyw'.&assertion;
 }
@@ -179,13 +201,21 @@ multi sub compile(:@alt!)   { alt @alt.map(&compile) }
 multi sub compile(:@seq!)   { seq @seq.map(&compile) }
 multi sub compile(:$group!) { group compile($group) }
 
+my constant Seen-Decl = RakuAST::Regex::Statement.new(
+    RakuAST::Statement::Expression.new(
+        expression => RakuAST::VarDeclaration::Simple.new(
+            sigil       => "\@",
+            desigilname => RakuAST::Name.from-identifier("S")
+        )
+    )
+);
+
 multi sub compile(:@required) {
     my $id = 0;
     my $atom = alt @required.map: {
-        my $args = ($id++).&arg;
-        my $seen = 'seen'.&assertion(:$args).&look-ahead(:negated);
+        my $seen = seen($id++);
         my $term = compile($_);
-        [$term, $seen].&seq;
+        [Seen-Decl, $term, $seen].&seq;
     }
     $atom .= &group;
     my RakuAST::Regex::Quantifier::Range $quantifier .= new: :min($id), :max($id);

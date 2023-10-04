@@ -80,13 +80,11 @@ method term-options($/) {
 
 method term-combo($/) {
     my @combo = @<term>>>.ast;
-warn @combo.elems;
     make @combo == 1 ?? @combo[0] !! (:@combo)
 }
 
 method term-required($/) {
     my @required = $<term>>>.ast;
-
     make @required == 1 ?? @required[0] !! (:@required);
 }
 
