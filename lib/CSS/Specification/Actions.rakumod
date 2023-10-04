@@ -44,7 +44,7 @@ method no($/)  { make False }
 
 method spec($/) {
     my $spec = $<seq>.ast;
-    $spec = ':my @*SEEN; ' ~ $spec
+    $spec = ':my @S; ' ~ $spec
         if $*CHOICE;
 
     make $spec;
@@ -74,7 +74,7 @@ method term-options($/) {
 }
 
 method !choose(@choices) {
-    my $choices := @choices.map({[~] ($_, ' <!seen(', $*CHOICE++, ')>')}).join(' | ');
+    my $choices := @choices.map({[~] ($_, ' <!{@S[', $*CHOICE++, ']++}>')}).join(' | ');
     return [~] '[ ', $choices, ' ]';
 }
 
