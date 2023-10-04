@@ -76,11 +76,13 @@ for (
     'spec' => {
         input => 'bold thin && <length>',
         ast => :required[:seq[:keywords["bold"], :keywords["thin"]], :rule("length")],
-        deparse => '[:my @S; [bold & <keyw>][thin & <keyw>]<!@S[0]++>| :my @S; <length><!@S[1]++>]** 2',
+        deparse => '[:my @S; [bold & <keyw>][thin & <keyw>]<!@S[0]++>| <length><!@S[1]++>]** 2',
     },
-##    'spec' => {input => 'bold || thin && <length>',
-##               deparse => ':my @S; [ bold & <keyw> <!{@S[2]++}> | [ thin & <keyw> <!{@S[0]++}> | <length> <!{@S[1]++}> ]**2 <!{@S[3]++}> ]+',
-##    },
+    'spec' => {
+        input => 'bold || thin && <length>',
+        ast => :combo[:keywords["bold"], :required[:keywords["thin"], :rule("length")]],
+        deparse => '[:my @S; [bold & <keyw>]<!@S[0]++>| [:my @S; [thin & <keyw>]<!@S[0]++>| <length><!@S[1]++>]** 2<!@S[1]++>]+',
+    },
 ##    'property-spec' => {input => "'content'\tnormal | none | [ <string> | <uri> | <counter> | attr(<identifier>) | open-quote | close-quote | no-open-quote | no-close-quote ]+ | inherit	normal	:before and :after pseudo-elements	no",
 ##                        ast => {:props['content'],
 ##                                :default<normal>,

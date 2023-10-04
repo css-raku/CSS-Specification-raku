@@ -68,9 +68,7 @@ method rule($/)      { make $<id>.ast }
 
 method seq($/) {
     my @seq = @<term>>>.ast;
-    make @seq == 1
-         ?? @seq[0]
-         !! (:@seq);
+    make @seq == 1 ?? @seq[0] !! (:@seq);
 }
 
 method term-options($/) {

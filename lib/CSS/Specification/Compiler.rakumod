@@ -210,15 +210,22 @@ my constant Seen-Decl = RakuAST::Regex::Statement.new(
     )
 );
 
-multi sub compile(:@required) {
+multi sub compile(:required(@combo)!) {
+    compile(:@combo, :required);
+}
+
+multi sub compile(:@combo!, Bool :$required) {
     my $id = 0;
-    my $atom = alt @required.map: {
+    my $atom = alt @combo.map: {
         my $seen = seen($id++);
         my $term = compile($_);
-        [Seen-Decl, $term, $seen].&seq;
+        [$term, $seen].&seq;
     }
-    $atom .= &group;
-    my RakuAST::Regex::Quantifier::Range $quantifier .= new: :min($id), :max($id);
+    $atom = [Seen-Decl, $atom].&seq.&group;
+    my RakuAST::Regex::Quantifier $quantifier = $required
+        ?? RakuAST::Regex::Quantifier::Range.new: :min($id), :max($id)
+        !! RakuAST::Regex::Quantifier::OneOrMore.new;
+
     RakuAST::Regex::QuantifiedAtom.new: :$atom, :$quantifier;
 }
 
