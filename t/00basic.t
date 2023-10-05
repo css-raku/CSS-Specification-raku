@@ -65,6 +65,10 @@ for (
         input => 'bold || thin && <length>',
         ast => ':my @S; [ bold & <keyw> <!{@S[2]++}> | [ thin & <keyw> <!{@S[0]++}> | <length> <!{@S[1]++}> ]**2 <!{@S[3]++}> ]+',
     },
+    'spec' => {
+        input => 'attr(<identifier>)',
+        ast => '<attr>',
+    },
     'property-spec' => {
         input => "'content'\tnormal | none | [ <string> | <uri> | <counter> | attr(<identifier>) | open-quote | close-quote | no-open-quote | no-close-quote ]+ | inherit	normal	:before and :after pseudo-elements	no",
         ast => {:props['content'],

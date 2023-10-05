@@ -2,7 +2,7 @@ unit class CSS::Specification::Compiler::Actions;
 
 # these actions translate a CSS property specification to Raku
 # rules or actions.
-has %.prop-refs is rw;
+has %.rule-refs is rw;
 has %.props is rw;
 has %.rules is rw;
 has %.child-props is rw;
@@ -121,10 +121,11 @@ method range($/) {
     make @seq;
 }
 
-method value:sym<func>($/) is DEPRECATED {
+method value:sym<func>($/) {
     # todo - save function prototype
-    %.prop-refs{ ~$<id>.ast }++;
-    make [~] '<', $<id>.ast, '>';
+    my $rule = $<id>.ast;
+    %.rule-refs{ $rule }++;
+    make (:$rule);
 }
 
 method value:sym<keywords>($/) {
@@ -152,7 +153,7 @@ method value:sym<group>($/) {
 
 method value:sym<rule>($/) {
     my $rule = ~$<rule>.ast;
-    %.prop-refs{ $rule }++;
+    %.rule-refs{ $rule }++;
     make (:$rule);
 }
 
@@ -163,7 +164,7 @@ method property-ref:sym<css3>($/) { make $<id>.ast }
 method value:sym<prop-ref>($/)        {
     my $prop-ref = $<property-ref>.ast;
     my $rule = 'expr-' ~ $prop-ref;
-    %.prop-refs{ $rule; }++;
+    %.rule-refs{ $rule; }++;
     %.child-props{$_}.push: $prop-ref for @*PROP-NAMES;
     make (:$rule);
 }

@@ -9,8 +9,6 @@ use CSS::Specification::Compiler::Actions;
 
 lives-ok {require CSS::Grammar:ver(v0.3.0..*) }, "CSS::Grammar version";
 
-my CSS::Specification::Compiler::Actions $actions .= new;
-
 for (
     'spec' => {
         input => 'thin',
@@ -41,47 +39,62 @@ for (
         input => "<rule-ref>",
         ast => :rule<rule-ref>,
         deparse => "<rule-ref>",
+        rule-refs => ['rule-ref'],
     },
     'spec' => {
         input => "'css21-prop-ref'",
         ast => :rule<expr-css21-prop-ref>,
         deparse => "<expr-css21-prop-ref>",
+        rule-refs => ['expr-css21-prop-ref'],
     },
     'spec' => {
         input => "<rule-ref> [ 'css21-prop-ref' <'css3-prop-ref'> ]?",
         ast => :seq[:rule<rule-ref>, :occurs["?", :group( :seq[:rule<expr-css21-prop-ref>, :rule<expr-css3-prop-ref> ]) ] ],
         deparse => "<rule-ref>[<expr-css21-prop-ref><expr-css3-prop-ref>]?",
+        rule-refs => ["expr-css21-prop-ref", "expr-css3-prop-ref", "rule-ref"],
     },
     'spec' => {
         input => "<rule-ref> [, [ 'css21-prop-ref' | <'css3-prop-ref'> ] ]*",
         ast => :seq[ :rule<rule-ref>, :occurs["*", :group( :seq[:op<,>, :group(:alt[:rule<expr-css21-prop-ref>, :rule<expr-css3-prop-ref>])])]],
         deparse => '<rule-ref>[<op(",")>[<expr-css21-prop-ref>| <expr-css3-prop-ref>]]*',
+        rule-refs => ["expr-css21-prop-ref", "expr-css3-prop-ref", "rule-ref"],
     },
     'spec' => {
         input => '<length>{4}',
         ast => :occurs[['seq',4,4], :rule<length>],
         deparse => '<length>** 4',
+        rule-refs => ['length'],
     },
     'spec' => {
         input => '<length>#',
         ast => :occurs['#', :rule<length>],
-               deparse => '<length>+% <op(",")>',
+        deparse => '<length>+% <op(",")>',
+        rule-refs => ['length'],
     },
     'spec' => {
         input => '<length>#{1,4}',
         ast => :occurs[['#', 1, 4], :rule<length>],
         deparse => '<length>** 1..4% <op(",")>',
+        rule-refs => ['length'],
+    },
+    'spec' => {
+        input => 'attr(<identifier>)',
+        ast => :rule<attr>,
+        deparse => '<attr>',
+        rule-refs => ['attr', 'identifier'],
     },
 ##    # precedence tests taken from: https://developer.mozilla.org/en-US/docs/CSS/Value_definition_syntax
     'spec' => {
         input => 'bold thin && <length>',
         ast => :required[:seq[:keywords["bold"], :keywords["thin"]], :rule("length")],
         deparse => '[:my @S; [bold & <keyw>][thin & <keyw>]<!@S[0]++>| <length><!@S[1]++>]** 2',
+        rule-refs => ['length'],
     },
     'spec' => {
         input => 'bold || thin && <length>',
         ast => :combo[:keywords["bold"], :required[:keywords["thin"], :rule("length")]],
         deparse => '[:my @S; [bold & <keyw>]<!@S[0]++>| [:my @S; [thin & <keyw>]<!@S[0]++>| <length><!@S[1]++>]** 2<!@S[1]++>]+',
+        rule-refs => ['length'],
     },
 ##    'property-spec' => {input => "'content'\tnormal | none | [ <string> | <uri> | <counter> | attr(<identifier>) | open-quote | close-quote | no-open-quote | no-close-quote ]+ | inherit	normal	:before and :after pseudo-elements	no",
 ##                        ast => {:props['content'],
@@ -101,8 +114,11 @@ for (
     my $expected := .value;
     my $input := $expected<input>;
     my $deparse := $expected<deparse>;
+    my $rule-refs := $expected<rule-refs>;
 
     my @*PROP-NAMES = [];
+
+    my CSS::Specification::Compiler::Actions $actions .= new;
 
     my $parse = CSS::Grammar::Test::parse-tests(
         CSS::Specification, $input,
@@ -115,6 +131,11 @@ for (
     with $deparse {
         my $AST = CSS::Specification::Compiler::compile(|$parse.ast);
         is $AST.DEPARSE, $_, 'deparse';
+    }
+
+    my @refs = $actions.rule-refs.keys.sort.Array;
+    if @refs || $rule-refs {
+        is-deeply @refs, $rule-refs, "rule-refs";
     }
 }
 
