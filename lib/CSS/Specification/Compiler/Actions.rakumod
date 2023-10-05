@@ -9,7 +9,7 @@ has %.child-props is rw;
 
 method TOP($/) is DEPRECATED { make $<def>>>.ast };
 
-method property-spec($/) is DEPRECATED {
+method property-spec($/) {
     my @props = @($<prop-names>.ast);
     %.props{$_}++ for @props;
 
@@ -18,7 +18,7 @@ method property-spec($/) is DEPRECATED {
     my %prop-def = (
         props    => @props,
         synopsis => ~$<spec>,
-        raku    => $spec,
+        raku-ast => $spec,
         );
 
     %prop-def<inherit> = .ast with $<inherit>;
@@ -29,29 +29,25 @@ method property-spec($/) is DEPRECATED {
     make %prop-def;
 }
 
-method rule-spec($/) is DEPRECATED {
+method rule-spec($/) {
 
     my $rule = $<rule>.ast,
-    my $raku = $<spec>.ast;
+    my $raku-ast = $<spec>.ast;
     my $synopsis = ~$<spec>;
     %.props{$rule}++;
 
     my %rule-def = (
-        :$rule, :$synopsis, :$raku
+        :$rule, :$synopsis, :$raku-ast
         );
 
     make %rule-def;
 }
 
-method yes($/) is DEPRECATED { make True }
+method yes($/) { make True }
 method no($/)  { make False }
 
 method spec($/) {
     my $spec = $<seq>.ast;
-    warn "todo CHOICE" if $*CHOICE;
-##    $spec = ':my @*SEEN; ' ~ $spec
-##        if $*CHOICE;
-
     make $spec;
 }
 
@@ -105,14 +101,13 @@ method occurs:sym<maybe>($/)     { make '?' }
 method occurs:sym<once-plus>($/) is DEPRECATED { make '+' }
 method occurs:sym<zero-plus>($/) { make '*' }
 method occurs:sym<list>($/) {
-    my @list = 'list';
     with $<range> {
         given .ast {
-            make ['#', .[1],  .[2] ];
+            make ['list', .[1],  .[2] ];
         }
     }
     else {
-        make '#';
+        make 'list';
     }
 }
 method occurs:sym<range>($/)     { make $<range>.ast }

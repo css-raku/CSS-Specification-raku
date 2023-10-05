@@ -67,13 +67,13 @@ for (
     },
     'spec' => {
         input => '<length>#',
-        ast => :occurs['#', :rule<length>],
+        ast => :occurs['list', :rule<length>],
         deparse => '<length>+% <op(",")>',
         rule-refs => ['length'],
     },
     'spec' => {
         input => '<length>#{1,4}',
-        ast => :occurs[['#', 1, 4], :rule<length>],
+        ast => :occurs[['list', 1, 4], :rule<length>],
         deparse => '<length>** 1..4% <op(",")>',
         rule-refs => ['length'],
     },
@@ -82,6 +82,17 @@ for (
         ast => :rule<attr>,
         deparse => '<attr>',
         rule-refs => ['attr', 'identifier'],
+    },
+    'property-spec' => {
+        input => "'direction'	ltr | rtl | inherit	ltr	all elements, but see prose	yes",
+        ast => {
+            :props['direction'],
+            :default<ltr>,
+            :raku-ast(:keywords["ltr", "rtl", "inherit"]),
+            :synopsis("ltr | rtl | inherit"),
+            :inherit
+        },
+        ## deparse => 'xxx';
     },
 ##    # precedence tests taken from: https://developer.mozilla.org/en-US/docs/CSS/Value_definition_syntax
     'spec' => {

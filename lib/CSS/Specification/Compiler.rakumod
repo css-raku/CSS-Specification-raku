@@ -75,7 +75,7 @@ our proto sub compile (|) {*}
 multi sub compile(:@occurs! ($quant! is copy, *%term)) {
     my RakuAST::Regex $atom = compile(|%term);
     my RakuAST::Regex $separator = compile(:op<,>)
-        if $quant[0] ~~ '#';
+        if $quant[0] ~~ 'list';
 
     my RakuAST::Regex::Quantifier $quantifier = do given $quant {
         when '?' {
@@ -84,7 +84,7 @@ multi sub compile(:@occurs! ($quant! is copy, *%term)) {
         when '*' {
             RakuAST::Regex::Quantifier::ZeroOrMore.new
         }
-        when '+'|'#' {
+        when '+'|'list' {
             RakuAST::Regex::Quantifier::OneOrMore.new
         }
         when Array {

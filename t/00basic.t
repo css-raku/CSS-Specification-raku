@@ -70,6 +70,16 @@ for (
         ast => '<attr>',
     },
     'property-spec' => {
+        input => "'direction'	ltr | rtl | inherit	ltr	all elements, but see prose	yes",
+        ast => {
+            :props['direction'],
+            :default<ltr>,
+            :synopsis('ltr | rtl | inherit'),
+            :raku('[ ltr | rtl | inherit ] & <keyw>'),
+            :inherit
+        }
+    },
+    'property-spec' => {
         input => "'content'\tnormal | none | [ <string> | <uri> | <counter> | attr(<identifier>) | open-quote | close-quote | no-open-quote | no-close-quote ]+ | inherit	normal	:before and :after pseudo-elements	no",
         ast => {:props['content'],
                 :default<normal>,
