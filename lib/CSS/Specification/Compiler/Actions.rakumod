@@ -7,19 +7,16 @@ has %.props is rw;
 has %.rules is rw;
 has %.child-props is rw;
 
-method TOP($/) is DEPRECATED { make $<def>>>.ast };
+method TOP($/) { make $<def>>>.ast };
 
 method property-spec($/) {
     my @props = @($<prop-names>.ast);
     %.props{$_}++ for @props;
 
     my $spec = $<spec>.ast;
+    my $synopsis = ~$<spec>;
 
-    my %prop-def = (
-        props    => @props,
-        synopsis => ~$<spec>,
-        raku-ast => $spec,
-        );
+    my %prop-def = (:@props, :$synopsis, :$spec);
 
     %prop-def<inherit> = .ast with $<inherit>;
 

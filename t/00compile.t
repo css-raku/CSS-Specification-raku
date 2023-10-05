@@ -88,11 +88,10 @@ for (
         ast => {
             :props['direction'],
             :default<ltr>,
-            :raku-ast(:keywords["ltr", "rtl", "inherit"]),
+            :spec(:keywords["ltr", "rtl", "inherit"]),
             :synopsis("ltr | rtl | inherit"),
             :inherit
         },
-        ## deparse => 'xxx';
     },
 ##    # precedence tests taken from: https://developer.mozilla.org/en-US/docs/CSS/Value_definition_syntax
     'spec' => {

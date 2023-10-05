@@ -1,8 +1,7 @@
 unit class CSS::Specification::Compiler;
 use CSS::Specification;
-##use CSS::Specification::Actions;
-##has CSS::Specification::Actions:D $.actions is required;
-has $.actions is required;
+use CSS::Specification::Compiler::Actions;
+has CSS::Specification::Compiler::Actions:D $.actions .= new;
 has @.defs;
 
 use experimental :rakuast;
@@ -37,12 +36,13 @@ method role-ast($actions: @role-id) {
         :declarator<role>,
         :$name,
         :body(RakuAST::Block.new: :$body),
+        :scope<unit>,
     );
 }
 
 #= generate an interface class for all unresolved terms.
 method !interface-methods {
-    my %unresolved = $!actions.prop-refs;
+    my %unresolved = $!actions.rule-refs;
     %unresolved{'expr-' ~ $_}:delete
         for $!actions.props.keys;
     %unresolved{$_}:delete
