@@ -27,7 +27,28 @@ method load-defs($properties-spec) {
     @!defs;
 }
 
-method role-ast($actions: @role-id) {
+method actions-raku(@actions-id) {
+    my %references = $!actions.rule-refs;
+
+    for @!defs -> $def {
+
+        my $synopsis = $def<synopsis>;
+
+        with $def<props> -> @props {
+            for @props -> $prop {
+
+                say "method expr-{$prop}(\$/) \{ make \$.build.list(\$/) \}"
+                    if %references{'expr-' ~ $prop}:exists;
+            }
+        }
+        else {
+            my $rule = $def<rule>;
+            say "method $rule\(\$/\) \{ make \$.build.rule(\$/) \}"
+        }
+    }
+}
+
+method role-ast(@role-id) {
     my RakuAST::Method @methods = self!interface-methods;
     my @expression = @methods.map(-> $expression { RakuAST::Statement::Expression.new: :$expression });
     my RakuAST::Blockoid $body .= new: RakuAST::StatementList.new(|@expression);
@@ -48,29 +69,28 @@ method !interface-methods {
     %unresolved{$_}:delete
         for $!actions.rules.keys;
 
-    my Str @stubs = %unresolved.keys.sort;
-    @stubs.map: -> $id {
-        my RakuAST::Method $method .= new(
-            name      => RakuAST::Name.from-identifier($id),
-            signature => RakuAST::Signature.new(
-                parameters => (
-                    RakuAST::Parameter.new(
-                        target => RakuAST::ParameterTarget::Var.new("\$/")
-                    ),
-                )
-            ),
-            body      => RakuAST::Blockoid.new(
-                RakuAST::StatementList.new(
-                    RakuAST::Statement::Expression.new(
-                        expression => RakuAST::Stub::Fail.new
-                    )
-                )
+    my RakuAST::Signature $signature .= new(
+        :parameters( '$/'.&param )
+    );
+
+    my RakuAST::Blockoid $body .= new(
+        RakuAST::StatementList.new(
+            RakuAST::Statement::Expression.new(
+                expression => RakuAST::Stub::Fail.new
             )
-        );
+        )
+    );
+
+    my Str @stubs = %unresolved.keys.sort;
+    @stubs.map: {
+        my $name = .&id;
+        RakuAST::Method.new: :$name, :$signature, :$body;
     }
 }
 
-our proto sub compile (|) {*}
+our proto sub compile (|c) {
+    {*}
+}
 
 multi sub compile(:@occurs! ($quant! is copy, *%term)) {
     my RakuAST::Regex $atom = compile(|%term);
@@ -145,25 +165,53 @@ sub conjunct(RakuAST::Regex $r1, RakuAST::Regex $r2) {
 
 sub literal(Str:D() $_) { .&lit.&ws }
 
-sub seen(Int:D $id) {
-    my $expression = $id.&arg;
-    RakuAST::Regex::Assertion::PredicateBlock.new(
-        :negated,
-        block   =>  RakuAST::Statement::Expression.new(
-            expression => RakuAST::ApplyPostfix.new(
-                operand => RakuAST::ApplyPostfix.new(
-                    operand => RakuAST::Var::Lexical.new("\@S"),
-                    postfix => RakuAST::Postcircumfix::ArrayIndex.new(
-                        index => RakuAST::SemiList.new(
-                            RakuAST::Statement::Expression.new(
-                                :$expression
-                            )
-                        )
-                    )
-                ),
-                postfix => RakuAST::Postfix.new("++")
+sub lexical(Str:D $sym) {
+    RakuAST::Var::Lexical.new($sym)
+}
+
+sub param(Str:D $sym) {
+    RakuAST::Parameter.new(
+        target => RakuAST::ParameterTarget::Var.new($sym)
+    )
+}
+
+sub array-index($expression) {
+    RakuAST::Postcircumfix::ArrayIndex.new(
+        index => RakuAST::SemiList.new(
+            RakuAST::Statement::Expression.new(
+                :$expression
             )
         )
+    )
+}
+
+sub call(Str:D $id, :@args) {
+    my $name = $id.&id;
+    my %etc;
+    %etc<args> = RakuAST::ArgList.new(|@args)
+        if @args;
+    RakuAST::Call::Method.new: :$name, |%etc;
+}
+
+sub seen(Int:D $id) {
+    my $postfix = $id.&arg.&array-index;
+    my $operand = '@S'.&lexical;
+    my RakuAST::Block $block .= new(
+        body => RakuAST::Blockoid.new(
+            RakuAST::StatementList.new(
+                RakuAST::Statement::Expression.new(
+                    expression => RakuAST::ApplyPostfix.new(
+                        operand => RakuAST::ApplyPostfix.new(
+                            :$operand, :$postfix
+                        ),
+                        postfix => RakuAST::Postfix.new(operator => "++")
+                    )
+                )
+            )
+        )
+    );
+    RakuAST::Regex::Assertion::PredicateBlock.new(
+        :$block, :negated,
     )
  }
 

@@ -97,13 +97,13 @@ for (
     'spec' => {
         input => 'bold thin && <length>',
         ast => :required[:seq[:keywords["bold"], :keywords["thin"]], :rule("length")],
-        deparse => '[:my @S; [bold & <keyw>][thin & <keyw>]<!@S[0]++>| <length><!@S[1]++>]** 2',
+        deparse => "[:my \@S; [bold \& <keyw>][thin \& <keyw>]<!\{\n    \@S[0]++\n}>| <length><!\{\n    \@S[1]++\n}>]** 2",
         rule-refs => ['length'],
     },
     'spec' => {
         input => 'bold || thin && <length>',
         ast => :combo[:keywords["bold"], :required[:keywords["thin"], :rule("length")]],
-        deparse => '[:my @S; [bold & <keyw>]<!@S[0]++>| [:my @S; [thin & <keyw>]<!@S[0]++>| <length><!@S[1]++>]** 2<!@S[1]++>]+',
+        deparse => "[:my \@S; [bold \& <keyw>]<!\{\n    \@S[0]++\n}>| [:my \@S; [thin \& <keyw>]<!\{\n    \@S[0]++\n}>| <length><!\{\n    \@S[1]++\n}>]** 2<!\{\n    \@S[1]++\n}>]+",
         rule-refs => ['length'],
     },
 ##    'property-spec' => {input => "'content'\tnormal | none | [ <string> | <uri> | <counter> | attr(<identifier>) | open-quote | close-quote | no-open-quote | no-close-quote ]+ | inherit	normal	:before and :after pseudo-elements	no",
