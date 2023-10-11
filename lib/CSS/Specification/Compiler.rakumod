@@ -92,10 +92,10 @@ our proto sub compile (|c) {
     {*}
 }
 
-multi sub compile(:@occurs! ($quant! is copy, *%term)) {
+multi sub compile(:@occurs! ($quant!, *%term)) {
     my RakuAST::Regex $atom = compile(|%term);
     my RakuAST::Regex $separator = compile(:op<,>)
-        if $quant[0] ~~ 'list';
+        if $quant.tail ~~ ',';
 
     my RakuAST::Regex::Quantifier $quantifier = do given $quant {
         when '?' {
@@ -104,12 +104,12 @@ multi sub compile(:@occurs! ($quant! is copy, *%term)) {
         when '*' {
             RakuAST::Regex::Quantifier::ZeroOrMore.new
         }
-        when '+'|'list' {
+        when '+'|',' {
             RakuAST::Regex::Quantifier::OneOrMore.new
         }
         when Array {
-            my $min  = .[1];
-            my $max  = .[2];
+            my $min  = .[0];
+            my $max  = .[1];
             RakuAST::Regex::Quantifier::Range.new: :$min, :$max;
         }
         default { die "unknown quant: $quant" }

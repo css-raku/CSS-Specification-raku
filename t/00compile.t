@@ -61,19 +61,19 @@ for (
     },
     'spec' => {
         input => '<length>{4}',
-        ast => :occurs[['seq',4,4], :rule<length>],
+        ast => :occurs[[4,4], :rule<length>],
         deparse => '<length>** 4',
         rule-refs => ['length'],
     },
     'spec' => {
         input => '<length>#',
-        ast => :occurs['list', :rule<length>],
+        ast => :occurs[',', :rule<length>],
         deparse => '<length>+% <op(",")>',
         rule-refs => ['length'],
     },
     'spec' => {
         input => '<length>#{1,4}',
-        ast => :occurs[['list', 1, 4], :rule<length>],
+        ast => :occurs[[1, 4, ','], :rule<length>],
         deparse => '<length>** 1..4% <op(",")>',
         rule-refs => ['length'],
     },

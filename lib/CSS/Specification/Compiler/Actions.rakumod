@@ -27,14 +27,13 @@ method property-spec($/) {
 }
 
 method rule-spec($/) {
-
     my $rule = $<rule>.ast,
-    my $raku-ast = $<spec>.ast;
+    my $spec = $<spec>.ast;
     my $synopsis = ~$<spec>;
     %.props{$rule}++;
 
     my %rule-def = (
-        :$rule, :$synopsis, :$raku-ast
+        :$rule, :$synopsis, :$spec
         );
 
     make %rule-def;
@@ -100,17 +99,18 @@ method occurs:sym<zero-plus>($/) { make '*' }
 method occurs:sym<list>($/) {
     with $<range> {
         given .ast {
-            make ['list', .[1],  .[2] ];
+            make [.[0],  .[1], ',' ];
         }
     }
     else {
-        make 'list';
+        make ',';
     }
 }
 method occurs:sym<range>($/)     { make $<range>.ast }
 method range($/) {
-    my @seq = 'seq', $<min>.ast.value, ($<max> // $<min>).ast.value;
-    make @seq;
+    my $min = $<min>.ast.value;
+    my $max = do with $<max> { .ast.value } else { $min };
+    make [$min, $max];
 }
 
 method value:sym<func>($/) {
