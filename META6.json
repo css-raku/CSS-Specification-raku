@@ -20,6 +20,10 @@
     "CSS::Specification::Build": "lib/CSS/Specification/Build.rakumod",
     "CSS::Specification::Compiler": "lib/CSS/Specification/Compiler.rakumod",
     "CSS::Specification::Compiler::Actions": "lib/CSS/Specification/Compiler/Actions.rakumod",
+      "CSS::Specification::Compiler::RakuAST": "lib/CSS/Specification/Compiler/RakuAST.rakumod",
+      "CSS::Specification::Compiler::RakuAST::Actions": "lib/CSS/Specification/Compiler/RakuAST/Actions.rakumod",
+      "CSS::Specification::Compiler::RakuAST::Grammars": "lib/CSS/Specification/Compiler/RakuAST/Grammars.rakumod",
+      "CSS::Specification::Compiler::RakuAST::Roles": "lib/CSS/Specification/Compiler/RakuAST/Roles.rakumod",
     "CSS::Specification::Defs": "lib/CSS/Specification/Defs.rakumod",
     "CSS::Specification::Defs::Actions": "lib/CSS/Specification/Defs/Actions.rakumod"
   },

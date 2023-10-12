@@ -6,6 +6,7 @@ use CSS::Grammar::Test;
 use CSS::Specification;
 use CSS::Specification::Compiler;
 use CSS::Specification::Compiler::Actions;
+use CSS::Specification::Compiler::RakuAST;
 
 lives-ok {require CSS::Grammar:ver(v0.3.0..*) }, "CSS::Grammar version";
 
@@ -139,7 +140,7 @@ for (
     );
 
     with $deparse {
-        my $AST = CSS::Specification::Compiler::compile(|$parse.ast);
+        my $AST = compile(|$parse.ast);
         is $AST.DEPARSE, $_, 'deparse';
     }
 
