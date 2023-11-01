@@ -1,13 +1,13 @@
 unit class CSS::Specification::Compiler;
 
 use CSS::Specification::Compiler::RakuAST::Actions;
-also does  CSS::Specification::Compiler::RakuAST::Actions;
+also does CSS::Specification::Compiler::RakuAST::Actions;
 
 use CSS::Specification::Compiler::RakuAST::Grammars;
-also does  CSS::Specification::Compiler::RakuAST::Grammars;
+also does CSS::Specification::Compiler::RakuAST::Grammars;
 
 use CSS::Specification::Compiler::RakuAST::Roles;
-also does  CSS::Specification::Compiler::RakuAST::Roles;
+also does CSS::Specification::Compiler::RakuAST::Roles;
 
 use CSS::Specification;
 use CSS::Specification::Compiler::Actions;

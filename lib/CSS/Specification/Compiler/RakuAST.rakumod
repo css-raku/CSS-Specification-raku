@@ -2,7 +2,7 @@ unit module CSS::Specification::Compiler::RakuAST;
 
 use experimental :rakuast;
 
-our proto sub compile (|c) is export {
+our proto sub compile (|c) is export(:compile) {
     {*}
 }
 

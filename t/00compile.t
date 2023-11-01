@@ -6,7 +6,7 @@ use CSS::Grammar::Test;
 use CSS::Specification;
 use CSS::Specification::Compiler;
 use CSS::Specification::Compiler::Actions;
-use CSS::Specification::Compiler::RakuAST;
+use CSS::Specification::Compiler::RakuAST :&compile;
 
 lives-ok {require CSS::Grammar:ver(v0.3.0..*) }, "CSS::Grammar version";
 

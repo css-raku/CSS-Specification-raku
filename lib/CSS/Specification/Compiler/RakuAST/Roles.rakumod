@@ -11,8 +11,7 @@ method role-ast(@role-id) {
     my @expression = @methods.map(-> $expression { RakuAST::Statement::Expression.new: :$expression });
     my RakuAST::Blockoid $body .= new: RakuAST::StatementList.new(|@expression);
     my RakuAST::Name $name .= from-identifier-parts(|@role-id);
-    RakuAST::Package.new(
-        :declarator<role>,
+    RakuAST::Role.new(
         :$name,
         :body(RakuAST::Block.new: :$body),
         :scope<unit>,
