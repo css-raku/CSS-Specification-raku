@@ -1,4 +1,4 @@
-unit grammar CSS::Compiler::Runtime::BaseGrammar;
+unit grammar CSS::Compiler::Runtime::Grammar;
 
 proto rule proforma {*}
 

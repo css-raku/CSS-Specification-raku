@@ -1,4 +1,4 @@
-unit class CSS::Compiler::Runtime::BaseActions;
+unit class CSS::Compiler::Runtime::Actions;
 
 use CSS::Grammar::Defs :CSSValue;
 use CSS::Compiler::Runtime::AST-Builder;

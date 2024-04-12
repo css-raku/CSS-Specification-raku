@@ -26,8 +26,8 @@
     "CSS::Compiler::RakuAST::Actions": "lib/CSS/Compiler/RakuAST/Actions.rakumod",
     "CSS::Compiler::RakuAST::Grammars": "lib/CSS/Compiler/RakuAST/Grammars.rakumod",
     "CSS::Compiler::RakuAST::Roles": "lib/CSS/Compiler/RakuAST/Roles.rakumod",
-    "CSS::Compiler::Runtime::BaseGrammar": "lib/CSS/Compiler/Runtime/BaseGrammar.rakumod",
-      "CSS::Compiler::Runtime::BaseActions": "lib/CSS/Compiler/Runtime/BaseActions.rakumod",
+    "CSS::Compiler::Runtime::Grammar": "lib/CSS/Compiler/Runtime/Grammar.rakumod",
+    "CSS::Compiler::Runtime::Actions": "lib/CSS/Compiler/Runtime/Actions.rakumod",
     "CSS::Compiler::Runtime::AST-Builder": "lib/CSS/Compiler/Runtime/AST-Builder.rakumod"
   },
   "resources": [

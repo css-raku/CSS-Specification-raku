@@ -3,15 +3,15 @@ use Test;
 use CSS::Grammar::Test;
 use CSS::Grammar::CSS3;
 use CSS::Grammar::Actions;
-use CSS::Compiler::Runtime::BaseGrammar;
-use CSS::Compiler::Runtime::BaseActions;
+use CSS::Compiler::Runtime::Grammar;
+use CSS::Compiler::Runtime::Actions;
 
 grammar CSS3Defs
-    is CSS::Compiler::Runtime::BaseGrammar
+    is CSS::Compiler::Runtime::Grammar
     is CSS::Grammar::CSS3 {};
 
 class CSS3Defs::Actions
-    is CSS::Compiler::Runtime::BaseActions
+    is CSS::Compiler::Runtime::Actions
     is CSS::Grammar::Actions {};
 
 for <0% 10%> {
