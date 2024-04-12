@@ -1,4 +1,4 @@
-unit module CSS::Specification::Compiler::RakuAST;
+unit module CSS::Compiler::RakuAST;
 
 use experimental :rakuast;
 
@@ -85,9 +85,9 @@ sub lexical(Str:D $sym) is export {
     RakuAST::Var::Lexical.new($sym)
 }
 
-sub param(Str:D $sym) is export {
+sub param(Str:D $name) is export {
     RakuAST::Parameter.new(
-        target => RakuAST::ParameterTarget::Var.new($sym)
+        target => RakuAST::ParameterTarget::Var.new(:$name)
     )
 }
 

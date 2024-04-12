@@ -1,41 +1,6 @@
-use CSS::Grammar::AST;
+unit class CSS::Specification::AST;
 
-class CSS::Specification::AST
-    is CSS::Grammar::AST {
+warn "Please use class CSS::Compiler::Runtime::AST-Builder";
 
-    method proforma { [] } # e.g. ['inherit', 'initial']
-
-    method decl($/, :$obj!) {
-
-        my %ast;
-
-        %ast<ident> = .trim.lc
-            with $0;
-
-        with $<val> {
-            my Hash $val = .ast;
-
-            with $val<usage> -> $synopsis {
-                my $usage = 'usage ' ~ $synopsis;
-                $usage ~= ' | ' ~ $_
-                    for @.proforma;
-                $obj.warning($usage);
-                return;
-            }
-            elsif ! $val<expr> {
-                $obj.warning('dropping declaration', %ast<ident>);
-                return;
-            }
-            else {
-                %ast<expr> = $val<expr>;
-            }
-        }
-
-        return %ast;
-    }
-
-    method rule($/) {
-        $.node($/).pairs[0];
-    }
-
-}
+use CSS::Compiler::Runtime::AST-Builder;
+also is CSS::Compiler::Runtime::AST-Builder;

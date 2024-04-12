@@ -18,18 +18,21 @@
     "CSS::Specification::AST": "lib/CSS/Specification/AST.rakumod",
     "CSS::Specification::Actions": "lib/CSS/Specification/Actions.rakumod",
     "CSS::Specification::Build": "lib/CSS/Specification/Build.rakumod",
-    "CSS::Specification::Compiler": "lib/CSS/Specification/Compiler.rakumod",
-    "CSS::Specification::Compiler::Actions": "lib/CSS/Specification/Compiler/Actions.rakumod",
-      "CSS::Specification::Compiler::RakuAST": "lib/CSS/Specification/Compiler/RakuAST.rakumod",
-      "CSS::Specification::Compiler::RakuAST::Actions": "lib/CSS/Specification/Compiler/RakuAST/Actions.rakumod",
-      "CSS::Specification::Compiler::RakuAST::Grammars": "lib/CSS/Specification/Compiler/RakuAST/Grammars.rakumod",
-      "CSS::Specification::Compiler::RakuAST::Roles": "lib/CSS/Specification/Compiler/RakuAST/Roles.rakumod",
     "CSS::Specification::Defs": "lib/CSS/Specification/Defs.rakumod",
-    "CSS::Specification::Defs::Actions": "lib/CSS/Specification/Defs/Actions.rakumod"
+    "CSS::Specification::Defs::Actions": "lib/CSS/Specification/Defs/Actions.rakumod",
+    "CSS::Compiler": "lib/CSS/Compiler.rakumod",
+    "CSS::Compiler::Actions": "lib/CSS/Compiler/Actions.rakumod",
+    "CSS::Compiler::RakuAST": "lib/CSS/Compiler/RakuAST.rakumod",
+    "CSS::Compiler::RakuAST::Actions": "lib/CSS/Compiler/RakuAST/Actions.rakumod",
+    "CSS::Compiler::RakuAST::Grammars": "lib/CSS/Compiler/RakuAST/Grammars.rakumod",
+    "CSS::Compiler::RakuAST::Roles": "lib/CSS/Compiler/RakuAST/Roles.rakumod",
+    "CSS::Compiler::Runtime::BaseGrammar": "lib/CSS/Compiler/Runtime/BaseGrammar.rakumod",
+      "CSS::Compiler::Runtime::BaseActions": "lib/CSS/Compiler/Runtime/BaseActions.rakumod",
+    "CSS::Compiler::Runtime::AST-Builder": "lib/CSS/Compiler/Runtime/AST-Builder.rakumod"
   },
   "resources": [
   ],
-  "source-url": "git://github.com/css-raku/CSS-Specification-raku.git",
+  "source-url": "git://github.com/css-raku/CSS-Speicifcation-raku.git",
   "tags": [
   ],
   "test-depends": [

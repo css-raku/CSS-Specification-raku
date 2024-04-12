@@ -1,4 +1,4 @@
-unit class CSS::Specification::Compiler::Actions;
+unit class CSS::Compiler::Actions;
 
 # these actions translate a CSS property specification to Raku
 # rules or actions.

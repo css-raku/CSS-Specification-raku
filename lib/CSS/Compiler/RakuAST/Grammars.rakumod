@@ -1,4 +1,4 @@
-unit role CSS::Specification::Compiler::RakuAST::Grammars;
+unit role CSS::Compiler::RakuAST::Grammars;
 
 method actions { ... }
 method defs { ... }

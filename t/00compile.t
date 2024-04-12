@@ -4,9 +4,9 @@ use Test;
 use CSS::Grammar::Test;
 
 use CSS::Specification;
-use CSS::Specification::Compiler;
-use CSS::Specification::Compiler::Actions;
-use CSS::Specification::Compiler::RakuAST :&compile;
+use CSS::Compiler;
+use CSS::Compiler::Actions;
+use CSS::Compiler::RakuAST :&compile;
 
 lives-ok {require CSS::Grammar:ver(v0.3.0..*) }, "CSS::Grammar version";
 
@@ -129,7 +129,7 @@ for (
 
     my @*PROP-NAMES = [];
 
-    my CSS::Specification::Compiler::Actions $actions .= new;
+    my CSS::Compiler::Actions $actions .= new;
 
     my $parse = CSS::Grammar::Test::parse-tests(
         CSS::Specification, $input,
@@ -140,7 +140,7 @@ for (
     );
 
     with $deparse {
-        my $AST = compile(|$parse.ast);
+        my $AST = compile |$parse.ast;
         is $AST.DEPARSE, $_, 'deparse';
     }
 
