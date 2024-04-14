@@ -6,7 +6,7 @@ use experimental :rakuast;
 
 method actions { ... }
 
-method role-ast(@role-id) {
+method role-package(@role-id) {
     my RakuAST::Method @methods = self!interface-methods;
     my @expression = @methods.map(-> $expression { RakuAST::Statement::Expression.new: :$expression });
     my RakuAST::Blockoid $body .= new: RakuAST::StatementList.new(|@expression);
