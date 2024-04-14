@@ -1,5 +1,7 @@
 unit class CSS::Compiler::Actions;
 
+use Method::Also;
+
 # these actions translate a CSS property specification to Raku
 # rules or actions.
 has %.rule-refs is rw;
@@ -58,31 +60,25 @@ method keyw($/)      { make 'keyw' => ~$<id> }
 method digits($/)    { make 'num' => $/.Int }
 method rule($/)      { make $<id>.ast }
 
-method seq($/) {
-    my @seq = @<term>>>.ast;
-    make @seq == 1 ?? @seq[0] !! (:@seq);
+method !make-term($/, $name) {
+    my @term =  @<term>>>.ast;
+    make @term == 1 ?? @term[0] !! ($name => @term);
+}
+
+method seq($/) is also<term-seq> {
+    self!make-term: $/, 'seq';
 }
 
 method term-options($/) {
-    my @alt = @<term>>>.ast;
-    make @alt == 1 ?? @alt[0] !! :@alt;
+    self!make-term: $/, 'alt';
 }
 
 method term-combo($/) {
-    my @combo = @<term>>>.ast;
-    make @combo == 1 ?? @combo[0] !! (:@combo)
+    self!make-term: $/, 'combo';
 }
 
 method term-required($/) {
-    my @required = $<term>>>.ast;
-    make @required == 1 ?? @required[0] !! (:@required);
-}
-
-method term-seq($/) {
-    my @seq = @<term>>>.ast;
-    make @seq == 1
-        ?? @seq[0]
-        !! (:@seq);
+    self!make-term: $/, 'required';
 }
 
 method term($/) {
