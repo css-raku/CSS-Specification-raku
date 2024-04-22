@@ -15,7 +15,7 @@ multi sub compile(:@props!, :$default, :$spec, Str :$synopsis) {
         RakuAST::Regex::InternalModifier::IgnoreCase.new(
             modifier => "i"
         ),
-        RakuAST::Regex::WithWhitespace.new($body),
+        ws($body),
     );
 
     my Str $leading = $_ ~ "\n" with $synopsis;
@@ -66,7 +66,7 @@ sub look-ahead(RakuAST::Regex::Assertion $assertion, Bool :$negated = False, Boo
     );
 }
 
-proto sub assertions(|) is export {*}
+proto sub assertion(|) is export {*}
 multi sub assertion(Str:D $id, Bool :$capturing = True, RakuAST::ArgList :$args!) {
     my $name := $id.&id;
     RakuAST::Regex::Assertion::Named::Args.new(

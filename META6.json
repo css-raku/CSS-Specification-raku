@@ -7,7 +7,8 @@
   ],
   "depends": [
     "CSS::Grammar:ver<0.3.9+>",
-    "Color::Names"
+    "Color::Names",
+    "Method::Also"
   ],
   "description": "CSS Property definition grammar and generation tools",
   "license": "Artistic-2.0",
