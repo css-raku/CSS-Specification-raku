@@ -4,9 +4,9 @@
 #  http://dev.w3.org/csswg/css-values/#value-defs
 #  https://developer.mozilla.org/en-US/docs/Web/CSS/Value_definition_syntax
 
-use CSS::Grammar::CSS3;
-
 grammar CSS::Specification:ver<0.4.13> {
+    use CSS::Grammar::CSS3;
+
     rule TOP { [<def=.property-spec> | <def=.rule-spec>] * }
 
     rule property-spec {

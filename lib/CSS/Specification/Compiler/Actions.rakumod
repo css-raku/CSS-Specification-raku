@@ -1,4 +1,4 @@
-unit class CSS::Compiler::Actions;
+unit class CSS::Specification::Compiler::Actions;
 
 use Method::Also;
 

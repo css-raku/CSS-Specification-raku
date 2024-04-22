@@ -1,6 +1,6 @@
 unit grammar CSS::Specification::Defs;
 
-warn "this grammar is deprecated. Please use CSS::Compiler::Runtime::BaseActions";
+warn "this grammar is deprecated. Please use CSS::Specification::Compiler::Runtime::BaseActions";
 
-use CSS::Compiler::Runtime::BaseGrammar;
-also is CSS::Compiler::Runtime::BaseGrammar;
+use CSS::Specification::Compiler::Runtime::BaseGrammar;
+also is CSS::Specification::Compiler::Runtime::BaseGrammar;

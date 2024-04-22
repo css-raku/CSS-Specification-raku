@@ -1,9 +1,36 @@
-unit module CSS::Compiler::RakuAST;
+unit module CSS::Specification::Compiler::RakuAST;
 
 use experimental :rakuast;
 
 our proto sub compile (|c) is export(:compile) {
     {*}
+}
+
+multi sub compile(:@props!, :$default, :$spec, Str :$synopsis) {
+    die "todo: {@props}" unless @props == 1;
+    my $prop = @props.head;
+    my $name = id($prop);
+    my RakuAST::Regex $body = compile($spec);
+    $body = RakuAST::Regex::Sequence.new(
+        RakuAST::Regex::InternalModifier::IgnoreCase.new(
+            modifier => "i"
+        ),
+        RakuAST::Regex::WithWhitespace.new($body),
+    );
+
+    my Str $leading = $_ ~ "\n" with $synopsis;
+
+    RakuAST::StatementList.new(
+        RakuAST::Statement::Expression.new(
+            expression =>
+            RakuAST::RuleDeclaration.new(
+                :$name,
+                :$body,
+            ).declarator-docs(
+                :$leading
+            )
+        )
+    );
 }
 
 multi sub compile(:@occurs! ($quant!, *%term)) {
@@ -161,8 +188,8 @@ multi sub compile(Str:D :$op!) {
     'op'.&assertion(:$args);
 }
 
-multi sub compile(:@alt!)   { alt @alt.map(&compile) }
-multi sub compile(:@seq!)   { seq @seq.map(&compile) }
+multi sub compile(:@alt!)   { alt @alt.map(&compile).map(&ws) }
+multi sub compile(:@seq!)   { seq @seq.map(&compile).map(&ws) }
 multi sub compile(:$group!) { group compile($group) }
 
 my constant Seen-Decl = RakuAST::Regex::Statement.new(

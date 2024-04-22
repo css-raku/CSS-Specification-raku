@@ -2,7 +2,7 @@ use Test;
 use CSS::Grammar::Test;
 use CSS::Grammar::CSS21;
 use CSS::Specification::Build;
-use CSS::Compiler;
+use CSS::Specification::Compiler;
 use lib 't';
 use experimental :rakuast;
 
@@ -23,7 +23,7 @@ my $grammar-name = @grammar-id.join: '::';
 
 my $input-path = $*SPEC.catfile('examples', 'css21-aural.txt');
 
-my CSS::Compiler $compiler .= new;
+my CSS::Specification::Compiler $compiler .= new;
 $compiler.load-defs($input-path);
 
 my @summary = CSS::Specification::Build::summary( :$input-path );

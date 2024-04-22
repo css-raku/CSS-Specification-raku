@@ -4,9 +4,9 @@ use Test;
 use CSS::Grammar::Test;
 
 use CSS::Specification;
-use CSS::Compiler;
-use CSS::Compiler::Actions;
-use CSS::Compiler::RakuAST :&compile;
+use CSS::Specification::Compiler;
+use CSS::Specification::Compiler::Actions;
+use CSS::Specification::Compiler::RakuAST :&compile;
 
 lives-ok {require CSS::Grammar:ver(v0.3.0..*) }, "CSS::Grammar version";
 
@@ -34,7 +34,7 @@ for (
     'spec' => {
         input => '35 | 7 | 42?',
         ast => :alt[:numbers[35, 7], :occurs["?", :num(42)]],
-        deparse => '[[35 | 7 ]& <number>]| [42& <number>]?',
+        deparse => '[[35 | 7 ]& <number>] | [42& <number>]? ',
     },
     'spec' => {
         input => "<rule-ref>",
@@ -51,13 +51,13 @@ for (
     'spec' => {
         input => "<rule-ref> [ 'css21-prop-ref' <'css3-prop-ref'> ]?",
         ast => :seq[:rule<rule-ref>, :occurs["?", :group( :seq[:rule<expr-css21-prop-ref>, :rule<expr-css3-prop-ref> ]) ] ],
-        deparse => "<rule-ref>[<expr-css21-prop-ref><expr-css3-prop-ref>]?",
+        deparse => "<rule-ref> [<expr-css21-prop-ref> <expr-css3-prop-ref> ]? ",
         rule-refs => ["expr-css21-prop-ref", "expr-css3-prop-ref", "rule-ref"],
     },
     'spec' => {
         input => "<rule-ref> [, [ 'css21-prop-ref' | <'css3-prop-ref'> ] ]*",
         ast => :seq[ :rule<rule-ref>, :occurs["*", :group( :seq[:op<,>, :group(:alt[:rule<expr-css21-prop-ref>, :rule<expr-css3-prop-ref>])])]],
-        deparse => '<rule-ref>[<op(",")>[<expr-css21-prop-ref>| <expr-css3-prop-ref>]]*',
+        deparse => '<rule-ref> [<op(",")> [<expr-css21-prop-ref> | <expr-css3-prop-ref> ] ]* ',
         rule-refs => ["expr-css21-prop-ref", "expr-css3-prop-ref", "rule-ref"],
     },
     'spec' => {
@@ -98,7 +98,7 @@ for (
     'spec' => {
         input => 'bold thin && <length>',
         ast => :required[:seq[:keywords["bold"], :keywords["thin"]], :rule("length")],
-        deparse => "[:my \@S; [bold \& <keyw>][thin \& <keyw>]<!\{\n    \@S[0]++\n}>| <length><!\{\n    \@S[1]++\n}>]** 2",
+        deparse => "[:my \@S; [bold \& <keyw>] [thin \& <keyw>] <!\{\n    \@S[0]++\n}>| <length><!\{\n    \@S[1]++\n}>]** 2",
         rule-refs => ['length'],
     },
     'spec' => {
@@ -107,7 +107,22 @@ for (
         deparse => "[:my \@S; [bold \& <keyw>]<!\{\n    \@S[0]++\n}>| [:my \@S; [thin \& <keyw>]<!\{\n    \@S[0]++\n}>| <length><!\{\n    \@S[1]++\n}>]** 2<!\{\n    \@S[1]++\n}>]+",
         rule-refs => ['length'],
     },
-##    'property-spec' => {input => "'content'\tnormal | none | [ <string> | <uri> | <counter> | attr(<identifier>) | open-quote | close-quote | no-open-quote | no-close-quote ]+ | inherit	normal	:before and :after pseudo-elements	no",
+    'property-spec' => {
+        input => "'min-width'\t<length> | <percentage> | inherit\t0",
+        ast => {
+            :props['min-width'],
+            :default<0>,
+            :synopsis("<length> | <percentage> | inherit"),
+            :spec(:alt([:rule("length"), :rule("percentage"), :keywords(["inherit"])])),
+        },
+        rule-refs => ['length', 'percentage'],
+        deparse => join("\n",
+                        '#| <length> | <percentage> | inherit',
+                        'rule min-width {',
+                        ':i <length> | <percentage> | [inherit & <keyw>]  }',
+                       ''),
+    },
+##    'property-spec' => {input => "'content'\tnormal | none | [ <string> | <uri> | <counter> | attr(<identifier>) | open-quote | close-quote | no-open-quote | no-close-quote ]+ | inherit\tnormal	:before and :after pseudo-elements	no",
 ##                        ast => {:props['content'],
 ##                                :default<normal>,
 ##                                :raku('[ [ normal | none ] & <keyw> || [ [ <string> || <uri> || <counter> || <attr> || [ open\\-quote | close\\-quote | no\\-open\\-quote | no\\-close\\-quote ] & <keyw> ] ]+ || inherit & <keyw> ]'),
@@ -129,7 +144,7 @@ for (
 
     my @*PROP-NAMES = [];
 
-    my CSS::Compiler::Actions $actions .= new;
+    my CSS::Specification::Compiler::Actions $actions .= new;
 
     my $parse = CSS::Grammar::Test::parse-tests(
         CSS::Specification, $input,

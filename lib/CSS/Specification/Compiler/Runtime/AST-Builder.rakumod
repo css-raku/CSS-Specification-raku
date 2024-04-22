@@ -1,4 +1,4 @@
-unit class CSS::Compiler::Runtime::AST-Builder;
+unit class CSS::Specification::Compiler::Runtime::AST-Builder;
 
 use CSS::Grammar::AST;
 also is CSS::Grammar::AST;
