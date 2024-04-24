@@ -90,7 +90,7 @@ method term($/) {
 }
 
 method occurs:sym<maybe>($/)     { make '?' }
-method occurs:sym<once-plus>($/) is DEPRECATED { make '+' }
+method occurs:sym<once-plus>($/) { make '+' }
 method occurs:sym<zero-plus>($/) { make '*' }
 method occurs:sym<list>($/) {
     with $<range> {

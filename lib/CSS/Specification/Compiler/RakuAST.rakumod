@@ -6,7 +6,7 @@ our proto sub compile (|c) is export(:compile) {
     {*}
 }
 
-multi sub compile(:@props!, :$default, :$spec, Str :$synopsis) {
+multi sub compile(:@props!, :$default, :$spec, Str :$synopsis, Bool :$inherit = True) {
     die "todo: {@props}" unless @props == 1;
     my $prop = @props.head;
     my $name = id($prop);
