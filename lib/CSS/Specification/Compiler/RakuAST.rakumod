@@ -38,24 +38,18 @@ multi sub compile(:@occurs! ($quant!, *%term)) {
     my RakuAST::Regex $separator = compile(:op<,>)
         if $quant.tail ~~ ',';
 
-    my RakuAST::Regex::Quantifier $quantifier = do given $quant {
-        when '?' {
-            RakuAST::Regex::Quantifier::ZeroOrOne.new
-        }
-        when '*' {
-            RakuAST::Regex::Quantifier::ZeroOrMore.new
-        }
-        when '+'|',' {
-            RakuAST::Regex::Quantifier::OneOrMore.new
-        }
-        when Array {
-            my $min  = .[0];
-            my $max  = .[1];
-            RakuAST::Regex::Quantifier::Range.new: :$min, :$max;
-        }
-        default { die "unknown quant: $quant" }
-    }
+    my RakuAST::Regex::Quantifier $quantifier = quant($quant);
     RakuAST::Regex::QuantifiedAtom.new: :$atom, :$quantifier, :$separator;
+}
+
+multi sub quant('?') { RakuAST::Regex::Quantifier::ZeroOrOne.new }
+multi sub quant('*') { RakuAST::Regex::Quantifier::ZeroOrMore.new }
+multi sub quant('+') { RakuAST::Regex::Quantifier::OneOrMore.new }
+multi sub quant(',') { RakuAST::Regex::Quantifier::OneOrMore.new }
+multi sub quant(Array $_) {
+    my $min  = .[0];
+    my $max  = .[1];
+    RakuAST::Regex::Quantifier::Range.new: :$min, :$max;
 }
 
 sub id(Str:D $id) is export {  RakuAST::Name.from-identifier($id) }
@@ -90,7 +84,7 @@ multi sub arg(Int:D $arg) {
     RakuAST::ArgList.new: RakuAST::IntLiteral.new($arg);
 }
 
-sub ws(RakuAST::Regex $r) is export { RakuAST::Regex::WithWhitespace.new($r) }
+multi sub ws(RakuAST::Regex $r) is export { RakuAST::Regex::WithWhitespace.new($r) }
 
 sub lit(Str:D $s) is export { RakuAST::Regex::Literal.new($s) }
 
@@ -206,16 +200,16 @@ multi sub compile(:required(@combo)!) {
 }
 
 multi sub compile(:@combo!, Bool :$required) {
-    my $id = 0;
+    my $n = 0;
     my $atom = alt @combo.map: {
-        my $seen = seen($id++);
+        my $seen = seen($n++);
         my $term = compile($_);
         [$term, $seen].&seq;
     }
     $atom = [Seen-Decl, $atom].&seq.&group;
     my RakuAST::Regex::Quantifier $quantifier = $required
-        ?? RakuAST::Regex::Quantifier::Range.new: :min($id), :max($id)
-        !! RakuAST::Regex::Quantifier::OneOrMore.new;
+        ?? quant([$n, $n])
+        !! quant('+');
 
     RakuAST::Regex::QuantifiedAtom.new: :$atom, :$quantifier;
 }
