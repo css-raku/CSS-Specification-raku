@@ -9,8 +9,8 @@ our proto sub compile (|c) is export(:compile) {
 multi sub compile(:@props!, :$default, :$spec, Str :$synopsis, Bool :$inherit = True) {
     die "todo: {@props}" unless @props == 1;
     my $prop = @props.head;
-    my $name = id($prop);
-    my RakuAST::Regex $body = compile($spec);
+    my RakuAST::Name $name = $prop.&id;
+    my RakuAST::Regex $body =$spec.&compile;
     $body = RakuAST::Regex::Sequence.new(
         RakuAST::Regex::InternalModifier::IgnoreCase.new(
             modifier => "i"
@@ -46,10 +46,8 @@ multi sub quant('?') { RakuAST::Regex::Quantifier::ZeroOrOne.new }
 multi sub quant('*') { RakuAST::Regex::Quantifier::ZeroOrMore.new }
 multi sub quant('+') { RakuAST::Regex::Quantifier::OneOrMore.new }
 multi sub quant(',') { RakuAST::Regex::Quantifier::OneOrMore.new }
-multi sub quant(Array $_) {
-    my $min  = .[0];
-    my $max  = .[1];
-    RakuAST::Regex::Quantifier::Range.new: :$min, :$max;
+multi sub quant(Array:D $_ where .elems >= 2) {
+    RakuAST::Regex::Quantifier::Range.new: min => .[0], max => .[1]
 }
 
 sub id(Str:D $id) is export {  RakuAST::Name.from-identifier($id) }
@@ -62,14 +60,14 @@ sub look-ahead(RakuAST::Regex::Assertion $assertion, Bool :$negated = False, Boo
 
 proto sub assertion(|) is export {*}
 multi sub assertion(Str:D $id, Bool :$capturing = True, RakuAST::ArgList :$args!) {
-    my $name := $id.&id;
+    my RakuAST::Name $name := $id.&id;
     RakuAST::Regex::Assertion::Named::Args.new(
         :$name, :$capturing, :$args,
     );
 }
 
 multi sub assertion(Str:D $id, Bool :$capturing = True) {
-    my $name := $id.&id;
+    my RakuAST::Name $name := $id.&id;
     RakuAST::Regex::Assertion::Named.new(
         :$name, :$capturing,
     );
@@ -87,6 +85,7 @@ multi sub arg(Int:D $arg) {
 multi sub ws(RakuAST::Regex $r) is export { RakuAST::Regex::WithWhitespace.new($r) }
 
 sub lit(Str:D $s) is export { RakuAST::Regex::Literal.new($s) }
+sub lit-ws(Str:D() $_) is export { .&lit.&ws }
 
 sub group(RakuAST::Regex $r) is export  { RakuAST::Regex::Group.new: $r }
 
@@ -99,8 +98,6 @@ sub seq(@seq) is export  { RakuAST::Regex::Sequence.new: |@seq }
 sub conjunct(RakuAST::Regex $r1, RakuAST::Regex $r2) is export {
     RakuAST::Regex::Conjunction.new($r1, $r2).&group;
 }
-
-sub literal(Str:D() $_) is export { .&lit.&ws }
 
 sub lexical(Str:D $sym) is export {
     RakuAST::Var::Lexical.new($sym)
@@ -123,16 +120,15 @@ sub array-index($expression) is export {
 }
 
 sub call(Str:D $id, :@args) is export {
-    my $name = $id.&id;
-    my %etc;
-    %etc<args> = RakuAST::ArgList.new(|@args)
+    my RakuAST::Name $name = $id.&id;
+    my RakuAST::ArgList $args .= new(|@args)
         if @args;
-    RakuAST::Call::Method.new: :$name, |%etc;
+    RakuAST::Call::Method.new: :$name, :$args;
 }
 
 sub seen(Int:D $id) is export {
-    my $postfix = $id.&arg.&array-index;
-    my $operand = '@S'.&lexical;
+    my RakuAST::Postcircumfix $postfix = $id.&arg.&array-index;
+    my RakuAST::Var $operand = '@S'.&lexical;
     my RakuAST::Block $block .= new(
         body => RakuAST::Blockoid.new(
             RakuAST::StatementList.new(
@@ -161,7 +157,7 @@ multi sub compile(Str:D() :$num!) {
 }
 
 sub _choice(@lits, RakuAST::Regex $term2) {
-    my $term1 = @lits == 1 ?? @lits[0] !! @lits.&alt.&group;
+    my RakuAST::Regex $term1 = @lits == 1 ?? @lits[0] !! @lits.&alt.&group;
     conjunct($term1, $term2);
 }
 
@@ -170,15 +166,15 @@ multi sub compile(Str:D :$rule) {
 }
 
 multi sub compile(:@keywords!) {
-    _choice @keywords.map(&literal), 'keyw'.&assertion;
+    _choice @keywords.map(&lit-ws), 'keyw'.&assertion;
 }
 
 multi sub compile(:@numbers!) {
-    _choice @numbers.map(&literal), 'number'.&assertion;
+    _choice @numbers.map(&lit-ws), 'number'.&assertion;
 }
 
 multi sub compile(Str:D :$op!) {
-    my $args = ','.&arg;
+    my RakuAST::ArgList $args = ','.&arg;
     'op'.&assertion(:$args);
 }
 
@@ -200,10 +196,10 @@ multi sub compile(:required(@combo)!) {
 }
 
 multi sub compile(:@combo!, Bool :$required) {
-    my $n = 0;
-    my $atom = alt @combo.map: {
-        my $seen = seen($n++);
-        my $term = compile($_);
+    my UInt $n = 0;
+    my RakuAST::Regex $atom = alt @combo.map: {
+        my RakuAST::Regex::Assertion $seen = seen($n++);
+        my RakuAST::Regex $term = compile($_);
         [$term, $seen].&seq;
     }
     $atom = [Seen-Decl, $atom].&seq.&group;
