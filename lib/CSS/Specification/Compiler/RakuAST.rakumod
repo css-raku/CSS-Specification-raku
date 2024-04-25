@@ -6,15 +6,15 @@ our proto sub compile (|c) is export(:compile) {
     {*}
 }
 
+multi sub modifier('i') { RakuAST::Regex::InternalModifier::IgnoreCase.new }
+
 multi sub compile(:@props!, :$default, :$spec, Str :$synopsis, Bool :$inherit = True) {
     die "todo: {@props}" unless @props == 1;
     my $prop = @props.head;
-    my RakuAST::Name $name = $prop.&id;
+    my RakuAST::Name $name = $prop.&name;
     my RakuAST::Regex $body =$spec.&compile;
     $body = RakuAST::Regex::Sequence.new(
-        RakuAST::Regex::InternalModifier::IgnoreCase.new(
-            modifier => "i"
-        ),
+        modifier('i'),
         ws($body),
     );
 
@@ -50,7 +50,7 @@ multi sub quant(Array:D $_ where .elems >= 2) {
     RakuAST::Regex::Quantifier::Range.new: min => .[0], max => .[1]
 }
 
-sub id(Str:D $id) is export {  RakuAST::Name.from-identifier($id) }
+sub name(Str:D $id) is export {  RakuAST::Name.from-identifier($id) }
 
 sub look-ahead(RakuAST::Regex::Assertion $assertion, Bool :$negated = False, Bool :$capturing = False) is export {
     RakuAST::Regex::Assertion::Lookahead.new(
@@ -60,14 +60,14 @@ sub look-ahead(RakuAST::Regex::Assertion $assertion, Bool :$negated = False, Boo
 
 proto sub assertion(|) is export {*}
 multi sub assertion(Str:D $id, Bool :$capturing = True, RakuAST::ArgList :$args!) {
-    my RakuAST::Name $name := $id.&id;
+    my RakuAST::Name $name := $id.&name;
     RakuAST::Regex::Assertion::Named::Args.new(
         :$name, :$capturing, :$args,
     );
 }
 
 multi sub assertion(Str:D $id, Bool :$capturing = True) {
-    my RakuAST::Name $name := $id.&id;
+    my RakuAST::Name $name := $id.&name;
     RakuAST::Regex::Assertion::Named.new(
         :$name, :$capturing,
     );
@@ -120,7 +120,7 @@ sub array-index($expression) is export {
 }
 
 sub call(Str:D $id, :@args) is export {
-    my RakuAST::Name $name = $id.&id;
+    my RakuAST::Name $name = $id.&name;
     my RakuAST::ArgList $args .= new(|@args)
         if @args;
     RakuAST::Call::Method.new: :$name, :$args;

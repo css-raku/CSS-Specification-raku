@@ -40,7 +40,7 @@ method !interface-methods {
 
     my Str @stubs = %unresolved.keys.sort;
     @stubs.map: {
-        my $name = .&id;
+        my RakuAST::Name $name = .&name;
         RakuAST::Method.new: :$name, :$signature, :$body;
     }
 }
