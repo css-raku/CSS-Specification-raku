@@ -8,29 +8,36 @@ our proto sub compile (|c) is export(:compile) {
 
 multi sub modifier('i') { RakuAST::Regex::InternalModifier::IgnoreCase.new }
 
+sub rule(RakuAST::Name:D :$name!, RakuAST::Regex:D :$body!, Str :$leading) {
+    RakuAST::RuleDeclaration.new(
+            :$name,
+            :$body,
+        ).declarator-docs(
+            :$leading
+        )
+}
+
+multi sub statements(@exprs) {
+    RakuAST::StatementList.new(|@exprs);
+}
+multi sub statements($expr) {
+    RakuAST::StatementList.new($expr);
+}
+
+sub expression($expression) {
+    RakuAST::Statement::Expression.new: :$expression;
+}
+
 multi sub compile(:@props!, :$default, :$spec, Str :$synopsis, Bool :$inherit = True) {
     die "todo: {@props}" unless @props == 1;
     my $prop = @props.head;
     my RakuAST::Name $name = $prop.&name;
     my RakuAST::Regex $body =$spec.&compile;
-    $body = RakuAST::Regex::Sequence.new(
-        modifier('i'),
-        ws($body),
-    );
+    $body = seq [ modifier('i'),  ws($body), ];
 
     my Str $leading = $_ ~ "\n" with $synopsis;
 
-    RakuAST::StatementList.new(
-        RakuAST::Statement::Expression.new(
-            expression =>
-            RakuAST::RuleDeclaration.new(
-                :$name,
-                :$body,
-            ).declarator-docs(
-                :$leading
-            )
-        )
-    );
+    rule(:$name, :$body, :$leading).&expression.&statements;
 }
 
 multi sub compile(:@occurs! ($quant!, *%term)) {
@@ -109,13 +116,9 @@ sub param(Str:D $name) is export {
     )
 }
 
-sub array-index($expression) is export {
+sub array-index($_) is export {
     RakuAST::Postcircumfix::ArrayIndex.new(
-        index => RakuAST::SemiList.new(
-            RakuAST::Statement::Expression.new(
-                :$expression
-            )
-        )
+        index => RakuAST::SemiList.new(.&expression)
     )
 }
 
@@ -132,13 +135,11 @@ sub seen(Int:D $id) is export {
     my RakuAST::Block $block .= new(
         body => RakuAST::Blockoid.new(
             RakuAST::StatementList.new(
-                RakuAST::Statement::Expression.new(
-                    expression => RakuAST::ApplyPostfix.new(
-                        operand => RakuAST::ApplyPostfix.new(
-                            :$operand, :$postfix
-                        ),
-                        postfix => RakuAST::Postfix.new(operator => "++")
-                    )
+                expression RakuAST::ApplyPostfix.new(
+                    operand => RakuAST::ApplyPostfix.new(
+                        :$operand, :$postfix
+                    ),
+                    postfix => RakuAST::Postfix.new(operator => "++")
                 )
             )
         )
@@ -183,13 +184,11 @@ multi sub compile(:@seq!)   { seq @seq.map(&compile).map(&ws) }
 multi sub compile(:$group!) { group compile($group) }
 
 my constant Seen-Decl = RakuAST::Regex::Statement.new(
-    RakuAST::Statement::Expression.new(
-        expression => RakuAST::VarDeclaration::Simple.new(
+    expression RakuAST::VarDeclaration::Simple.new(
             sigil       => "\@",
             desigilname => RakuAST::Name.from-identifier("S")
         )
-    )
-);
+    );
 
 multi sub compile(:required(@combo)!) {
     compile(:@combo, :required);
