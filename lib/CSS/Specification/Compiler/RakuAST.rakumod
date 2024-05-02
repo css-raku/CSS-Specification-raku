@@ -129,17 +129,20 @@ sub call(Str:D $id, :@args) is export {
     RakuAST::Call::Method.new: :$name, :$args;
 }
 
+sub postfix($operand, $postfix) {
+    RakuAST::ApplyPostfix.new(
+        :$operand, :$postfix
+    )
+}
+
 sub seen(Int:D $id) is export {
-    my RakuAST::Postcircumfix $postfix = $id.&arg.&array-index;
+    my RakuAST::Postcircumfix $op = $id.&arg.&array-index;
     my RakuAST::Var $operand = '@S'.&lexical;
     my RakuAST::Block $block .= new(
         body => RakuAST::Blockoid.new(
             RakuAST::StatementList.new(
-                expression RakuAST::ApplyPostfix.new(
-                    operand => RakuAST::ApplyPostfix.new(
-                        :$operand, :$postfix
-                    ),
-                    postfix => RakuAST::Postfix.new(operator => "++")
+                expression $operand.&postfix($op).&postfix(
+                    RakuAST::Postfix.new(operator => "++")
                 )
             )
         )
