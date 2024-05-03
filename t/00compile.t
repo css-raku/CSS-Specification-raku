@@ -118,7 +118,7 @@ for (
         rule-refs => ['length', 'percentage'],
         deparse => join("\n",
                         '#| <length> | <percentage> | inherit',
-                        'rule min-width {',
+                        'rule expr-min-width {',
                         ':i <length> | <percentage> | [inherit & <keyw>]  }',
                        ''),
     },
@@ -137,7 +137,7 @@ for (
                         rule-refs => [<attr counter identifier string uri>],
                         deparse => join("\n",
                                         '#| normal | none | [ <string> | <uri> | <counter> | attr(<identifier>) | open-quote | close-quote | no-open-quote | no-close-quote ]+ | inherit',
-                                        'rule content {',
+                                        'rule expr-content {',
                                         ':i [[normal | none ]& <keyw>] | [<string> | <uri> | <counter> | <attr> | [["open-quote" | "close-quote" | "no-open-quote" | "no-close-quote" ]& <keyw>] ]+ | [inherit & <keyw>]  }',
                                         ''
                                        ),

@@ -31,13 +31,14 @@ sub expression($expression) {
 multi sub compile(:@props!, :$default, :$spec, Str :$synopsis, Bool :$inherit = True) {
     die "todo: {@props}" unless @props == 1;
     my $prop = @props.head;
-    my RakuAST::Name $name = $prop.&name;
-    my RakuAST::Regex $body =$spec.&compile;
+    my RakuAST::Regex $body = $spec.&compile;
     $body = seq [ modifier('i'),  ws($body), ];
 
     my Str $leading = $_ ~ "\n" with $synopsis;
 
-    rule(:$name, :$body, :$leading).&expression.&statements;
+    (
+        rule(name => ('expr-' ~ $prop).&name, :$body, :$leading).&expression,
+     ).&statements;
 }
 
 multi sub compile(:@occurs! ($quant!, *%term)) {
