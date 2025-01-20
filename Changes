@@ -1,4 +1,6 @@
 {{$NEXT}}
+  - Backported CSS::Specification::AST methods to
+    CSS::Grammar::AST (v0.3.13)
 
 0.4.13  2023-01-01T10:28:12+13:00
   - Fix for Color::Names api(v2)
