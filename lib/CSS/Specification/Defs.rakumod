@@ -5,14 +5,14 @@ grammar CSS::Specification::Defs {
     proto rule proforma {*}
 
     token val( $*EXPR, $*USAGE='' ) {
-        <proforma> || <rx={$*EXPR}> || <usage>
+        <proforma> || <rx={$*EXPR}> || <usage($*USAGE)>
     }
 
     token seen($opt) {
         <?{@*SEEN[$opt]++}>
     }
 
-    token usage {
+    token usage($*USAGE) {
         <any-args>
     }
 
