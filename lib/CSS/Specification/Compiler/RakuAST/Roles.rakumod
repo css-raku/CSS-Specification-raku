@@ -11,9 +11,10 @@ method role-package(@role-id) {
     my @expression = @methods.map(-> $expression { RakuAST::Statement::Expression.new: :$expression });
     my RakuAST::Blockoid $body .= new: RakuAST::StatementList.new(|@expression);
     my RakuAST::Name $name .= from-identifier-parts(|@role-id);
+
     RakuAST::Role.new(
         :$name,
-        :body(RakuAST::Block.new: :$body),
+        :body(RakuAST::RoleBody.new: :$body),
         :scope<unit>,
     );
 }
