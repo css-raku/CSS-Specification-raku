@@ -1,5 +1,13 @@
 {{$NEXT}}
 
+0.4.15  2025-01-21T12:16:33+13:00
+  - Revert v0.4.14 changes to usage token; unbreaks
+    CSS::Module
+
+0.4.14  2025-01-21T10:15:22+13:00
+  - Backported CSS::Specification::AST methods to
+    CSS::Grammar::AST (v0.3.13)
+
 0.4.13  2023-01-01T10:28:12+13:00
   - Fix for Color::Names api(v2)
 

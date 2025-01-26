@@ -1,9 +1,9 @@
 unit class CSS::Specification::Compiler::Runtime::Actions;
 
 use CSS::Grammar::Defs :CSSValue;
-use CSS::Specification::Compiler::Runtime::AST-Builder;
+use CSS::Grammar::AST;
 
-method build { CSS::Specification::Compiler::Runtime::AST-Builder }
+method build { CSS::Grammar::AST }
 
 method val($/) {
     my %ast;
