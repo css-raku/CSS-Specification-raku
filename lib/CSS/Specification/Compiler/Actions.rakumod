@@ -147,11 +147,11 @@ method value:sym<rule>($/) {
 
 method value:sym<op>($/) { my $op = $/.trim; make (:$op); }
 
-method property-ref:sym<css21>($/) { make $<id>.ast }
-method property-ref:sym<css3>($/) { make $<id>.ast }
+method property-ref:sym<css21>($/) { make 'ref' => $<id>.ast }
+method property-ref:sym<css3>($/) { make 'ref' => $<id>.ast }
 method value:sym<prop-ref>($/)        {
-    my $prop-ref = $<property-ref>.ast;
-    my $rule = 'expr-' ~ $prop-ref;
+    my Pair $prop-ref = $<property-ref>.ast;
+    my $rule = 'expr-' ~ $prop-ref.value;
     %.rule-refs{ $rule; }++;
     %.child-props{$_}.push: $prop-ref for @*PROP-NAMES;
     make (:$rule);

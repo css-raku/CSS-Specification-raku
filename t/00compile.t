@@ -118,8 +118,9 @@ for (
         rule-refs => ['length', 'percentage'],
         deparse => join("\n",
                         '#| <length> | <percentage> | inherit',
-                        'rule expr-min-width {',
-                        ':i <length> | <percentage> | [inherit & <keyw>]  }',
+                        'rule decl:sym<min-width> {;',
+                        ':i ("min-width") ":" <val(/ <expr=.expr-min-width> /, &?ROUTINE.WHY)> }',
+                        'rule expr-min-width { :i <length> | <percentage> | [inherit & <keyw>]  }',
                        ''),
     },
     'property-spec' => {input => "'content'\tnormal | none | [ <string> | <uri> | <counter> | attr(<identifier>) | open-quote | close-quote | no-open-quote | no-close-quote ]+ | inherit\tnormal	:before and :after pseudo-elements	no",
@@ -137,8 +138,9 @@ for (
                         rule-refs => [<attr counter identifier string uri>],
                         deparse => join("\n",
                                         '#| normal | none | [ <string> | <uri> | <counter> | attr(<identifier>) | open-quote | close-quote | no-open-quote | no-close-quote ]+ | inherit',
-                                        'rule expr-content {',
-                                        ':i [[normal | none ]& <keyw>] | [<string> | <uri> | <counter> | <attr> | [["open-quote" | "close-quote" | "no-open-quote" | "no-close-quote" ]& <keyw>] ]+ | [inherit & <keyw>]  }',
+                                        'rule decl:sym<content> {;', # stray semicolon?
+                                        ':i (content) ":" <val(/ <expr=.expr-content> /, &?ROUTINE.WHY)> }',
+                                        'rule expr-content { :i [[normal | none ]& <keyw>] | [<string> | <uri> | <counter> | <attr> | [["open-quote" | "close-quote" | "no-open-quote" | "no-close-quote" ]& <keyw>] ]+ | [inherit & <keyw>]  }',
                                         ''
                                        ),
 

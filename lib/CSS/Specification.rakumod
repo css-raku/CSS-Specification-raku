@@ -40,7 +40,7 @@ grammar CSS::Specification:ver<0.4.15> {
     rule digits      { \d+ }
     rule rule        { '<'~'>' <id> }
 
-    rule seq         { <term=.term-options>+ }
+    rule seq           { <term=.term-options>+ }
     rule term-options  { <term=.term-combo>    +% '|'  }
     rule term-combo    { <term=.term-required> +% '||' }
     rule term-required { <term=.term-seq>      +% '&&' }

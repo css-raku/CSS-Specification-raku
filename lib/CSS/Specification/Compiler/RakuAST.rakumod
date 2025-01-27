@@ -8,12 +8,10 @@ our proto sub compile (|c) is export(:compile) {
 
 multi sub modifier('i') { RakuAST::Regex::InternalModifier::IgnoreCase.new }
 
-sub rule(RakuAST::Name:D :$name!, RakuAST::Regex:D :$body!, Str :$leading) {
+sub rule(RakuAST::Name:D :$name!, RakuAST::Regex:D :$body!) {
     RakuAST::RuleDeclaration.new(
             :$name,
             :$body,
-        ).declarator-docs(
-            :$leading
         )
 }
 
@@ -28,16 +26,55 @@ sub expression($expression) {
     RakuAST::Statement::Expression.new: :$expression;
 }
 
+sub property-decl(Str:D $prop-name) {
+    rule(
+      name => RakuAST::Name.from-identifier("decl:sym<$prop-name>"),
+      body => seq (
+        'i'.&modifier,
+        RakuAST::Regex::CapturingGroup.new(
+            (
+              $prop-name.&lit,
+            ).&seq
+        ).&ws,
+        RakuAST::Regex::Quote.new(
+            RakuAST::QuotedString.new(
+              segments   => (
+                RakuAST::StrLiteral.new(":"),
+              )
+            )
+        ).&ws,
+        RakuAST::Regex::Assertion::Named::Args.new(
+            name      => 'val'.&name,
+            args      => RakuAST::ArgList.new(
+                RakuAST::QuotedRegex.new(
+                    body => RakuAST::Regex::WithWhitespace.new(
+                        RakuAST::Regex::Assertion::Alias.new(
+                            name      => "expr",
+                            assertion => ("expr-" ~ $prop-name).&assertion(:!capturing),
+                        )
+                    )
+                ),
+                RakuAST::Var::Compiler::Routine.new.&postfix('WHY'.&call),
+            ),
+            :capturing
+        ).&ws
+      )
+    );
+}
+
 multi sub compile(:@props!, :$default, :$spec, Str :$synopsis, Bool :$inherit = True) {
     die "todo: {@props}" unless @props == 1;
     my $prop = @props.head;
     my RakuAST::Regex $body = $spec.&compile;
-    $body = seq [ modifier('i'),  ws($body), ];
+    $body = ('i'.&modifier,  $body.&ws, ).&seq;
 
     my Str $leading = $_ ~ "\n" with $synopsis;
 
     (
-        rule(name => ('expr-' ~ $prop).&name, :$body, :$leading).&expression,
+        $prop.&property-decl.declarator-docs(
+            :$leading
+        ),
+        rule(name => ('expr-' ~ $prop).&name, :$body).&expression,
      ).&statements;
 }
 
@@ -60,7 +97,7 @@ multi sub quant(Array:D $_ where .elems >= 2) {
 
 sub name(Str:D $id) is export {  RakuAST::Name.from-identifier($id) }
 
-sub look-ahead(RakuAST::Regex::Assertion $assertion, Bool :$negated = False, Bool :$capturing = False) is export {
+sub look-ahead(RakuAST::Regex::Assertion $assertion, Bool :$negated = False) is export {
     RakuAST::Regex::Assertion::Lookahead.new(
         :$assertion, :$negated
     );
@@ -93,7 +130,6 @@ multi sub arg(Int:D $arg) {
 multi sub ws(RakuAST::Regex $r) is export { RakuAST::Regex::WithWhitespace.new($r) }
 
 sub lit(Str:D $s) is export { RakuAST::Regex::Literal.new($s) }
-sub lit-ws(Str:D() $_) is export { .&lit.&ws }
 
 sub group(RakuAST::Regex $r) is export  { RakuAST::Regex::Group.new: $r }
 
@@ -177,6 +213,8 @@ multi sub compile(:@keywords!) {
 multi sub compile(:@numbers!) {
     _choice @numbers.map(&lit-ws), 'number'.&assertion;
 }
+
+sub lit-ws(Str:D() $_) is export { .&lit.&ws }
 
 multi sub compile(Str:D :$op!) {
     my RakuAST::ArgList $args = ','.&arg;
