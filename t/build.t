@@ -35,7 +35,7 @@ capture({
 }, 't/lib/Test/CSS/Aural/Spec/Grammar.rakumod');
 lives-ok {require ::($grammar-name)}, "$grammar-name compilation";
 
-my RakuAST::Package $grammar-pkg = $compiler.grammar-package(@grammar-id);
+my RakuAST::Package $grammar-pkg = $compiler.build-grammar(@grammar-id);
 
 't/lib/Test/CSS/Aural/Spec/GrammarAST.rakumod'.IO.spurt: $grammar-pkg.DEPARSE;
 
@@ -44,12 +44,12 @@ capture({
 }, 't/lib/Test/CSS/Aural/Spec/Actions.rakumod');
 lives-ok {require ::($actions-name)}, "$actions-name compilation";
 
-my RakuAST::Package $actions-pkg = $compiler.actions-package(@actions-id);
+my RakuAST::Package $actions-pkg = $compiler.build-actions(@actions-id);
 
 't/lib/Test/CSS/Aural/Spec/ActionsAST.rakumod'.IO.spurt: $actions-pkg.DEPARSE;
 
 my $role-name = @role-id.join: '::';
-my RakuAST::Package $interface-pkg = $compiler.role-package(@role-id);
+my RakuAST::Package $interface-pkg = $compiler.build-role(@role-id);
 't/lib/Test/CSS/Aural/Spec/Interface.rakumod'.IO.spurt: $interface-pkg.DEPARSE;
 lives-ok {require ::($role-name)}, "$role-name compilation";
 

@@ -152,7 +152,7 @@ method property-ref:sym<css3>($/) { make 'ref' => $<id>.ast }
 method value:sym<prop-ref>($/)        {
     my Pair $prop-ref = $<property-ref>.ast;
     my $rule = 'expr-' ~ $prop-ref.value;
-    %.rule-refs{ $rule; }++;
+    %.rule-refs{ $rule }++;
     %.child-props{$_}.push: $prop-ref for @*PROP-NAMES;
     make (:$rule);
 }

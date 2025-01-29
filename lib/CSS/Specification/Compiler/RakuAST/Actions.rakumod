@@ -7,7 +7,7 @@ use experimental :rakuast;
 method actions { ... }
 method defs { ... }
 
-method actions-package(@actions-id) {
+method build-actions(@actions-id) {
     # stub
     my RakuAST::Name $name .= from-identifier-parts(|@actions-id);
     RakuAST::Class.new(
