@@ -32,8 +32,9 @@ sub expression($expression) {
 }
 
 sub property-decl(Str:D $prop-name) {
+    my RakuAST::Name $name = "decl:sym<$prop-name>".&name;
     rule(
-      name => RakuAST::Name.from-identifier("decl:sym<$prop-name>"),
+      :$name,
       body => seq (
         'i'.&modifier,
         RakuAST::Regex::CapturingGroup.new(
@@ -67,20 +68,39 @@ sub property-decl(Str:D $prop-name) {
     );
 }
 
-multi sub compile(:@props!, :$default, :$spec, Str :$synopsis, Bool :$inherit = True) {
-    die "todo: {@props}" unless @props == 1;
-    my $prop = @props.head;
+multi sub compile(:@props!, :$default, :$spec!, Str :$synopsis!, Bool :$inherit = True) {
     my RakuAST::Regex $body = $spec.&compile;
     $body = ('i'.&modifier,  $body.&ws, ).&seq;
 
     my Str $leading = $_ ~ "\n" with $synopsis;
 
-    (
+    my RakuAST::Statement::Expression @exprs;
+
+    for @props -> $prop {
+        @exprs.append: (
         $prop.&property-decl.declarator-docs(
             :$leading
-        ),
+        ).&expression,
         rule(name => ('expr-' ~ $prop).&name, :$body).&expression,
-     ).&statements;
+    )
+    }
+    @exprs;
+}
+
+multi sub compile(Str :$rule!, :$spec!, Str :$synopsis!) {
+    my RakuAST::Regex $body = $spec.&compile;
+    $body = ('i'.&modifier,  $body.&ws, ).&seq;
+
+    my Str $leading = $_ ~ "\n" with $synopsis;
+    my RakuAST::Name $name = $rule.&name;
+
+    (
+        rule(
+            :$name, :$body
+        ).declarator-docs(
+            :$leading
+        ).&expression,
+    );
 }
 
 multi sub compile(:@occurs! ($quant!, *%term)) {
@@ -251,10 +271,14 @@ multi sub compile(:@combo!, Bool :$required) {
 multi sub compile($arg) { compile |$arg }
 
 method build-grammar(@grammar-id) {
-    # stub
     my RakuAST::Name $name .= from-identifier-parts(|@grammar-id);
+    my RakuAST::Statement::Expression @compiled = flat @.defs.map: &compile;
+    my RakuAST::StatementList $statements .= new: |@compiled;
+    my RakuAST::Blockoid $body .= new: |$statements;
+
     RakuAST::Grammar.new(
         :$name,
         :scope<unit>,
+        body => RakuAST::Block.new(:$body),
     );
 }

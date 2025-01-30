@@ -8,14 +8,14 @@ method actions { ... }
 
 method build-role(@role-id) {
     my RakuAST::Method @methods = self!interface-methods;
-    my @expression = @methods.map(-> $expression { RakuAST::Statement::Expression.new: :$expression });
-    my RakuAST::Blockoid $body .= new: RakuAST::StatementList.new(|@expression);
+    my @expressions = @methods.map(-> $expression { RakuAST::Statement::Expression.new: :$expression });
+    my RakuAST::Blockoid $body .= new: RakuAST::StatementList.new(|@expressions);
     my RakuAST::Name $name .= from-identifier-parts(|@role-id);
 
     RakuAST::Role.new(
         :$name,
-        :body(RakuAST::RoleBody.new: :$body),
         :scope<unit>,
+        :body(RakuAST::RoleBody.new: :$body),
     );
 }
 

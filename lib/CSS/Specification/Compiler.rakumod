@@ -12,7 +12,7 @@ also does CSS::Specification::Compiler::RakuAST::Roles;
 use CSS::Specification;
 use CSS::Specification::Compiler::Actions;
 has CSS::Specification::Compiler::Actions:D $.actions .= new;
-has @.defs;
+has Associative @.defs;
 
 method load-defs($properties-spec) {
     my $fh = $properties-spec
@@ -27,11 +27,9 @@ method load-defs($properties-spec) {
 
         my $/ = CSS::Specification.subparse($spec, :$!actions )
             // die "unable to parse: $spec";
-        my $defs = $/.ast;
-        @!defs.append: @$defs;
+        my $ast = $/.ast;
+        @!defs.append: @$ast;
     }
-
-    @!defs;
 }
 
 
