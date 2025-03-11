@@ -240,15 +240,18 @@ multi sub compile(:@alt!)   { alt @alt.map(&compile).map(&ws) }
 multi sub compile(:@seq!)   { seq @seq.map(&compile).map(&ws) }
 multi sub compile(:$group!) { group compile($group) }
 
-my constant Seen-Decl = RakuAST::Regex::Statement.new(
-    expression RakuAST::VarDeclaration::Simple.new(
+multi sub compile(:required(@combo)!) {
+    compile(:@combo, :required);
+}
+
+sub combo($atom) {
+    my constant Seen-Decl = RakuAST::Regex::Statement.new(
+        expression RakuAST::VarDeclaration::Simple.new(
             sigil       => "\@",
             desigilname => RakuAST::Name.from-identifier("S")
         )
     );
-
-multi sub compile(:required(@combo)!) {
-    compile(:@combo, :required);
+    [Seen-Decl, $atom].&seq.&group;
 }
 
 multi sub compile(:@combo!, Bool :$required) {
@@ -258,7 +261,7 @@ multi sub compile(:@combo!, Bool :$required) {
         my RakuAST::Regex $term = compile($_);
         [$term, $seen].&seq;
     }
-    $atom = [Seen-Decl, $atom].&seq.&group;
+    $atom .= &combo;
     my RakuAST::Regex::Quantifier $quantifier = $required
         ?? quant([$n, $n])
         !! quant('+');
