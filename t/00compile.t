@@ -120,7 +120,7 @@ for (
         deparse => join("\n",
                         '#| <length> | <percentage> | inherit',
                         'rule decl:sym<min-width> {;',
-                        ':i ("min-width") ":" <val(/ <expr=.expr-min-width> /, &?ROUTINE.WHY)> }',
+                        ':i ("min-width") ":" <val(/<expr=.expr-min-width> /, &?ROUTINE.WHY)> }',
                         'rule expr-min-width { :i <length> | <percentage> | [inherit & <keyw>]  }',
                        ''),
     },
@@ -140,7 +140,7 @@ for (
                         deparse => join("\n",
                                         '#| normal | none | [ <string> | <uri> | <counter> | attr(<identifier>) | open-quote | close-quote | no-open-quote | no-close-quote ]+ | inherit',
                                         'rule decl:sym<content> {;', # stray semicolon?
-                                        ':i (content) ":" <val(/ <expr=.expr-content> /, &?ROUTINE.WHY)> }',
+                                        ':i (content) ":" <val(/<expr=.expr-content> /, &?ROUTINE.WHY)> }',
                                         'rule expr-content { :i [[normal | none ]& <keyw>] | [<string> | <uri> | <counter> | <attr> | [["open-quote" | "close-quote" | "no-open-quote" | "no-close-quote" ]& <keyw>] ]+ | [inherit & <keyw>]  }',
                                         ''
                                        ),

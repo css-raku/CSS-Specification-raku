@@ -38,9 +38,7 @@ sub property-decl(Str:D $prop-name) {
       body => seq (
         'i'.&modifier,
         RakuAST::Regex::CapturingGroup.new(
-            (
-              $prop-name.&lit,
-            ).&seq
+            ( $prop-name.&lit, ).&seq
         ).&ws,
         RakuAST::Regex::Quote.new(
             RakuAST::QuotedString.new(
@@ -194,7 +192,7 @@ sub seen(Int:D $id) is export {
     my RakuAST::Var $operand = '@S'.&lexical;
     my RakuAST::Block $block .= new(
         body => RakuAST::Blockoid.new(
-            RakuAST::StatementList.new(
+            statements(
                 expression $operand.&postfix($op).&postfix(
                     RakuAST::Postfix.new(operator => "++")
                 )
@@ -274,11 +272,11 @@ method build-grammar(@grammar-id) {
     my RakuAST::Name $name .= from-identifier-parts(|@grammar-id);
     my RakuAST::Statement::Expression @compiled = flat @.defs.map: &compile;
     my RakuAST::StatementList $statements .= new: |@compiled;
-    my RakuAST::Blockoid $body .= new: |$statements;
+    my RakuAST::Block $body .= new: :body(RakuAST::Blockoid.new: $statements);
 
     RakuAST::Grammar.new(
         :$name,
         :scope<unit>,
-        body => RakuAST::Block.new(:$body),
+        :$body,
     );
 }
