@@ -248,7 +248,7 @@ sub combo($atom) {
     my constant Seen-Decl = RakuAST::Regex::Statement.new(
         expression RakuAST::VarDeclaration::Simple.new(
             sigil       => "\@",
-            desigilname => RakuAST::Name.from-identifier("S")
+            desigilname => RakuAST::Name.from-identifier('S')
         )
     );
     [Seen-Decl, $atom].&seq.&group;
