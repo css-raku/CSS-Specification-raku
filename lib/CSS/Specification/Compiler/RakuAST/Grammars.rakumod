@@ -70,7 +70,8 @@ multi sub compile(:@props!, :$default, :$spec!, Str :$synopsis!, Bool :$inherit 
     my RakuAST::Regex $body = $spec.&compile;
     $body = ('i'.&modifier,  $body.&ws, ).&seq;
 
-    my Str $leading = $_ ~ "\n" with $synopsis;
+    my Str $leading = (@props.head, ': ', $_, "\n").join
+        with $synopsis;
 
     my RakuAST::Statement::Expression @exprs;
 
@@ -257,8 +258,8 @@ sub combo($atom) {
 multi sub compile(:@combo!, Bool :$required) {
     my UInt $n = 0;
     my RakuAST::Regex $atom = alt @combo.map: {
-        my RakuAST::Regex::Assertion $seen = seen($n++);
-        my RakuAST::Regex $term = compile($_);
+        my RakuAST::Regex::Assertion $seen = $n++.&seen;
+        my RakuAST::Regex $term = .&compile;
         [$term, $seen].&seq;
     }
     $atom .= &combo;
