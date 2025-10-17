@@ -38,7 +38,7 @@ sub property-decl(Str:D $prop-name) {
       body => seq (
         'i'.&modifier,
         RakuAST::Regex::CapturingGroup.new(
-            ( $prop-name.&lit, ).&seq
+            $prop-name.&lit.&seq
         ).&ws,
         RakuAST::Regex::Quote.new(
             RakuAST::QuotedString.new(
@@ -159,7 +159,8 @@ sub alt(@choices) is export {
     RakuAST::Regex::Alternation.new: |@choices;
 }
 
-sub seq(@seq) is export  { RakuAST::Regex::Sequence.new: |@seq }
+multi sub seq(@seq) is export  { RakuAST::Regex::Sequence.new: |@seq }
+multi sub seq($seq) is export  { RakuAST::Regex::Sequence.new: $seq }
 
 sub conjunct(RakuAST::Regex $r1, RakuAST::Regex $r2) is export {
     RakuAST::Regex::Conjunction.new($r1, $r2).&group;
@@ -218,7 +219,7 @@ sub _choice(@lits, RakuAST::Regex $term2) {
     conjunct($term1, $term2);
 }
 
-multi sub compile(Str:D :$rule) {
+multi sub compile(Str:D :$rule!) {
     $rule.&assertion;
 }
 
