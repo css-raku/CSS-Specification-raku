@@ -108,7 +108,7 @@ for (
         deparse => "[:my \@S\n; [bold \& <keyw>]<!\{\n    \@S[0]++\n}>| [:my \@S\n; [thin \& <keyw>]<!\{\n    \@S[0]++\n}>| <length><!\{\n    \@S[1]++\n}>]** 2<!\{\n    \@S[1]++\n}>]+",
         rule-refs => ['length'],
     },
-    'property-spec' => {
+   'property-spec' => {
         input => "'min-width'\t<length> | <percentage> | inherit\t0",
         ast => {
             :props['min-width'],

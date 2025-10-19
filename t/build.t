@@ -35,9 +35,9 @@ capture({
 }, 't/lib/Test/CSS/Aural/Spec/Grammar.rakumod');
 lives-ok {require ::($grammar-name)}, "$grammar-name compilation";
 
-my RakuAST::Package $grammar-pkg = $compiler.build-grammar(@grammar-id);
+my RakuAST::StatementList $grammar = $compiler.build-grammar(@grammar-id);
 
-'t/lib/Test/CSS/Aural/Spec/GrammarAST.rakumod'.IO.spurt: $grammar-pkg.DEPARSE;
+'t/lib/Test/CSS/Aural/Spec/GrammarAST.rakumod'.IO.spurt: $grammar.DEPARSE;
 
 capture({
     CSS::Specification::Build::generate( 'actions', $actions-name, :$input-path );

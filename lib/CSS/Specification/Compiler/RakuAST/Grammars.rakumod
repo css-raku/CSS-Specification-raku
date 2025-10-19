@@ -163,7 +163,7 @@ multi sub seq(@seq) is export  { RakuAST::Regex::Sequence.new: |@seq }
 multi sub seq($seq) is export  { RakuAST::Regex::Sequence.new: $seq }
 
 sub conjunct(RakuAST::Regex $r1, RakuAST::Regex $r2) is export {
-    RakuAST::Regex::Conjunction.new($r1, $r2).&group;
+    RakuAST::Regex::Conjunction.new($r1, $r2);
 }
 
 sub lexical(Str:D $sym) is export {
@@ -215,7 +215,7 @@ multi sub compile(Str:D() :$num!) {
 }
 
 sub _choice(@lits, RakuAST::Regex $term2) {
-    my RakuAST::Regex $term1 = @lits == 1 ?? @lits[0] !! @lits.&alt.&group;
+    my RakuAST::Regex $term1 = @lits == 1 ?? @lits[0] !! @lits.&alt;
     conjunct($term1, $term2);
 }
 
@@ -240,30 +240,28 @@ multi sub compile(Str:D :$op!) {
 
 multi sub compile(:@alt!)   { alt @alt.map(&compile).map(&ws) }
 multi sub compile(:@seq!)   { seq @seq.map(&compile).map(&ws) }
-multi sub compile(:$group!) { group compile($group) }
+multi sub compile(:$group!) { group $group.&compile }
 
 multi sub compile(:required(@combo)!) {
     compile(:@combo, :required);
 }
 
-sub combo($atom) {
+multi sub compile(:@combo!, Bool :$required) {
     my constant Seen-Decl = RakuAST::Regex::Statement.new(
-        expression RakuAST::VarDeclaration::Simple.new(
+        RakuAST::VarDeclaration::Simple.new(
             sigil       => "\@",
             desigilname => RakuAST::Name.from-identifier('S')
-        )
-    );
-    [Seen-Decl, $atom].&seq.&group;
-}
-
-multi sub compile(:@combo!, Bool :$required) {
+        ).&expression
+    ).&ws;
     my UInt $n = 0;
-    my RakuAST::Regex $atom = alt @combo.map: {
+    my @atoms = @combo.map: {
         my RakuAST::Regex::Assertion $seen = $n++.&seen;
         my RakuAST::Regex $term = .&compile;
-        [$term, $seen].&seq;
+        my @seq = [$term, $seen];
+        @seq.unshift: Seen-Decl if $n == 1;
+        @seq.&seq;
     }
-    $atom .= &combo;
+    my $atom = @atoms == 1 ?? @atoms.head !! @atoms.&alt;
     my RakuAST::Regex::Quantifier $quantifier = $required
         ?? quant([$n, $n])
         !! quant('+');
@@ -283,5 +281,5 @@ method build-grammar(@grammar-id) {
         :$name,
         :scope<unit>,
         :$body,
-    );
+    ).&expression.&statements;
 }
