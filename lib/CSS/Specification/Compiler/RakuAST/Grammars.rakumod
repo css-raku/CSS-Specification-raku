@@ -51,12 +51,10 @@ sub property-decl(Str:D $prop-name) {
             name      => 'val'.&name,
             args      => RakuAST::ArgList.new(
                 RakuAST::QuotedRegex.new(
-                    body => RakuAST::Regex::WithWhitespace.new(
-                        RakuAST::Regex::Assertion::Alias.new(
-                            name      => "expr",
-                            assertion => ("expr-" ~ $prop-name).&assertion(:!capturing),
-                        )
-                    )
+                    body => RakuAST::Regex::Assertion::Alias.new(
+                        name      => "expr",
+                        assertion => ("expr-" ~ $prop-name).&assertion(:!capturing),
+                    ).&ws,
                 ),
                 RakuAST::Var::Compiler::Routine.new.&postfix('WHY'.&call),
             ),
@@ -103,7 +101,7 @@ multi sub compile(Str :$rule!, :$spec!, Str :$synopsis!) {
 }
 
 multi sub compile(:@occurs! ($quant!, *%term)) {
-    my RakuAST::Regex $atom = compile(|%term);
+    my RakuAST::Regex $atom = (|%term).&compile.&group;
     my RakuAST::Regex $separator = compile(:op<,>)
         if $quant.tail ~~ ',';
 
@@ -149,11 +147,16 @@ multi sub arg(Int:D $arg) {
     RakuAST::ArgList.new: RakuAST::IntLiteral.new($arg);
 }
 
+multi sub ws(RakuAST::Regex::WithWhitespace $w) is export { $w }
 multi sub ws(RakuAST::Regex $r) is export { RakuAST::Regex::WithWhitespace.new($r) }
 
 sub lit(Str:D $s) is export { RakuAST::Regex::Literal.new($s) }
 
-sub group(RakuAST::Regex $r) is export  { RakuAST::Regex::Group.new: $r }
+multi sub group(RakuAST::Regex::Group $g) {$g}
+multi sub group(RakuAST::Regex::Assertion $a) {$a}
+multi sub group(RakuAST::Regex $r) is export  {
+    RakuAST::Regex::Group.new: $r
+}
 
 sub alt(@choices) is export {
     RakuAST::Regex::Alternation.new: |@choices;
@@ -207,15 +210,15 @@ sub seen(Int:D $id) is export {
  }
 
 multi sub compile(Str:D :$keyw!) {
-    conjunct $keyw.&lit, 'keyw'.&assertion;
+    conjunct $keyw.&lit-ws, 'keyw'.&assertion;
 }
 
 multi sub compile(Str:D() :$num!) {
-    conjunct $num.&lit, 'number'.&assertion;
+    conjunct $num.&lit-ws, 'number'.&assertion;
 }
 
 sub _choice(@lits, RakuAST::Regex $term2) {
-    my RakuAST::Regex $term1 = @lits == 1 ?? @lits[0] !! @lits.&alt;
+    my RakuAST::Regex $term1 = @lits == 1 ?? @lits[0] !! @lits.&alt.&group;
     conjunct($term1, $term2);
 }
 
@@ -261,7 +264,7 @@ multi sub compile(:@combo!, Bool :$required) {
         @seq.unshift: Seen-Decl if $n == 1;
         @seq.&seq;
     }
-    my $atom = @atoms == 1 ?? @atoms.head !! @atoms.&alt;
+    my $atom = @atoms == 1 ?? @atoms.head !! @atoms.&alt.&group;
     my RakuAST::Regex::Quantifier $quantifier = $required
         ?? quant([$n, $n])
         !! quant('+');
