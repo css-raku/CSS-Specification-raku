@@ -130,17 +130,23 @@ for (
                        ''),
     },
     'property-spec' => {input => "'content'\tnormal | none | [ <string> | <uri> | <counter> | attr(<identifier>) | open-quote | close-quote | no-open-quote | no-close-quote ]+ | inherit\tnormal	:before and :after pseudo-elements	no",
-                        ast => {:props['content'],
-                                :default<normal>,
-                                :spec{:alt[
-                                               {:keywords<normal none>},
-                                               {:occurs["+",
-                                                        {:group(${:alt[{:rule<string>}, {:rule<uri>}, {:rule<counter>}, {:rule<attr>}, {:keywords<open-quote close-quote no-open-quote no-close-quote>}]})}]},
-                                               {:keywords["inherit"]},
-                                           ]},
-                                :synopsis('normal | none | [ <string> | <uri> | <counter> | attr(<identifier>) | open-quote | close-quote | no-open-quote | no-close-quote ]+ | inherit'),
-                                :!inherit,
-                               },
+                        :ast{:props['content'],
+                             :default<normal>,
+                             :spec{
+                                 :alt[
+                                          {:keywords<normal none>},
+                                          {:occurs["+",
+                                                   {:group{
+                                                        :alt[{:rule<string>}, {:rule<uri>}, {:rule<counter>}, {:rule<attr>}, {:keywords<open-quote close-quote no-open-quote no-close-quote>}]}
+                                                   },
+                                                  ]
+                                          },
+                                          {:keywords["inherit"]},
+                                      ]
+                             },
+                             :synopsis('normal | none | [ <string> | <uri> | <counter> | attr(<identifier>) | open-quote | close-quote | no-open-quote | no-close-quote ]+ | inherit'),
+                             :!inherit,
+                            },
                         rule-refs => [<attr counter identifier string uri>],
                         deparse => join("\n",
                                         '#| content: normal | none | [ <string> | <uri> | <counter> | attr(<identifier>) | open-quote | close-quote | no-open-quote | no-close-quote ]+ | inherit',

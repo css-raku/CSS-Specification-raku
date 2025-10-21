@@ -26,34 +26,36 @@ my $input-path = $*SPEC.catfile('examples', 'css21-aural.txt');
 my CSS::Specification::Compiler $compiler .= new;
 $compiler.load-defs($input-path);
 
+sub name(RakuAST::Package $p, $j) {
+    $p.name.parts>>.name.join: $j
+}
+
 my @summary = CSS::Specification::Build::summary( :$input-path );
 is +@summary, 25, 'number of summary items';
-is-deeply [@summary.grep({ .<box> })], [{:box, :!inherit, :name<border-color>, :edges["border-top-color", "border-right-color", "border-bottom-color", "border-left-color"], :synopsis("[ <color> | transparent ]\{1,4}")},], 'summary item';
+is-deeply @summary.first(*.<box>), {:box, :!inherit, :name<border-color>, :edges["border-top-color", "border-right-color", "border-bottom-color", "border-left-color"], :synopsis("[ <color> | transparent ]\{1,4}")}, 'summary item';
 
 {
     CSS::Specification::Build::generate( 'grammar', $grammar-name, :$input-path );
 }.&capture: 't/lib/Test/CSS/Aural/Spec/Grammar.rakumod';
 lives-ok {require ::($grammar-name)}, "$grammar-name compilation";
 
-my RakuAST::StatementList $grammar = $compiler.build-grammar(@grammar-id);
-
-'t/lib/Test/CSS/Aural/Spec/GrammarAST.rakumod'.IO.spurt: $grammar.DEPARSE
-.subst(/";\n;"/, ';', :g) # work-around for https://github.com/rakudo/rakudo/issues/5991
-.subst(/'Grammar'/, 'GrammarAST')
-.subst(/'  '/, ' ', :g);
+@grammar-id.tail ~= 'AST'; # parallel build for now
+my RakuAST::Package $grammar = $compiler.build-grammar(@grammar-id);
+"t/lib/{$grammar.&name('/')}.rakumod".IO.spurt: $grammar.DEPARSE
+.subst(/";\n;"/, ';', :g); # work-around for https://github.com/rakudo/rakudo/issues/5991
 
 {
     CSS::Specification::Build::generate( 'actions', $actions-name, :$input-path );
 }.&capture: 't/lib/Test/CSS/Aural/Spec/Actions.rakumod';
 lives-ok {require ::($actions-name)}, "$actions-name compilation";
 
+@actions-id.tail ~= 'AST'; # parallel build for now
 my RakuAST::Package $actions-pkg = $compiler.build-actions(@actions-id);
-
-'t/lib/Test/CSS/Aural/Spec/ActionsAST.rakumod'.IO.spurt: $actions-pkg.DEPARSE;
+"t/lib/{$actions-pkg.&name('/')}.rakumod".IO.spurt: $actions-pkg.DEPARSE;
 
 my $role-name = @role-id.join: '::';
 my RakuAST::Package $interface-pkg = $compiler.build-role(@role-id);
-'t/lib/Test/CSS/Aural/Spec/Interface.rakumod'.IO.spurt: $interface-pkg.DEPARSE;
+"t/lib/{$interface-pkg.&name('/')}.rakumod".IO.spurt: $interface-pkg.DEPARSE;
 lives-ok {require ::($role-name)}, "$role-name compilation";
 
 dies-ok {require ::("Test::CSS::Aural::BadGrammar")}, 'grammar composition, unimplemented interface - dies';
@@ -67,29 +69,27 @@ lives-ok {$actions = (require ::("Test::CSS::Aural::Actions")).new}, 'class comp
 ok $actions.defined, '::("Test::CSS::Aural::Actions").new';
 
 for ('.aural-test { stress: 42; speech-rate: fast; volume: inherit; voice-family: female; }' =>
-     {ast => { :stylesheet[
-               :ruleset{
-                   :selectors[ :selector[ :simple-selector[ :class<aural-test> ] ] ],
-                   :declarations[
-                       :property{ :ident<stress>, :expr[{ :num(42) }] },
-                       :property{ :ident<speech-rate>, :expr[{ :keyw<fast> }] },
-                       :property{ :ident<volume>, :expr[{ :keyw<inherit> }] },
-                       :property{ :ident<voice-family>, :expr[{ :keyw<female> }] },
-                       ],
-                    }
-                   ]}
-      },
+     ast => :stylesheet[
+                     :ruleset{
+                         :selectors[ :selector[ :simple-selector[ :class<aural-test> ] ] ],
+                         :declarations[
+                                  :property{ :ident<stress>, :expr[ :num(42) ] },
+                                  :property{ :ident<speech-rate>, :expr[ :keyw<fast> ] },
+                                  :property{ :ident<volume>, :expr[ :keyw<inherit> ] },
+                                  :property{ :ident<voice-family>, :expr[ :keyw<female> ] },
+                              ],
+                     }
+                 ],
      '.boxed-test { border-color: #aaa }' =>
-     {ast => { :stylesheet[
+     ast => :stylesheet[
                     :ruleset{
-                        :selectors[ :selector[ :simple-selector[{:class<boxed-test>}] ]],
+                        :selectors[ :selector[ :simple-selector[ :class<boxed-test> ] ]],
                         :declarations[ :property{
                             :ident<border-color>,
-                            :expr[{ :rgb[ :num(170), :num(170), :num(170) ]}]}],
+                            :expr[ :rgb[ :num(170), :num(170), :num(170) ]]}],
                     }
-                   ]}
-     },
-    ) {
+                  ],
+     ) {
     my ($input, $expected) = .kv;
 
     &CSS::Grammar::Test::parse-tests($aural-class, $input, 

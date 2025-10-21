@@ -46,7 +46,7 @@ method any-function($/)             {
 
 multi method declaration($/ where $<any-declaration>)  {
     with $<any-declaration>.ast -> $ast {
-        my ($key, $value) = $ast.kv;
+        my :($key, $value) := $ast.kv;
         if $.lax {
             make $key => $value;
         }

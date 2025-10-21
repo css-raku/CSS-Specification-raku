@@ -285,5 +285,5 @@ method build-grammar(@grammar-id) {
         :$name,
         :scope<unit>,
         :$body,
-    ).&expression.&statements;
+    );
 }
