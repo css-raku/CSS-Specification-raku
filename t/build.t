@@ -30,20 +30,21 @@ my @summary = CSS::Specification::Build::summary( :$input-path );
 is +@summary, 25, 'number of summary items';
 is-deeply [@summary.grep({ .<box> })], [{:box, :!inherit, :name<border-color>, :edges["border-top-color", "border-right-color", "border-bottom-color", "border-left-color"], :synopsis("[ <color> | transparent ]\{1,4}")},], 'summary item';
 
-capture({
+{
     CSS::Specification::Build::generate( 'grammar', $grammar-name, :$input-path );
-}, 't/lib/Test/CSS/Aural/Spec/Grammar.rakumod');
+}.&capture: 't/lib/Test/CSS/Aural/Spec/Grammar.rakumod';
 lives-ok {require ::($grammar-name)}, "$grammar-name compilation";
 
 my RakuAST::StatementList $grammar = $compiler.build-grammar(@grammar-id);
 
 't/lib/Test/CSS/Aural/Spec/GrammarAST.rakumod'.IO.spurt: $grammar.DEPARSE
 .subst(/";\n;"/, ';', :g) # work-around for https://github.com/rakudo/rakudo/issues/5991
+.subst(/'Grammar'/, 'GrammarAST')
 .subst(/'  '/, ' ', :g);
 
-capture({
+{
     CSS::Specification::Build::generate( 'actions', $actions-name, :$input-path );
-}, 't/lib/Test/CSS/Aural/Spec/Actions.rakumod');
+}.&capture: 't/lib/Test/CSS/Aural/Spec/Actions.rakumod';
 lives-ok {require ::($actions-name)}, "$actions-name compilation";
 
 my RakuAST::Package $actions-pkg = $compiler.build-actions(@actions-id);

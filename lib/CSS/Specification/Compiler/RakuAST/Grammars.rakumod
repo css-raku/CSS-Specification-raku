@@ -163,8 +163,9 @@ sub alt(@choices) is export {
 }
 
 multi sub seq(@seq) is export  { RakuAST::Regex::Sequence.new: |@seq }
-multi sub seq($seq) is export  { RakuAST::Regex::Sequence.new: $seq }
+multi sub seq($seq) is export  { $seq }
 
+multi sub seq-alt(@seq) is export  { RakuAST::Regex::SequentialAlternation.new: |@seq }
 sub conjunct(RakuAST::Regex $r1, RakuAST::Regex $r2) is export {
     RakuAST::Regex::Conjunction.new($r1, $r2);
 }
@@ -241,7 +242,7 @@ multi sub compile(Str:D :$op!) {
     'op'.&assertion(:$args);
 }
 
-multi sub compile(:@alt!)   { alt @alt.map(&compile).map(&ws) }
+multi sub compile(:@alt!)   { seq-alt @alt.map(&compile).map(&ws) }
 multi sub compile(:@seq!)   { seq @seq.map(&compile).map(&ws) }
 multi sub compile(:$group!) { group $group.&compile }
 

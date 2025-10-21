@@ -35,7 +35,7 @@ for (
     'spec' => {
         input => '35 | 7 | 42?',
         ast => :alt[:numbers[35, 7], :occurs["?", :num(42)]],
-        deparse => '[35 | 7 ]& <number> | [42 & <number>]? ',
+        deparse => '[35 | 7 ]& <number> || [42 & <number>]? ',
     },
     'spec' => {
         input => "<rule-ref>",
@@ -58,7 +58,7 @@ for (
     'spec' => {
         input => "<rule-ref> [, [ 'css21-prop-ref' | <'css3-prop-ref'> ] ]*",
         ast => :seq[ :rule<rule-ref>, :occurs["*", :group( :seq[:op<,>, :group(:alt[:rule<expr-css21-prop-ref>, :rule<expr-css3-prop-ref>])])]],
-        deparse => '<rule-ref> [<op(",")> [<expr-css21-prop-ref> | <expr-css3-prop-ref> ] ]* ',
+        deparse => '<rule-ref> [<op(",")> [<expr-css21-prop-ref> || <expr-css3-prop-ref> ] ]* ',
         rule-refs => ["expr-css21-prop-ref", "expr-css3-prop-ref", "rule-ref"],
     },
     'spec' => {
@@ -78,6 +78,12 @@ for (
         ast => :occurs[[1, 4, ','], :rule<length>],
         deparse => '<length>** 1..4% <op(",")>',
         rule-refs => ['length'],
+    },
+    'spec' => {
+        input => '[<generic-voice> | <specific-voice> ]#',
+        ast => :occurs[",", :group(:alt[:rule("generic-voice"), :rule("specific-voice")])],
+        deparse => '[<generic-voice> || <specific-voice> ]+% <op(",")>',
+        rule-refs => ['generic-voice', 'specific-voice'],
     },
     'spec' => {
         input => 'attr(<identifier>)',
@@ -114,13 +120,13 @@ for (
             :props['min-width'],
             :default<0>,
             :synopsis("<length> | <percentage> | inherit"),
-            :spec(:alt([:rule("length"), :rule("percentage"), :keywords(["inherit"])])),
+            :spec(:alt[:rule("length"), :rule("percentage"), :keywords["inherit"]]),
         },
         rule-refs => ['length', 'percentage'],
         deparse => join("\n",
                         '#| min-width: <length> | <percentage> | inherit',
                         'rule decl:sym<min-width> { :i ("min-width") ":" <val(/<expr=.expr-min-width> /, &?ROUTINE.WHY)> }',
-                        'rule expr-min-width { :i <length> | <percentage> | inherit & <keyw>  }',
+                        'rule expr-min-width { :i <length> || <percentage> || inherit & <keyw>  }',
                        ''),
     },
     'property-spec' => {input => "'content'\tnormal | none | [ <string> | <uri> | <counter> | attr(<identifier>) | open-quote | close-quote | no-open-quote | no-close-quote ]+ | inherit\tnormal	:before and :after pseudo-elements	no",
@@ -139,7 +145,7 @@ for (
                         deparse => join("\n",
                                         '#| content: normal | none | [ <string> | <uri> | <counter> | attr(<identifier>) | open-quote | close-quote | no-open-quote | no-close-quote ]+ | inherit',
                                         'rule decl:sym<content> { :i (content) ":" <val(/<expr=.expr-content> /, &?ROUTINE.WHY)> }',
-                                        'rule expr-content { :i [normal | none ]& <keyw> | [<string> | <uri> | <counter> | <attr> | ["open-quote" | "close-quote" | "no-open-quote" | "no-close-quote" ]& <keyw> ]+ | inherit & <keyw>  }',
+                                        'rule expr-content { :i [normal | none ]& <keyw> || [<string> || <uri> || <counter> || <attr> || ["open-quote" | "close-quote" | "no-open-quote" | "no-close-quote" ]& <keyw> ]+ || inherit & <keyw>  }',
                                         ''
                                        ),
 
