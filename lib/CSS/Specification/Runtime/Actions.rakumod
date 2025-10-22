@@ -1,4 +1,4 @@
-unit class CSS::Specification::Compiler::Runtime::Actions;
+unit class CSS::Specification::Runtime::Actions;
 
 use CSS::Grammar::Defs :CSSValue;
 use CSS::Grammar::AST;

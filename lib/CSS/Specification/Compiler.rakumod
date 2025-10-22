@@ -1,17 +1,17 @@
 unit class CSS::Specification::Compiler;
 
-use CSS::Specification::Compiler::RakuAST::Actions;
-also does CSS::Specification::Compiler::RakuAST::Actions;
+use CSS::Specification::Compiler::Actions;
+also does CSS::Specification::Compiler::Actions;
 
-use CSS::Specification::Compiler::RakuAST::Grammars;
-also does CSS::Specification::Compiler::RakuAST::Grammars;
+use CSS::Specification::Compiler::Grammars;
+also does CSS::Specification::Compiler::Grammars;
 
-use CSS::Specification::Compiler::RakuAST::Roles;
-also does CSS::Specification::Compiler::RakuAST::Roles;
+use CSS::Specification::Compiler::Roles;
+also does CSS::Specification::Compiler::Roles;
 
 use CSS::Specification;
-use CSS::Specification::Compiler::Actions;
-has CSS::Specification::Compiler::Actions:D $.actions .= new;
+use CSS::Specification::Actions;
+has CSS::Specification::Actions:D $.actions .= new;
 has Associative @.defs;
 
 method load-defs($properties-spec) {

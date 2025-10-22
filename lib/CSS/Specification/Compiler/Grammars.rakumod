@@ -1,6 +1,6 @@
-unit role CSS::Specification::Compiler::RakuAST::Grammars;
+unit role CSS::Specification::Compiler::Grammars;
 
-use CSS::Specification::Compiler::RakuAST;
+use CSS::Specification::Compiler::Util;
 
 use experimental :rakuast;
 

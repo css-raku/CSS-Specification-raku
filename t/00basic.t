@@ -14,60 +14,71 @@ my CSS::Specification::Actions $actions .= new;
 for (
     'spec' => {
         input => 'thin',
-        ast => 'thin & <keyw>',
+        ast => :keywords['thin'],
     },
     'spec' => {
         input => 'thin?',
-        ast => '[ thin & <keyw> ]?',
+        ast => :occurs['?', :keyw<thin>],
     },
     'spec' => {
         input => 'thick | thin',
-        ast => '[ thick | thin ] & <keyw>',
+        ast => :keywords<thick thin>,
     },
     'spec' => {
         input => '35 | 7',
-        ast => '[ 35 | 7 ] & <number>',
+        ast =>  :numbers[35, 7],
     },
     'spec' => {
         input => '35 | 7 | 42?',
-        ast => '[ [ 35 | 7 ] & <number> || [ 42 & <number> ]? ]',
+        ast => :alt[ :numbers[35, 7], :occurs['?', :num(42)] ]
     },
     'spec' => {
         input => "<rule-ref>",
-        ast => "<rule-ref>",
+        ast => :rule<rule-ref>,
     },
     'spec' => {
         input => "<rule-ref> [ 'css21-prop-ref' <'css3-prop-ref'> ]?",
-        ast => "<rule-ref> [ <expr-css21-prop-ref> <expr-css3-prop-ref> ]?",
+        ast => :seq[ :rule<rule-ref>,
+                     :occurs['?', :group(:seq[:rule<expr-css21-prop-ref>, :rule<expr-css3-prop-ref>]) ]
+                   ],
     },
     'spec' => {
         input => "<rule-ref> [, [ 'css21-prop-ref' | <'css3-prop-ref'> ] ]*",
-        ast => "<rule-ref> [ <op(',')> [ [ <expr-css21-prop-ref> || <expr-css3-prop-ref> ] ] ]*",
+        ast => :seq[ :rule<rule-ref>,
+                     :occurs['*',
+                             :group(:seq[:op<,>, :group(:alt[:rule<expr-css21-prop-ref>, :rule<expr-css3-prop-ref>]) ])
+                            ],
+                   ]
     },
     'spec' => {
         input => '<length>{4}',
-        ast => '<length> ** 4',
+        ast => :occurs[ [4,4], :rule<length> ],
     },
     'spec' => {
         input => '<length>#',
-        ast => "<length>+% <op(',')>",
+        ast => :occurs[ ',', :rule<length> ],
     },
     'spec' => {
         input => '<length>#{1,4}',
-        ast => "<length> ** 1..4% <op(',')>",
+        ast => :occurs[ [1,4,','], :rule<length> ],
     },
     # precedence tests taken from: https://developer.mozilla.org/en-US/docs/CSS/Value_definition_syntax
     'spec' => {
         input => 'bold thin && <length>',
-        ast => ':my @S; [ bold & <keyw> thin & <keyw> <!{@S[0]++}> | <length> <!{@S[1]++}> ]**2',
+        ast => :required[
+                        :seq[ :keywords['bold'], :keywords['thin'] ]
+                        :rule<length>,
+                    ]
     },
     'spec' => {
         input => 'bold || thin && <length>',
-        ast => ':my @S; [ bold & <keyw> <!{@S[2]++}> | [ thin & <keyw> <!{@S[0]++}> | <length> <!{@S[1]++}> ]**2 <!{@S[3]++}> ]+',
+        ast => :combo[ :keywords['bold'],
+                       :required[ :keywords['thin'], :rule<length>],
+                     ]
     },
     'spec' => {
         input => 'attr(<identifier>)',
-        ast => '<attr>',
+        ast => :rule<attr>,
     },
     'property-spec' => {
         input => "'direction'	ltr | rtl | inherit	ltr	all elements, but see prose	yes",
@@ -75,7 +86,7 @@ for (
             :props['direction'],
             :default<ltr>,
             :synopsis('ltr | rtl | inherit'),
-            :raku('[ ltr | rtl | inherit ] & <keyw>'),
+            :spec(:keywords['ltr', 'rtl', 'inherit']),
             :inherit
         }
     },
@@ -83,8 +94,8 @@ for (
         input => "'content'\tnormal | none | [ <string> | <uri> | <counter> | attr(<identifier>) | open-quote | close-quote | no-open-quote | no-close-quote ]+ | inherit	normal	:before and :after pseudo-elements	no",
         ast => {:props['content'],
                 :default<normal>,
-                :raku('[ [ normal | none ] & <keyw> || [ [ <string> || <uri> || <counter> || <attr> || [ open\\-quote | close\\-quote | no\\-open\\-quote | no\\-close\\-quote ] & <keyw> ] ]+ || inherit & <keyw> ]'),
                 :synopsis('normal | none | [ <string> | <uri> | <counter> | attr(<identifier>) | open-quote | close-quote | no-open-quote | no-close-quote ]+ | inherit'),
+                :spec(:alt[:keywords["normal", "none"], :occurs['+', :group(:alt[:rule("string"), :rule("uri"), :rule("counter"), :rule("attr"), :keywords["open-quote", "close-quote", "no-open-quote", "no-close-quote"]])], :keywords["inherit"]]),
                 :!inherit,
                },
     },

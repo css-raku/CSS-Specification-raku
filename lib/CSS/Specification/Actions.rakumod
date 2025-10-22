@@ -1,8 +1,10 @@
 unit class CSS::Specification::Actions;
 
+use Method::Also;
+
 # these actions translate a CSS property specification to Raku
 # rules or actions.
-has %.prop-refs is rw;
+has %.rule-refs is rw;
 has %.props is rw;
 has %.rules is rw;
 has %.child-props is rw;
@@ -14,12 +16,9 @@ method property-spec($/) {
     %.props{$_}++ for @props;
 
     my $spec = $<spec>.ast;
+    my $synopsis = ~$<spec>;
 
-    my %prop-def = (
-        props    => @props,
-        synopsis => ~$<spec>,
-        raku    => $spec,
-        );
+    my %prop-def = (:@props, :$synopsis, :$spec);
 
     %prop-def<inherit> = .ast with $<inherit>;
 
@@ -30,13 +29,16 @@ method property-spec($/) {
 }
 
 method rule-spec($/) {
-
     my $rule = $<rule>.ast,
-    my $raku = $<spec>.ast;
+    my $spec = $<spec>.ast;
     my $synopsis = ~$<spec>;
     %.props{$rule}++;
 
-    make %( :$rule, :$synopsis, :$raku );
+    my %rule-def = (
+        :$rule, :$synopsis, :$spec
+        );
+
+    make %rule-def;
 }
 
 method yes($/) { make True }
@@ -44,9 +46,6 @@ method no($/)  { make False }
 
 method spec($/) {
     my $spec = $<seq>.ast;
-    $spec = ':my @S; ' ~ $spec
-        if $*CHOICE;
-
     make $spec;
 }
 
@@ -57,126 +56,110 @@ method prop-names($/) {
 
 method id($/)        { make ~$/ }
 method id-quoted($/) { make $<id>.ast }
-method keyw($/)      { make $<id>.subst(/\-/, '\-'):g }
-method digits($/)    { make $/.Int }
+method keyw($/)      { make 'keyw' => ~$<id> }
+method digits($/)    { make 'num' => $/.Int }
 method rule($/)      { make $<id>.ast }
 
-method seq($/) {
-    make @<term>>>.ast.join(' ');
+method !make-term($/, $name) {
+    my @term =  @<term>>>.ast;
+    make @term == 1 ?? @term[0] !! ($name => @term);
+}
+
+method seq($/) is also<term-seq> {
+    self!make-term: $/, 'seq';
 }
 
 method term-options($/) {
-    my @choices = @<term>>>.ast;
-
-    make @choices > 1
-        ?? [~] '[ ', @choices.join(' || '), ' ]'
-        !! @choices[0];
-}
-
-method !choose(@choices) {
-    my $choices := @choices.map({[~] ($_, ' <!{@S[', $*CHOICE++, ']++}>')}).join(' | ');
-    return [~] '[ ', $choices, ' ]';
+    self!make-term: $/, 'alt';
 }
 
 method term-combo($/) {
-    my @choices = @<term>>>.ast;
-
-    make @choices > 1
-        ?? self!choose( @choices ) ~ '+'
-        !! @choices[0];
+    self!make-term: $/, 'combo';
 }
 
 method term-required($/) {
-    my @choices = $<term>>>.ast;
-
-    make @choices > 1
-        ?? [~] self!choose( @choices ), '**', @choices.Int
-        !! @choices[0];
-}
-
-method term-seq($/) {
-    make @<term>>>.ast.join(' ');
+    self!make-term: $/, 'required';
 }
 
 method term($/) {
     my $value = $<value>.ast;
-    $value ~= .ast
-        with $<occurs>;
 
-    make $value;
+    make $<occurs>
+        ?? :occurs[$<occurs>.ast, $value]
+        !! $value;
 }
 
 method occurs:sym<maybe>($/)     { make '?' }
 method occurs:sym<once-plus>($/) { make '+' }
 method occurs:sym<zero-plus>($/) { make '*' }
-method occurs:sym<list>($/)      {
-    my $quant = $<range> ?? $<range>.ast !! '+';
-    make "{$quant}% <op(',')>"
+method occurs:sym<list>($/) {
+    with $<range> {
+        given .ast {
+            make [.[0],  .[1], ',' ];
+        }
+    }
+    else {
+        make ',';
+    }
 }
 method occurs:sym<range>($/)     { make $<range>.ast }
 method range($/) {
-    my $range = ' ** ' ~ $<min>.ast;
-    $range ~= '..' ~ $<max>.ast
-        if $<max>;
-
-    make $range;
+    my $min = $<min>.ast.value;
+    my $max = do with $<max> { .ast.value } else { $min };
+    make [$min, $max];
 }
 
-method value:sym<func>($/)     {
+method value:sym<func>($/) {
     # todo - save function prototype
-    %.prop-refs{ ~$<id>.ast }++;
-    make [~] '<', $<id>.ast, '>';
+    my $rule = $<id>.ast;
+    %.rule-refs{ $rule }++;
+    make (:$rule);
 }
 
 method value:sym<keywords>($/) {
-    my $keywords = @<keyw> > 1
-        ?? [~] '[ ', @<keyw>>>.ast.join(' | '), ' ]'
-        !! @<keyw>[0].ast;
-
-    make $keywords ~ ' & <keyw>';
+    my @keywords = @<keyw>.map: {.ast.value};
+    make (:@keywords);
 }
 
 method value:sym<keyw-quant>($/) {
-    make [~] '[ ', $<keyw>.ast, ' & <keyw> ]', $<occurs>.ast
+    make 'occurs' => [$<occurs>.ast, $<keyw>.ast];
 }
 
 method value:sym<numbers>($/) {
-    my $keywords = @<digits> > 1
-        ?? [~] '[ ', @<digits>>>.ast.join(' | '), ' ]'
-        !! @<digits>[0].ast;
-
-    make $keywords ~ ' & <number>';
+    my @numbers = @<digits>.map: {.ast.value};
+    make (:@numbers);
 }
 
 method value:sym<num-quant>($/) {
-    make [~] '[ ', $<digits>.ast, ' & <number> ]', $<occurs>.ast
+    make 'occurs' => [$<occurs>.ast, $<digits>.ast];
 }
 
 method value:sym<group>($/) {
-    my $val = $<seq>.ast;
-    make [~] '[ ', $val, ' ]';
+    my $group = $<seq>.ast;
+    make (:$group);
 }
 
 method value:sym<rule>($/) {
-    my $val = ~$<rule>.ast;
-    %.prop-refs{ $val }++;
-    make [~] '<', $val, '>'
+    my $rule = ~$<rule>.ast;
+    %.rule-refs{ $rule }++;
+    make (:$rule);
 }
 
-method value:sym<op>($/)     { make [~] "<op('", $/.trim, "')>" }
+method value:sym<op>($/) { my $op = $/.trim; make (:$op); }
 
-method property-ref:sym<css21>($/) { make $<id>.ast }
-method property-ref:sym<css3>($/)  { make $<id>.ast }
+method property-ref:sym<css21>($/) { make 'ref' => $<id>.ast }
+method property-ref:sym<css3>($/) { make 'ref' => $<id>.ast }
 method value:sym<prop-ref>($/)        {
-    my $prop-ref = $<property-ref>.ast;
-    %.prop-refs{ 'expr-' ~ $prop-ref }++;
-    %.child-props{$_}.push: $prop-ref for @*PROP-NAMES; 
-    make [~] '<expr-', $prop-ref, '>';
+    my Pair $prop-ref = $<property-ref>.ast;
+    my $rule = 'expr-' ~ $prop-ref.value;
+    %.rule-refs{ $rule }++;
+    %.child-props{$_}.push: $prop-ref for @*PROP-NAMES;
+    make (:$rule);
 }
 
-method value:sym<literal>($/)  { make [~] "'", ~$0, "'" }
+method value:sym<literal>($/)  { make 'string' => ~$0 }
 
-method value:sym<num>($/)      { make ~$/ }
+method value:sym<num>($/)      { make 'num' => $/.Int }
 
-method value:sym<keyw>($/)     { make ~$/ }
+method value:sym<keyw>($/)     { make 'ident' => ~$/ }
 

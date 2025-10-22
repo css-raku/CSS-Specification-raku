@@ -1,7 +1,6 @@
 use Test;
 use CSS::Grammar::Test;
 use CSS::Grammar::CSS21;
-use CSS::Specification::Build;
 use CSS::Specification::Compiler;
 use lib 't';
 use experimental :rakuast;
@@ -30,26 +29,12 @@ sub name(RakuAST::Package $p, $j) {
     $p.name.parts>>.name.join: $j
 }
 
-my @summary = CSS::Specification::Build::summary( :$input-path );
-is +@summary, 25, 'number of summary items';
-is-deeply @summary.first(*.<box>), {:box, :!inherit, :name<border-color>, :edges["border-top-color", "border-right-color", "border-bottom-color", "border-left-color"], :synopsis("[ <color> | transparent ]\{1,4}")}, 'summary item';
+is +$compiler.defs, 24, 'number of summary items';
 
-{
-    CSS::Specification::Build::generate( 'grammar', $grammar-name, :$input-path );
-}.&capture: 't/lib/Test/CSS/Aural/Spec/Grammar.rakumod';
-lives-ok {require ::($grammar-name)}, "$grammar-name compilation";
-
-@grammar-id.tail ~= 'AST'; # parallel build for now
 my RakuAST::Package $grammar = $compiler.build-grammar(@grammar-id);
 "t/lib/{$grammar.&name('/')}.rakumod".IO.spurt: $grammar.DEPARSE
 .subst(/";\n;"/, ';', :g); # work-around for https://github.com/rakudo/rakudo/issues/5991
 
-{
-    CSS::Specification::Build::generate( 'actions', $actions-name, :$input-path );
-}.&capture: 't/lib/Test/CSS/Aural/Spec/Actions.rakumod';
-lives-ok {require ::($actions-name)}, "$actions-name compilation";
-
-@actions-id.tail ~= 'AST'; # parallel build for now
 my RakuAST::Package $actions-pkg = $compiler.build-actions(@actions-id);
 "t/lib/{$actions-pkg.&name('/')}.rakumod".IO.spurt: $actions-pkg.DEPARSE;
 
