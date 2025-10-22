@@ -20,17 +20,6 @@ sub rule(RakuAST::Name:D :$name!, RakuAST::Regex:D :$body!) {
         )
 }
 
-multi sub statements(@exprs) {
-    RakuAST::StatementList.new(|@exprs);
-}
-multi sub statements($expr) {
-    RakuAST::StatementList.new($expr);
-}
-
-sub expression($expression) {
-    RakuAST::Statement::Expression.new: :$expression;
-}
-
 sub property-decl(Str:D $prop-name) {
     my RakuAST::Name $name = "decl:sym<$prop-name>".&name;
     rule(

@@ -8,8 +8,8 @@ method actions { ... }
 
 method build-role(@role-id) {
     my RakuAST::Method @methods = self!interface-methods;
-    my @expressions = @methods.map(-> $expression { RakuAST::Statement::Expression.new: :$expression });
-    my RakuAST::Blockoid $body .= new: RakuAST::StatementList.new(|@expressions);
+    my RakuAST::Statement::Expression @expressions = @methods.map(&expression);
+    my RakuAST::Blockoid $body .= new: @expressions.&statements;
     my RakuAST::Name $name .= from-identifier-parts(|@role-id);
 
     RakuAST::Role.new(
@@ -32,11 +32,7 @@ method !interface-methods {
     );
 
     my RakuAST::Blockoid $body .= new(
-        RakuAST::StatementList.new(
-            RakuAST::Statement::Expression.new(
-                expression => RakuAST::Stub::Fail.new
-            )
-        )
+        RakuAST::Stub::Fail.new.&expression.&statements
     );
 
     my Str @stubs = %unresolved.keys.sort;

@@ -216,9 +216,6 @@ module CSS::Specification::Build {
     sub generate-raku-actions(@defs, %references) {
 
         for @defs -> $def {
-
-            my $synopsis = $def<synopsis>;
-
             with $def<props> -> @props {
                 for @props -> $prop {
 
