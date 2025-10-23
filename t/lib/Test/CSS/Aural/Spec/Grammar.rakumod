@@ -76,8 +76,8 @@ rule specific-voice { :i <identifier> || <string>  }
 rule decl:sym<volume> { :i (volume) ":" <val(/<expr=.expr-volume> /, &?ROUTINE.WHY)> }
 rule expr-volume { :i <number> || <percentage> || [silent | "x-soft" | soft | medium | loud | "x-loud" ]& <keyw>  }
 #| border-color: [ <color> | transparent ]{1,4}
-rule decl:sym<border-color> { :i ("border-color") ":" <val(/<expr=.expr-border-color> /, &?ROUTINE.WHY)> }
-rule expr-border-color { :i [<color> || transparent & <keyw> ]** 1..4 }
+rule decl:sym<border-color> { :i ("border-color") ":" <val(/<expr=.expr-border-color>** 1..4 /, &?ROUTINE.WHY)> }
+rule expr-border-color { :i [<color> || transparent & <keyw> ] }
 #| border-top-color: <color> | transparent
 rule decl:sym<border-top-color> { :i ("border-top-color") ":" <val(/<expr=.expr-border-top-color> /, &?ROUTINE.WHY)> }
 rule expr-border-top-color { :i <color> || transparent & <keyw>  }

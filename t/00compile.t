@@ -115,6 +115,21 @@ for (
         deparse => "[:my \@S\n;  bold \& <keyw><!\{\n    !\@S[0]++\n}>| [:my \@S\n;  thin \& <keyw><!\{\n    !\@S[0]++\n}>| <length><!\{\n    !\@S[1]++\n}>]** 2<!\{\n    !\@S[1]++\n}>]+",
         rule-refs => ['length'],
     },
+    'property-spec' => {
+        input => join("\t", 'border-color','<color>{1,4}', 'transparent'),
+        ast => {
+            :props['border-color'],
+            :default<transparent>,
+            :synopsis('<color>{1,4}'),
+            :spec(:occurs[[1, 4], :rule<color>]),
+        },
+        rule-refs => ['color'],
+        deparse => join("\n",
+                        '#| border-color: <color>{1,4}',
+                        'rule decl:sym<border-color> { :i ("border-color") ":" <val(/<expr=.expr-border-color>** 1..4 /, &?ROUTINE.WHY)> }',
+                        'rule expr-border-color { :i <color> }',
+                       ''),
+    },
    'property-spec' => {
         input => "'min-width'\t<length> | <percentage> | inherit\t0",
         ast => {

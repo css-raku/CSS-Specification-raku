@@ -20,8 +20,17 @@ sub rule(RakuAST::Name:D :$name!, RakuAST::Regex:D :$body!) {
         )
 }
 
-sub property-decl(Str:D $prop-name) {
+sub property-decl(Str:D $prop-name, :$quant) {
     my RakuAST::Name $name = "decl:sym<$prop-name>".&name;
+    my RakuAST::Regex $regex-body = RakuAST::Regex::Assertion::Alias.new(
+        name      => "expr",
+        assertion => ("expr-" ~ $prop-name).&assertion(:!capturing),
+    );
+    if $quant ~~ Array:D {
+        my RakuAST::Regex::Quantifier $quantifier = quant($quant);
+        $regex-body = RakuAST::Regex::QuantifiedAtom.new: :atom($regex-body), :$quantifier;
+    }
+
     rule(
       :$name,
       body => seq (
@@ -40,10 +49,7 @@ sub property-decl(Str:D $prop-name) {
             name      => 'val'.&name,
             args      => RakuAST::ArgList.new(
                 RakuAST::QuotedRegex.new(
-                    body => RakuAST::Regex::Assertion::Alias.new(
-                        name      => "expr",
-                        assertion => ("expr-" ~ $prop-name).&assertion(:!capturing),
-                    ).&ws,
+                    body => $regex-body.&ws,
                 ),
                 RakuAST::Var::Compiler::Routine.new.&postfix('WHY'.&call),
             ),
@@ -53,7 +59,11 @@ sub property-decl(Str:D $prop-name) {
     );
 }
 
-multi sub compile(:@props!, :$default, :$spec!, Str :$synopsis!, Bool :$inherit = True) {
+multi sub compile(:@props!, :$default, Pair :$spec! is copy, Str :$synopsis!, Bool :$inherit = True) {
+    my $quant;
+    if $spec.key eq 'occurs' && $spec.value.head ~~ [1,4]  {
+        ($quant, $spec) = $spec.value.List;
+    }
     my RakuAST::Regex $body = $spec.&compile;
     $body = ('i'.&modifier,  $body.&ws, ).&seq;
 
@@ -64,10 +74,10 @@ multi sub compile(:@props!, :$default, :$spec!, Str :$synopsis!, Bool :$inherit 
 
     for @props -> $prop {
         @exprs.append: (
-        $prop.&property-decl.declarator-docs(
+        $prop.&property-decl(:$quant).declarator-docs(
             :$leading
         ).&expression,
-        rule(name => ('expr-' ~ $prop).&name, :$body).&expression,
+       rule(name => ('expr-' ~ $prop).&name, :$body).&expression,
     )
     }
     @exprs;
@@ -273,6 +283,7 @@ multi sub compile(:@combo!, Bool :$required) {
 
     RakuAST::Regex::QuantifiedAtom.new: :$atom, :$quantifier;
 }
+
 
 multi sub compile($arg) { compile |$arg }
 
