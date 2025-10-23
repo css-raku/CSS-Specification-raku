@@ -106,13 +106,13 @@ for (
     'spec' => {
         input => 'bold thin && <length>',
         ast => :required[:seq[:keywords["bold"], :keywords["thin"]], :rule("length")],
-        deparse => "[:my \@S\n;  bold \& <keyw> thin \& <keyw> <!\{\n    \@S[0]++\n}>| <length><!\{\n    \@S[1]++\n}>]** 2",
+        deparse => "[:my \@S\n;  bold \& <keyw> thin \& <keyw> <!\{\n    !\@S[0]++\n}>| <length><!\{\n    !\@S[1]++\n}>]** 2",
         rule-refs => ['length'],
     },
     'spec' => {
         input => 'bold || thin && <length>',
         ast => :combo[:keywords["bold"], :required[:keywords["thin"], :rule("length")]],
-        deparse => "[:my \@S\n;  bold \& <keyw><!\{\n    \@S[0]++\n}>| [:my \@S\n;  thin \& <keyw><!\{\n    \@S[0]++\n}>| <length><!\{\n    \@S[1]++\n}>]** 2<!\{\n    \@S[1]++\n}>]+",
+        deparse => "[:my \@S\n;  bold \& <keyw><!\{\n    !\@S[0]++\n}>| [:my \@S\n;  thin \& <keyw><!\{\n    !\@S[0]++\n}>| <length><!\{\n    !\@S[1]++\n}>]** 2<!\{\n    !\@S[1]++\n}>]+",
         rule-refs => ['length'],
     },
    'property-spec' => {

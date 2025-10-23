@@ -2,8 +2,8 @@ unit class CSS::Specification::Actions;
 
 use Method::Also;
 
-# these actions translate a CSS property specification to Raku
-# rules or actions.
+# these actions translate a CSS property specification to an
+# intermediate AST
 has %.rule-refs is rw;
 has %.props is rw;
 has %.rules is rw;
@@ -93,14 +93,9 @@ method occurs:sym<maybe>($/)     { make '?' }
 method occurs:sym<once-plus>($/) { make '+' }
 method occurs:sym<zero-plus>($/) { make '*' }
 method occurs:sym<list>($/) {
-    with $<range> {
-        given .ast {
-            make [.[0],  .[1], ',' ];
-        }
-    }
-    else {
-        make ',';
-    }
+    make $<range>
+        ?? $<range>.ast.clone.append: ','
+        !! ','
 }
 method occurs:sym<range>($/)     { make $<range>.ast }
 method range($/) {

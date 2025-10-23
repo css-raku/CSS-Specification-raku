@@ -151,7 +151,9 @@ sub alt(@choices) is export {
     RakuAST::Regex::Alternation.new: |@choices;
 }
 
-multi sub seq(@seq) is export  { RakuAST::Regex::Sequence.new: |@seq }
+multi sub seq(@seq) is export  {
+    RakuAST::Regex::Sequence.new(|@seq);
+}
 multi sub seq($seq) is export  { $seq }
 
 multi sub seq-alt(@seq) is export  { RakuAST::Regex::SequentialAlternation.new: |@seq }
@@ -176,11 +178,23 @@ sub call(Str:D $id, :@args) is export {
     RakuAST::Call::Method.new: :$name, :$args;
 }
 
-sub postfix($operand, $postfix) {
+sub prefix($operand, Str:D $op) {
+    my RakuAST::Prefix $prefix .= new($op);
+    RakuAST::ApplyPrefix.new(
+        :$operand, :$prefix
+    )
+}
+
+multi sub postfix($operand, Str:D $operator) {
+    $operand.&postfix: RakuAST::Postfix.new(:$operator);
+}
+
+multi sub postfix($operand, $postfix) {
     RakuAST::ApplyPostfix.new(
         :$operand, :$postfix
     )
 }
+
 
 sub seen(Int:D $id) is export {
     my RakuAST::Postcircumfix $op = $id.&arg.&array-index;
@@ -188,9 +202,7 @@ sub seen(Int:D $id) is export {
     my RakuAST::Block $block .= new(
         body => RakuAST::Blockoid.new(
             statements(
-                expression $operand.&postfix($op).&postfix(
-                    RakuAST::Postfix.new(operator => "++")
-                )
+                expression $operand.&postfix($op).&postfix('++').&prefix('!')
             )
         )
     );

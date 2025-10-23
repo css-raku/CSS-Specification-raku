@@ -5,20 +5,10 @@ use CSS::Specification::Compiler;
 use lib 't';
 use experimental :rakuast;
 
-sub capture($code, $output-path) {
-    my $*OUT = open $output-path, :w;
-    $code();
-    $*OUT.close;
-    $output-path;
-}
-
 my @base-id = qw<Test CSS Aural Spec>;
-my $base-name = @base-id.join: '::';
 my @actions-id = @base-id.Slip, 'Actions';
-my $actions-name = @actions-id.join: '::';
 my @role-id = @base-id.Slip, 'Interface';
 my @grammar-id = @base-id.Slip, 'Grammar';
-my $grammar-name = @grammar-id.join: '::';
 
 my $input-path = $*SPEC.catfile('examples', 'css21-aural.txt');
 
