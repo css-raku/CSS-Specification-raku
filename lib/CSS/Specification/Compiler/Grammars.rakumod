@@ -188,13 +188,6 @@ sub call(Str:D $id, :@args) is export {
     RakuAST::Call::Method.new: :$name, :$args;
 }
 
-sub prefix($operand, Str:D $op) {
-    my RakuAST::Prefix $prefix .= new($op);
-    RakuAST::ApplyPrefix.new(
-        :$operand, :$prefix
-    )
-}
-
 multi sub postfix($operand, Str:D $operator) {
     $operand.&postfix: RakuAST::Postfix.new(:$operator);
 }
@@ -206,13 +199,13 @@ multi sub postfix($operand, $postfix) {
 }
 
 
-sub seen(Int:D $id) is export {
+sub unseen(Int:D $id) is export {
     my RakuAST::Postcircumfix $op = $id.&arg.&array-index;
     my RakuAST::Var $operand = '@S'.&lexical;
     my RakuAST::Block $block .= new(
         body => RakuAST::Blockoid.new(
             statements(
-                expression $operand.&postfix($op).&postfix('++').&prefix('!')
+                expression $operand.&postfix($op).&postfix('++')
             )
         )
     );
@@ -270,7 +263,7 @@ multi sub compile(:@combo!, Bool :$required) {
     ).&ws;
     my UInt $n = 0;
     my @atoms = @combo.map: {
-        my RakuAST::Regex::Assertion $seen = $n++.&seen;
+        my RakuAST::Regex::Assertion $seen = $n++.&unseen;
         my RakuAST::Regex $term = .&compile;
         my @seq = [$term, $seen];
         @seq.unshift: Seen-Decl if $n == 1;
