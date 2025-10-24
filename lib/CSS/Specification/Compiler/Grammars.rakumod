@@ -100,7 +100,7 @@ multi sub compile(Str :$rule!, :$spec!, Str :$synopsis!) {
 }
 
 multi sub compile(:@occurs! ($quant!, *%term)) {
-    my RakuAST::Regex $atom = (|%term).&compile.&group;
+    my RakuAST::Regex $atom = (|%term).&compile.&group.&ws;
     my RakuAST::Regex $separator = compile(:op<,>)
         if $quant.tail ~~ ',';
 
@@ -232,7 +232,7 @@ multi sub compile(Str:D :$rule!) {
 }
 
 multi sub compile(:@keywords!) {
-    _choice @keywords.map(&lit-ws), 'keyw'.&assertion;
+    _choice @keywords.map(&lit-ws), 'keyw'.&assertion.&ws;
 }
 
 multi sub compile(:@numbers!) {
@@ -242,7 +242,7 @@ multi sub compile(:@numbers!) {
 sub lit-ws(Str:D() $_) is export { .&lit.&ws }
 
 multi sub compile(Str:D :$op!) {
-    my RakuAST::ArgList $args = ','.&arg;
+    my RakuAST::ArgList $args = $op.&arg;
     'op'.&assertion(:$args);
 }
 

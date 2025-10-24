@@ -3,10 +3,10 @@ unit grammar CSS::Specification::Runtime::Grammar;
 proto rule proforma {*}
 
 token val( $*EXPR, $*USAGE='' ) {
-    <proforma> || <rx={$*EXPR}> || <usage>
+    <proforma> || <rx={$*EXPR}> || <usage($*USAGE)>
 }
 
-token usage {
+token usage($*USAGE) {
     <any-args>
 }
 
@@ -23,6 +23,7 @@ token frequency:sym<zero> {<number> <?{ +$<number> == 0 }> }
 token integer     {$<sign>=< + - >?<uint>}
 token number      {<num><!before ['%'|\w]>}
 token uri         {<url>}
-token keyw        {<id=.Ident>}         # keyword (case insensitive)
+multi token keyw  {<id=.Ident>}         # keyword (case insensitive)
+multi token keyw($rx) {<id={$rx}>}      # keyword (case insensitive)
 token identifier  {<name>}              # identifier (case sensitive)
 rule identifiers  {[ <identifier> ]+}   # E.g. font name: Times New Roman
