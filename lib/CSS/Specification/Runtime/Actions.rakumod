@@ -18,7 +18,7 @@ method val($/) {
         else {
             with $<rx><expr> {
                 %ast<expr> = $.build.list($_)
-                    unless .can('caps') && (!.caps || .caps.first({! .value.ast.defined}));
+                    unless .isa(Capture) && .caps.first: {! .value.ast.defined};
             }
         }
     }

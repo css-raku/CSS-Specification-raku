@@ -1,4 +1,7 @@
 {{$NEXT}}
+  - A major rebuild of this module to compile specifications
+    via RakuAST. This release retires CSS::Specification::BUILD
+    and introduces CSS::Specification::Compiler.
 
 0.4.15  2025-01-21T12:16:33+13:00
   - Revert v0.4.14 changes to usage token; unbreaks

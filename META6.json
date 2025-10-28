@@ -7,7 +7,7 @@
   ],
   "depends": [
     "CSS::Grammar:ver<0.3.12+>",
-      "Color::Names",
+    "Color::Names",
     "Method::Also"
   ],
   "description": "CSS Property definition grammar and generation tools",
@@ -20,11 +20,6 @@
     "CSS::Specification::Actions": "lib/CSS/Specification/Actions.rakumod",
     "CSS::Specification::Defs": "lib/CSS/Specification/Defs.rakumod",
     "CSS::Specification::Defs::Actions": "lib/CSS/Specification/Defs/Actions.rakumod",
-    "CSS::Specification::Compiler": "lib/CSS/Specification/Compiler.rakumod",
-    "CSS::Specification::Compiler::Util": "lib/CSS/Specification/Compiler/Util.rakumod",
-    "CSS::Specification::Compiler::Grammars": "lib/CSS/Specification/Compiler/Grammars.rakumod",
-    "CSS::Specification::Compiler::Roles": "lib/CSS/Specification/Compiler/Roles.rakumod",
-    "CSS::Specification::Compiler::Actions": "lib/CSS/Specification/Compiler/Actions.rakumod",
     "CSS::Specification::Runtime::Grammar": "lib/CSS/Specification/Runtime/Grammar.rakumod",
     "CSS::Specification::Runtime::Actions": "lib/CSS/Specification/Runtime/Actions.rakumod"
   },
@@ -32,6 +27,7 @@
   ],
   "source-url": "https://github.com/css-raku/CSS-Specification-raku.git",
   "tags": [
+      "rakuast", "css"
   ],
   "test-depends": [
   ],
