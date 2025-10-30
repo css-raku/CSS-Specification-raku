@@ -6,11 +6,11 @@
   "build-depends": [
   ],
   "depends": [
-    "CSS::Grammar:ver<0.3.12+>",
+    "CSS::Grammar:ver<0.3.13+>",
     "Color::Names",
     "Method::Also"
   ],
-  "description": "CSS Property definition grammar and generation tools",
+  "description": "CSS Property definition grammar tools",
   "license": "Artistic-2.0",
   "name": "CSS::Specification",
   "perl": "6.c",
@@ -20,16 +20,17 @@
     "CSS::Specification::Actions": "lib/CSS/Specification/Actions.rakumod",
     "CSS::Specification::Defs": "lib/CSS/Specification/Defs.rakumod",
     "CSS::Specification::Defs::Actions": "lib/CSS/Specification/Defs/Actions.rakumod",
-    "CSS::Specification::Runtime::Grammar": "lib/CSS/Specification/Runtime/Grammar.rakumod",
-    "CSS::Specification::Runtime::Actions": "lib/CSS/Specification/Runtime/Actions.rakumod"
+    "CSS::Specification::Runtime::Actions": "lib/CSS/Specification/Runtime/Actions.rakumod",
+    "CSS::Specification::Runtime::Grammar": "lib/CSS/Specification/Runtime/Grammar.rakumod"
   },
   "resources": [
   ],
   "source-url": "https://github.com/css-raku/CSS-Specification-raku.git",
   "tags": [
-      "rakuast", "css"
+    "rakuast",
+    "css"
   ],
   "test-depends": [
   ],
-  "version": "0.4.15"
+  "version": "0.4.16"
 }

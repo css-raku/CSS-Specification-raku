@@ -24,5 +24,5 @@ An example, from http://www.w3.org/TR/CSS21/propidx.html:
 - `CSS::Specification::Defs` + `CSS::Specification::Defs::Actions` - is a grammar which maps property specification terminology to CSS Core syntax and defines any newly introduced terms. For example `integer` is mapped to `int`.
 
 ## See Also
-- [CSS::Specification::Compiler](https://github.com/css-raku/CSS-Specification-Compiler-raku.git) - an unrealsed RakuAST based compiler for property definitions
+- [CSS::Specification::Compiler](https://github.com/css-raku/CSS-Specification-Compiler-raku.git) - an unreleased RakuAST based compiler for property definitions
 - [make-modules.raku](https://github.com/css-raku/CSS-Module-raku/blob/master/make-modules.raku) in [CSS::Module](https://css-raku.github.io/CSS-Module-raku).
