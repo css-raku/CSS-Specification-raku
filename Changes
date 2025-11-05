@@ -1,9 +1,9 @@
 {{$NEXT}}
 
 0.4.16  2025-10-31T06:07:47+13:00
-  - A major rebuild of this module to compile specifications
-    via RakuAST. This release retires CSS::Specification::BUILD
-    and introduces CSS::Specification::Compiler.
+  - Retires CSS::Specification::BUILD; replaced by a new Raku module,
+    CSS::Specification::Compiler (unreleased). See
+    https://github.com/css-raku/CSS-Specification-Compiler-raku.git
 
 0.4.15  2025-01-21T12:16:33+13:00
   - Revert v0.4.14 changes to usage token; unbreaks
