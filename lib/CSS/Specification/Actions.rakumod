@@ -32,7 +32,7 @@ method rule-spec($/) {
     my $rule = $<rule>.ast,
     my $spec = $<spec>.ast;
     my $synopsis = ~$<spec>;
-    %.props{$rule}++;
+    %.rules{$rule}++;
 
     my %rule-def = (
         :$rule, :$synopsis, :$spec
@@ -52,6 +52,10 @@ method spec($/) {
 method prop-names($/) {
     my @prop-names = $<id>>>.ast;
     make @prop-names;
+}
+
+method unexpected($/) is hidden-from-backtrace {
+    die "Unexpected input: " ~$/;
 }
 
 method id($/)        { make ~$/ }
@@ -96,6 +100,10 @@ method occurs:sym<list>($/) {
     make $<range>
         ?? $<range>.ast.clone.append: ','
         !! ','
+}
+method occurs:sym<list-maybe>($/) {
+    my $trailing = $<trailing>.so;
+    make ['*', :$trailing, ',']
 }
 method occurs:sym<range>($/)     { make $<range>.ast }
 method range($/) {
@@ -147,7 +155,7 @@ method property-ref:sym<css3>($/) { make 'ref' => $<id>.ast }
 method value:sym<prop-ref>($/)        {
     my Pair $prop-ref = $<property-ref>.ast;
     my $prop =  $prop-ref.value;
-    my $rule = 'expr-' ~ $prop;;
+    my $rule = 'val-' ~ $prop;;
     %.rule-refs{ $rule }++;
     %.child-props{$_}.push: $prop for @*PROP-NAMES;
     make (:$rule);

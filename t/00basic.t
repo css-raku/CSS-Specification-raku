@@ -39,14 +39,14 @@ for (
     'spec' => {
         input => "<rule-ref> [ 'css21-prop-ref' <'css3-prop-ref'> ]?",
         ast => :seq[ :rule<rule-ref>,
-                     :occurs['?', :group(:seq[:rule<expr-css21-prop-ref>, :rule<expr-css3-prop-ref>]) ]
+                     :occurs['?', :group(:seq[:rule<val-css21-prop-ref>, :rule<val-css3-prop-ref>]) ]
                    ],
     },
     'spec' => {
         input => "<rule-ref> [, [ 'css21-prop-ref' | <'css3-prop-ref'> ] ]*",
         ast => :seq[ :rule<rule-ref>,
                      :occurs['*',
-                             :group(:seq[:op<,>, :group(:alt[:rule<expr-css21-prop-ref>, :rule<expr-css3-prop-ref>]) ])
+                             :group(:seq[:op<,>, :group(:alt[:rule<val-css21-prop-ref>, :rule<val-css3-prop-ref>]) ])
                             ],
                    ]
     },
@@ -79,6 +79,15 @@ for (
     'spec' => {
         input => 'attr(<identifier>)',
         ast => :rule<attr>,
+    },
+    'spec' => {
+        input => '[ <length-percentage [0,∞]> | auto ]{1,2} | cover | contain',
+        ast => :alt[:occurs[[1, 2], :group(:alt[:rule<length-percentage>, :keywords["auto"]])], :keywords["cover", "contain"]],
+    },
+    'spec' => {
+        input => '<bg-layer>#? , <final-bg-layer>',
+        ast => :seq[:occurs[["*", :trailing, ","], :rule<bg-layer>], :op(","), :rule<final-bg-layer>]
+
     },
     'property-spec' => {
         input => "'direction'	ltr | rtl | inherit	ltr	all elements, but see prose	yes",

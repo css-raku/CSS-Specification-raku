@@ -6,7 +6,7 @@
 
 grammar CSS::Specification:ver<0.4.16> {
     use CSS::Grammar::CSS3;
-    rule TOP { [<def=.property-spec> | <def=.rule-spec>] * }
+    rule TOP { [<def=.property-spec> | <def=.rule-spec> | ^^ $$ || <.unexpected> ] * }
 
     rule property-spec {
         :my @*PROP-NAMES = [];
@@ -15,13 +15,19 @@ grammar CSS::Specification:ver<0.4.16> {
             \t [:i 'n/a' | ua specific | <-[ \t ]>*? properties || $<default>=<-[ \t ]>* ]
             [ \t <-[ \t ]>*? # applies to
               \t [<inherit=.yes>|<inherit=.no>]? ]?
+            \t? \N*
     }
     rule rule-spec {
-        \t? <rule> ':=' <spec>
+        :my @*PROP-NAMES = [];
+        \t? <rule> ':'?'=' <spec>
     }
+    token unexpected { \N+ }
     rule spec          { :my $*CHOICE; <seq> }
     # possibly tab delimited. Assume one spec per line.
-    token ws {<!ww>' '*}
+    token comment {('<!--') .*? ['-->' || <unclosed-comment>]
+                  |('/*')   .*? ['*/'  || <unclosed-comment>]}
+    token unclosed-comment {$}
+    token ws {<!ww>[' '|'\\'\n|<.comment>]*}
 
     rule yes         {:i yes }
     rule no          {:i no}
@@ -38,7 +44,8 @@ grammar CSS::Specification:ver<0.4.16> {
     token id-quoted  { <.quote> <id> <.quote> }
     rule keyw        { <id> }
     rule digits      { \d+ }
-    rule rule        { '<'~'>' <id> }
+    rule rule        { '<'~'>' [ <id> [ '['~']' <.domain> +% ',' ]? ] }
+    rule domain      { <[0..9]>+ | '∞' }
 
     rule seq           { <term=.term-options>+ }
     rule term-options  { <term=.term-combo>    +% '|'  }
@@ -53,6 +60,8 @@ grammar CSS::Specification:ver<0.4.16> {
     token occurs:sym<zero-plus>   {'*'}
     token occurs:sym<range>       {<range>}
     token occurs:sym<list>        {'#'<range>?}
+    # e.g. <bg-layer>#? , <final-bg-layer>
+    token occurs:sym<list-maybe>  {'#?' $<trailing>=','? }
     token range                   {'{'~'}' [ <min=.digits> [',' <max=.digits>]? ] }
 
     proto rule value {*}

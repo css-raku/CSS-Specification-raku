@@ -56,8 +56,8 @@ multi method declaration($/ where $<any-declaration>)  {
         }
     }
 }
-multi method declaration($/)  {
-    my %ast = %( $.build.decl($<decl>, :obj(self)) )
+multi method declaration(::?CLASS:D $obj: $/)  {
+    my %ast = %( $.build.decl($<decl>, :$obj) )
        || return;
 
     if $<any-arg> {
