@@ -12,37 +12,37 @@ lives-ok {require CSS::Grammar:ver(v0.3.0..*) }, "CSS::Grammar version";
 my CSS::Specification::Actions $actions .= new;
 
 for (
-    'spec' => {
+    'values' => {
         input => 'thin',
         ast => :keywords['thin'],
     },
-    'spec' => {
+    'values' => {
         input => 'thin?',
         ast => :occurs['?', :keyw<thin>],
     },
-    'spec' => {
+    'values' => {
         input => 'thick | thin',
         ast => :keywords<thick thin>,
     },
-    'spec' => {
+    'values' => {
         input => '35 | 7',
         ast =>  :numbers[35, 7],
     },
-    'spec' => {
+    'values' => {
         input => '35 | 7 | 42?',
         ast => :alt[ :numbers[35, 7], :occurs['?', :num(42)] ]
     },
-    'spec' => {
+    'values' => {
         input => "<rule-ref>",
         ast => :rule<rule-ref>,
     },
-    'spec' => {
+    'values' => {
         input => "<rule-ref> [ 'css21-prop-ref' <'css3-prop-ref'> ]?",
         ast => :seq[ :rule<rule-ref>,
                      :occurs['?', :group(:seq[:rule<val-css21-prop-ref>, :rule<val-css3-prop-ref>]) ]
                    ],
     },
-    'spec' => {
+    'values' => {
         input => "<rule-ref> [, [ 'css21-prop-ref' | <'css3-prop-ref'> ] ]*",
         ast => :seq[ :rule<rule-ref>,
                      :occurs['*',
@@ -50,41 +50,49 @@ for (
                             ],
                    ]
     },
-    'spec' => {
+    'values' => {
         input => '<length>{4}',
         ast => :occurs[ [4,4], :rule<length> ],
     },
-    'spec' => {
+    'values' => {
         input => '<length>#',
         ast => :occurs[ ',', :rule<length> ],
     },
-    'spec' => {
+    'values' => {
         input => '<length>#{1,4}',
         ast => :occurs[ [1,4,','], :rule<length> ],
     },
     # precedence tests taken from: https://developer.mozilla.org/en-US/docs/CSS/Value_definition_syntax
-    'spec' => {
+    'values' => {
         input => 'bold thin && <length>',
         ast => :required[
                         :seq[ :keywords['bold'], :keywords['thin'] ]
                         :rule<length>,
                     ]
     },
-    'spec' => {
+    'values' => {
         input => 'bold || thin && <length>',
         ast => :combo[ :keywords['bold'],
                        :required[ :keywords['thin'], :rule<length>],
                      ]
     },
-    'spec' => {
+    'func-proto' => {
         input => 'attr(<identifier>)',
-        ast => :rule<attr>,
+        ast => :proto{:func<attr>, :signature(:rule<identifier>), :synopsis('attr(<identifier>)')},
     },
-    'spec' => {
+    'func-proto' => {
+        input => 'linear-gradient( [ <linear-gradient-syntax> ] )',
+        ast => :proto{:func<linear-gradient>, :signature(:group(:rule<linear-gradient-syntax>)), :synopsis('linear-gradient( [ <linear-gradient-syntax> ] )'), }
+    },
+    'func-spec' => {
+        input => '<linear-gradient()> = linear-gradient( [ <linear-gradient-syntax> ] )',
+        ast => {:func<linear-gradient>, :spec(:group(:rule<linear-gradient-syntax>)), :synopsis("linear-gradient( [ <linear-gradient-syntax> ] )")}
+    },
+   'values' => {
         input => '[ <length-percentage [0,∞]> | auto ]{1,2} | cover | contain',
         ast => :alt[:occurs[[1, 2], :group(:alt[:rule<length-percentage>, :keywords["auto"]])], :keywords["cover", "contain"]],
     },
-    'spec' => {
+    'values' => {
         input => '<bg-layer>#? , <final-bg-layer>',
         ast => :seq[:occurs[["*", :trailing, ","], :rule<bg-layer>], :op(","), :rule<final-bg-layer>]
 
@@ -104,7 +112,7 @@ for (
         ast => {:props['content'],
                 :default<normal>,
                 :synopsis('normal | none | [ <string> | <uri> | <counter> | attr(<identifier>) | open-quote | close-quote | no-open-quote | no-close-quote ]+ | inherit'),
-                :spec(:alt[:keywords["normal", "none"], :occurs['+', :group(:alt[:rule("string"), :rule("uri"), :rule("counter"), :rule("attr"), :keywords["open-quote", "close-quote", "no-open-quote", "no-close-quote"]])], :keywords["inherit"]]),
+                :spec(:alt[:keywords["normal", "none"], :occurs['+', :group(:alt[:rule("string"), :rule("uri"), :rule("counter"), :func("attr"), :keywords["open-quote", "close-quote", "no-open-quote", "no-close-quote"]])], :keywords["inherit"]]),
                 :!inherit,
                },
     },

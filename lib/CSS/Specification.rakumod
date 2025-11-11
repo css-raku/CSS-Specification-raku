@@ -6,12 +6,12 @@
 
 grammar CSS::Specification:ver<0.4.16> {
     use CSS::Grammar::CSS3;
-    rule TOP { [<def=.property-spec> | <def=.rule-spec> | ^^ $$ || <.unexpected> ] * }
+    rule TOP { [<def=.property-spec> | <def=.rule-spec> | <def=.func-spec> | ^^ $$ || <.unexpected> ] * }
 
     rule property-spec {
         :my @*PROP-NAMES = [];
         <prop-names>
-            \t <spec>
+            \t <values>
             \t [:i 'n/a' | ua specific | <-[ \t ]>*? properties || $<default>=<-[ \t ]>* ]
             [ \t <-[ \t ]>*? # applies to
               \t [<inherit=.yes>|<inherit=.no>]? ]?
@@ -19,11 +19,16 @@ grammar CSS::Specification:ver<0.4.16> {
     }
     rule rule-spec {
         :my @*PROP-NAMES = [];
-        \t? <rule> ':'?'=' <spec>
+        \t? <rule-ref> ':'?'=' <values>
     }
+    rule func-spec {
+        :my @*PROP-NAMES = [];
+        \t? <func-ref> ':'?'=' <func-proto>
+    }
+    rule func-proto { <id> '(' ~ ')' <signature=.seq>? }
     token unexpected { \N+ }
-    rule spec          { :my $*CHOICE; <seq> }
-    # possibly tab delimited. Assume one spec per line.
+    rule values    { <seq> }
+    # possibly tab delimited. Assume one synopsis per line.
     token comment {('<!--') .*? ['-->' || <unclosed-comment>]
                   |('/*')   .*? ['*/'  || <unclosed-comment>]}
     token unclosed-comment {$}
@@ -44,7 +49,8 @@ grammar CSS::Specification:ver<0.4.16> {
     token id-quoted  { <.quote> <id> <.quote> }
     rule keyw        { <id> }
     rule digits      { \d+ }
-    rule rule        { '<'~'>' [ <id> [ '['~']' <.domain> +% ',' ]? ] }
+    rule rule-ref    { '<'~'>' [ <id> [ '['~']' <.domain> +% ',' ]? ] }
+    rule func-ref    { '<'~'>' [ <id> '(' ')' ] }
     rule domain      { <[0..9]>+ | '∞' }
 
     rule seq           { <term=.term-options>+ }
@@ -65,13 +71,14 @@ grammar CSS::Specification:ver<0.4.16> {
     token range                   {'{'~'}' [ <min=.digits> [',' <max=.digits>]? ] }
 
     proto rule value {*}
-    rule value:sym<func>          { <id>'(' ~ ')' <.seq> }
+    rule value:sym<func-proto>    { <func-proto> }
     rule value:sym<keywords>      { [<keyw><!before <occurs>>] +% '|' }
     rule value:sym<numbers>       { [<digits><!before <occurs>>] +% '|' }
     rule value:sym<keyw-quant>    { <keyw><occurs> }
     rule value:sym<num-quant>     { <digits><occurs> }
     rule value:sym<group>         { '[' ~ ']' <seq> }
-    rule value:sym<rule>          { <rule> }
+    rule value:sym<func-ref>      { <func-ref> }
+    rule value:sym<rule-ref>      { <rule-ref> }
     rule value:sym<op>            { < , / = > }
     rule value:sym<prop-ref>      { <property-ref> }
 

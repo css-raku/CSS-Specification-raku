@@ -20,8 +20,8 @@
     "CSS::Specification::Actions": "lib/CSS/Specification/Actions.rakumod",
     "CSS::Specification::Defs": "lib/CSS/Specification/Defs.rakumod",
     "CSS::Specification::Defs::Actions": "lib/CSS/Specification/Defs/Actions.rakumod",
-    "CSS::Specification::Runtime::Actions": "lib/CSS/Specification/Runtime/Actions.rakumod",
-    "CSS::Specification::Runtime::Grammar": "lib/CSS/Specification/Runtime/Grammar.rakumod"
+    "CSS::Specification::Base::Actions": "lib/CSS/Specification/Base/Actions.rakumod",
+    "CSS::Specification::Base::Grammar": "lib/CSS/Specification/Base/Grammar.rakumod"
   },
   "resources": [
   ],

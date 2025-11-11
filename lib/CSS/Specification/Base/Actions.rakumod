@@ -1,4 +1,4 @@
-unit class CSS::Specification::Runtime::Actions;
+unit role CSS::Specification::Base::Actions;
 
 use CSS::Grammar::Defs :CSSValue;
 use CSS::Grammar::AST;
@@ -30,6 +30,11 @@ method usage($/) {
     make ~ $*USAGE;
 }
 
+method make-func($name, $/) {
+    return $.warning('usage: ' ~ .ast)
+        with $<usage>;
+    make $.build.func: $name, $.build.list($/);
+}
 # ---- CSS::Grammar overrides ---- #
 
 method any-function($/)             {

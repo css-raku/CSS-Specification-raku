@@ -4,21 +4,33 @@ use Method::Also;
 
 # these actions translate a CSS property specification to an
 # intermediate AST
-has %.rule-refs is rw;
-has %.props is rw;
 has %.rules is rw;
+has %.rule-refs is rw;
+has %.funcs is rw;
+has %.func-refs is rw;
+has %.props is rw;
 has %.child-props is rw;
 
-method TOP($/) { make $<def>>>.ast };
+method !check-symbols {
+    my %ruleish = %!rules, %!rule-refs;
+    for %ruleish.keys.sort {
+        warn "$_ used as both a rule and a function"
+            if %!funcs{$_} || %!func-refs{$_};
+    }
+}
+method TOP($/) {
+    self!check-symbols;
+    make @<def>>>.ast;
+};
 
 method property-spec($/) {
     my @props = @($<prop-names>.ast);
     %.props{$_}++ for @props;
 
-    my $spec = $<spec>.ast;
-    my $synopsis = ~$<spec>;
+    my $spec = $<values>.ast;
+    my $synopsis = ~$<values>;
 
-    my %prop-def = (:@props, :$synopsis, :$spec);
+    my %prop-def = :@props, :$spec, :$synopsis;
 
     %prop-def<inherit> = .ast with $<inherit>;
 
@@ -29,10 +41,10 @@ method property-spec($/) {
 }
 
 method rule-spec($/) {
-    my $rule = $<rule>.ast,
-    my $spec = $<spec>.ast;
-    my $synopsis = ~$<spec>;
-    %.rules{$rule}++;
+    my $rule = $<rule-ref>.ast,
+    my $spec = $<values>.ast;
+    my $synopsis = ~$<values>;
+    %!rules{$rule}++;
 
     my %rule-def = (
         :$rule, :$synopsis, :$spec
@@ -41,12 +53,40 @@ method rule-spec($/) {
     make %rule-def;
 }
 
+method func-spec($/) {
+    my $func = $<func-ref>.ast,
+    my $proto = $<func-proto>.ast<proto>;
+    my $synopsis = ~$<func-proto>;
+    my $spec = $proto<signature>;
+
+    my %func-def = (
+        :$func, :$synopsis, :$spec
+        );
+
+    make %func-def;
+}
+
+method func-proto($/) {
+    my $synopsis = $/.trim;
+    my $func = $<id>.ast;
+    my %proto = :$func, :$synopsis;
+    %proto<signature> = .ast with $<signature>;
+    with %!funcs{$func} {
+       warn "inconsistant function declaration: {$synopsis.raku} vs {.<proto><synopsis>.raku}"
+           unless .<proto><signature> eqv %proto<signature>;
+    }
+    else {
+        $_ = :%proto;
+    }
+
+    make (:%proto);
+}
+
 method yes($/) { make True }
 method no($/)  { make False }
 
-method spec($/) {
-    my $spec = $<seq>.ast;
-    make $spec;
+method values($/) {
+    make $<seq>.ast;
 }
 
 method prop-names($/) {
@@ -62,7 +102,8 @@ method id($/)        { make ~$/ }
 method id-quoted($/) { make $<id>.ast }
 method keyw($/)      { make 'keyw' => ~$<id> }
 method digits($/)    { make 'num' => $/.Int }
-method rule($/)      { make $<id>.ast }
+method rule-ref($/)  { make $<id>.ast }
+method func-ref($/)  { make $<id>.ast }
 
 method !make-term($/, $name) {
     my @term =  @<term>>>.ast;
@@ -112,13 +153,6 @@ method range($/) {
     make [$min, $max];
 }
 
-method value:sym<func>($/) {
-    # todo - save function prototype
-    my $rule = $<id>.ast;
-    %.rule-refs{ $rule }++;
-    make (:$rule);
-}
-
 method value:sym<keywords>($/) {
     my @keywords = @<keyw>.map: {.ast.value};
     make (:@keywords);
@@ -142,10 +176,23 @@ method value:sym<group>($/) {
     make (:$group);
 }
 
-method value:sym<rule>($/) {
-    my $rule = ~$<rule>.ast;
-    %.rule-refs{ $rule }++;
+method value:sym<rule-ref>($/) {
+    my $rule = ~$<rule-ref>.ast;
+    %!rule-refs{ $rule }++;
     make (:$rule);
+}
+
+method value:sym<func-ref>($/) {
+    my $func = ~$<func-ref>.ast;
+    %!func-refs{ $func }++;
+    make (:$func);
+}
+
+method value:sym<func-proto>($/) {
+    my $func = ~$<func-proto>.ast<proto><func>;
+    # todo process prototypes
+    %!func-refs{ $func }++;
+    make (:$func);
 }
 
 method value:sym<op>($/) { my $op = $/.trim; make (:$op); }
@@ -156,8 +203,8 @@ method value:sym<prop-ref>($/)        {
     my Pair $prop-ref = $<property-ref>.ast;
     my $prop =  $prop-ref.value;
     my $rule = 'val-' ~ $prop;;
-    %.rule-refs{ $rule }++;
-    %.child-props{$_}.push: $prop for @*PROP-NAMES;
+    %!rule-refs{ $rule }++;
+    %!child-props{$_}.push: $prop for @*PROP-NAMES;
     make (:$rule);
 }
 
