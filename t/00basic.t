@@ -37,16 +37,16 @@ for (
         ast => :rule<rule-ref>,
     },
     'values' => {
-        input => "<rule-ref> [ 'css21-prop-ref' <'css3-prop-ref'> ]?",
+        input => "<rule-ref> [ 'css21-prop' <'css3-prop'> ]?",
         ast => :seq[ :rule<rule-ref>,
-                     :occurs['?', :group(:seq[:rule<val-css21-prop-ref>, :rule<val-css3-prop-ref>]) ]
+                     :occurs['?', :group(:seq[:rule<prop-val-css21-prop>, :rule<prop-val-css3-prop>]) ]
                    ],
     },
     'values' => {
-        input => "<rule-ref> [, [ 'css21-prop-ref' | <'css3-prop-ref'> ] ]*",
+        input => "<rule-ref> [, [ 'css21-prop' | <'css3-prop'> ] ]*",
         ast => :seq[ :rule<rule-ref>,
                      :occurs['*',
-                             :group(:seq[:op<,>, :group(:alt[:rule<val-css21-prop-ref>, :rule<val-css3-prop-ref>]) ])
+                             :group(:seq[:op<,>, :group(:alt[:rule<prop-val-css21-prop>, :rule<prop-val-css3-prop>]) ])
                             ],
                    ]
     },
@@ -86,7 +86,7 @@ for (
     },
     'func-spec' => {
         input => '<linear-gradient()> = linear-gradient( [ <linear-gradient-syntax> ] )',
-        ast => {:func<linear-gradient>, :spec(:group(:rule<linear-gradient-syntax>)), :synopsis("linear-gradient( [ <linear-gradient-syntax> ] )")}
+        ast => :func-spec{:func<linear-gradient>, :signature(:group(:rule<linear-gradient-syntax>)), :synopsis("linear-gradient( [ <linear-gradient-syntax> ] )")}
     },
    'values' => {
         input => '[ <length-percentage [0,∞]> | auto ]{1,2} | cover | contain',

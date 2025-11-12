@@ -7,6 +7,7 @@ use Method::Also;
 has %.rules is rw;
 has %.rule-refs is rw;
 has %.funcs is rw;
+has %.protos is rw;
 has %.func-refs is rw;
 has %.props is rw;
 has %.child-props is rw;
@@ -57,13 +58,14 @@ method func-spec($/) {
     my $func = $<func-ref>.ast,
     my $proto = $<func-proto>.ast<proto>;
     my $synopsis = ~$<func-proto>;
-    my $spec = $proto<signature>;
+    my $signature = $proto<signature>;
 
-    my %func-def = (
-        :$func, :$synopsis, :$spec
+    my %func-spec = (
+        :$func, :$signature, :$synopsis,
         );
 
-    make %func-def;
+    %!funcs{$func}++;
+    make (:%func-spec);
 }
 
 method func-proto($/) {
@@ -71,12 +73,12 @@ method func-proto($/) {
     my $func = $<id>.ast;
     my %proto = :$func, :$synopsis;
     %proto<signature> = .ast with $<signature>;
-    with %!funcs{$func} {
-       warn "inconsistant function declaration: {$synopsis.raku} vs {.<proto><synopsis>.raku}"
-           unless .<proto><signature> eqv %proto<signature>;
+    with %!protos{$func} {
+       warn "inconsistant function declaration: {$synopsis.raku} vs {.<synopsis>.raku}"
+           unless .<signature> eqv %proto<signature>;
     }
     else {
-        $_ = :%proto;
+        $_ = %proto;
     }
 
     make (:%proto);
@@ -202,7 +204,7 @@ method property-ref:sym<css3>($/) { make 'ref' => $<id>.ast }
 method value:sym<prop-ref>($/)        {
     my Pair $prop-ref = $<property-ref>.ast;
     my $prop =  $prop-ref.value;
-    my $rule = 'val-' ~ $prop;;
+    my $rule = 'prop-val-' ~ $prop;;
     %!rule-refs{ $rule }++;
     %!child-props{$_}.push: $prop for @*PROP-NAMES;
     make (:$rule);
