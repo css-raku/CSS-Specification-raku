@@ -12,16 +12,16 @@ The syntax is described in http://www.w3.org/TR/CSS21/about.html#property-defs.
 
 An example, from http://www.w3.org/TR/CSS21/propidx.html:
 
-    'content'	normal
-               | none
-               | [  <string> | <uri> | <counter> | attr(<identifier>)
-                  | open-quote | close-quote | no-open-quote | no-close-quote
-                 ]+
+    'content'	normal \
+               | none \
+               | [  <string> | <uri> | <counter> | attr(<identifier>) \
+                  | open-quote | close-quote | no-open-quote | no-close-quote \
+                 ]+ \
                | inherit
 
 ## Grammars and Classes
 
-- `CSS::Specification::Defs` + `CSS::Specification::Defs::Actions` - is a grammar which maps property specification terminology to CSS Core syntax and defines any newly introduced terms. For example `integer` is mapped to `int`.
+- `CSS::Specification::Base::Grammar` + `CSS::Specification::Base::Actions` - maps property specification terminology to CSS Core syntax and defines any newly introduced terms. For example `integer` is mapped to `int`.
 
 ## See Also
 - [CSS::Specification::Compiler](https://github.com/css-raku/CSS-Specification-Compiler-raku.git) - a RakuAST based compiler for property definitions (unreleased)

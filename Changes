@@ -1,5 +1,11 @@
 {{$NEXT}}
 
+0.5.0  2025-11-14T06:51:05+13:00
+  - Some upgrades for Level 4 value definition syntax, including:
+     -- functional notation: <linear-gradient()>
+     -- list notation:  <bg-layer>#? , <final-bg-layer>
+     -- allow ranges:  <length [0,∞]>
+
 0.4.16  2025-10-31T06:07:47+13:00
   - Retires CSS::Specification::BUILD; replaced by a new Raku module,
     CSS::Specification::Compiler (unreleased). See
@@ -56,7 +62,7 @@
 - All children of an edge property, should also be edges
 0.3.1 Preserve declaration order of child properties in metadata
 0.3.0 Distinguish 'edge' and 'child' properties
-- A four sided propert has 'edges'. E.g. 'border' has
+- A four sided property has 'edges'. E.g. 'border' has
   'border-top', ... 'border-left'
 - A compound property has children. E.g. 'background' has 'background-color',
   'background-attachment', 'background-image', ...
