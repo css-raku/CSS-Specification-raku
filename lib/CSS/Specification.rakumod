@@ -19,11 +19,11 @@ grammar CSS::Specification:ver<0.4.16> {
     }
     rule rule-spec {
         :my @*PROP-NAMES = [];
-        \t? <rule-ref> ':'?'=' <values>
+        \t? <rule-ref> '=' <values>
     }
     rule func-spec {
         :my @*PROP-NAMES = [];
-        \t? <func-ref> ':'?'=' <func-proto>
+        \t? <func-ref> '=' <func-proto>
     }
     rule func-proto { <id> '(' ~ ')' <signature=.seq>? }
     token unexpected { \N+ }

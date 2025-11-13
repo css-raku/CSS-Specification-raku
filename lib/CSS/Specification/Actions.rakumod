@@ -73,6 +73,7 @@ method func-proto($/) {
     my $func = $<id>.ast;
     my %proto = :$func, :$synopsis;
     %proto<signature> = .ast with $<signature>;
+
     with %!protos{$func} {
        warn "inconsistant function declaration: {$synopsis.raku} vs {.<synopsis>.raku}"
            unless .<signature> eqv %proto<signature>;
