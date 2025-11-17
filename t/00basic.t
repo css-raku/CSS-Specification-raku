@@ -93,8 +93,13 @@ for (
         ast => :alt[:occurs[[1, 2], :group(:alt[:rule<length-percentage>, :keywords["auto"]])], :keywords["cover", "contain"]],
     },
     'values' => {
+        input => '<bg-layer>#? <final-bg-layer>',
+        ast => :seq[:occurs[["*", ",", :!trailing, ], :rule<bg-layer>], :rule<final-bg-layer>]
+
+    },
+    'values' => {
         input => '<bg-layer>#? , <final-bg-layer>',
-        ast => :seq[:occurs[["*", :trailing, ","], :rule<bg-layer>], :op(","), :rule<final-bg-layer>]
+        ast => :seq[:occurs[["*", ",", :trailing, ], :rule<bg-layer>], :rule<final-bg-layer>]
 
     },
     'property-spec' => {
