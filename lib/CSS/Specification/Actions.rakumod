@@ -140,14 +140,14 @@ method term($/) {
 method occurs:sym<maybe>($/)     { make '?' }
 method occurs:sym<once-plus>($/) { make '+' }
 method occurs:sym<zero-plus>($/) { make '*' }
-method occurs:sym<list-trailing>($/) {
-    my $trailing = $<trailing>.so;
-    make ['*', ',', :$trailing ]
-}
 method occurs:sym<list>($/) {
     make $<range>
         ?? $<range>.ast.clone.append: ','
         !! ','
+}
+method occurs:sym<list-optional>($/) {
+    my $trailing = $<trailing>.so;
+    make ['*', ',', :$trailing ]
 }
 method occurs:sym<range>($/)     { make $<range>.ast }
 method range($/) {

@@ -67,7 +67,7 @@ grammar CSS::Specification:ver<0.5.0> {
     token occurs:sym<range>       {<range>}
     token occurs:sym<list>        {'#'<range>?}
     # e.g. <bg-layer>#? , <final-bg-layer>
-    token occurs:sym<list-trailing>  {'#?' [<.ws> $<trailing>=',']?}
+    token occurs:sym<list-optional>  {'#?' [<.ws> $<trailing>=',']?}
     token range                   {'{'~'}' [ <min=.digits> [',' <max=.digits>]? ] }
 
     proto rule value {*}
