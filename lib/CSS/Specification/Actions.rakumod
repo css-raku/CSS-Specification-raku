@@ -68,6 +68,10 @@ method func-spec($/) {
     make (:%func-spec);
 }
 
+method group($/) {
+    make $<seq>.ast;
+}
+
 method func-proto($/) {
     my $synopsis = $/.trim;
     my $func = $<id>.ast;
@@ -156,6 +160,39 @@ method range($/) {
     make [$min, $max];
 }
 
+method stringchar:sym<escape>($/)   { make $<escape>.ast }
+method stringchar:sym<nonascii>($/) { make $<nonascii>.ast }
+method stringchar:sym<ascii>($/)    { make ~$/ }
+method !to-unicode($hex-str --> Str) {
+    my $char  = chr( :16($hex-str) );
+    CATCH {
+        default {
+            $.warning('invalid unicode code-point', 'U+' ~ $hex-str.uc );
+            $char = chr(0xFFFD); # �
+        }
+    }
+    $char;
+}
+
+method unicode($/)  { make self!to-unicode(~$0) }
+
+method regascii($/) { make ~$/ }
+method nonascii($/) { make ~$/ }
+
+method escape($/)   { make do with $<char> { .ast } else { '' } }
+
+method single-quote($/) { make "'" }
+method double-quote($/) { make '"' }
+
+method !string-token($/) {
+    make [~] $<stringchar>>>.ast;
+}
+
+proto method string {*}
+method string:sym<single-q>($/) { self!string-token($/) }
+
+method string:sym<double-q>($/) { self!string-token($/) }
+
 method value:sym<keywords>($/) {
     my @keywords = @<keyw>.map: {.ast.value};
     make (:@keywords);
@@ -211,9 +248,9 @@ method value:sym<prop-ref>($/)        {
     make (:$rule);
 }
 
-method value:sym<literal>($/)  { make 'string' => ~$0 }
-
-method value:sym<num>($/)      { make 'num' => $/.Int }
-
-method value:sym<keyw>($/)     { make 'ident' => ~$/ }
+method value:sym<string>($/)  { make 'op' => $<string>.ast }
+method value:sym<parenthesized>($/)  {
+    my @seq = :op<(>, $<group>.ast, :op<)>;
+    make (:@seq);
+}
 

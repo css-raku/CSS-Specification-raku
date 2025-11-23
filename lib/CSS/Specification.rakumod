@@ -3,6 +3,7 @@
 #  http://www.w3.org/TR/CSS21/about.html#property-defs
 #  http://dev.w3.org/csswg/css-values/#value-defs
 #  https://developer.mozilla.org/en-US/docs/Web/CSS/Value_definition_syntax
+##use Grammar::Debugger;
 
 grammar CSS::Specification:ver<0.5.0> {
     use CSS::Grammar::CSS3;
@@ -25,7 +26,8 @@ grammar CSS::Specification:ver<0.5.0> {
         :my @*PROP-NAMES = [];
         \t? <func-ref> '=' <func-proto>
     }
-    rule func-proto { <id> '(' ~ ')' <signature=.seq>? }
+    rule group { '(' ~ ')' <seq> }
+    rule func-proto { <id> <signature=.group> }
     token unexpected { \N+ }
     rule values    { <seq> }
     # possibly tab delimited. Assume one synopsis per line.
@@ -49,9 +51,8 @@ grammar CSS::Specification:ver<0.5.0> {
     token id-quoted  { <.quote> <id> <.quote> }
     rule keyw        { <id> }
     rule digits      { \d+ }
-    rule rule-ref    { '<'~'>' [ <id> [ '['~']' <.domain> +% ',' ]? ] }
+    rule rule-ref    { '<'~'>' [ <id> [ '['~']' [ <.digits> [ ',' [<.digits>|'∞'] ]? ] ]? ] }
     rule func-ref    { '<'~'>' [ <id> '(' ')' ] }
-    rule domain      { <[0..9]>+ | '∞' }
 
     rule seq           { <term=.term-options>+ }
     rule term-options  { <term=.term-combo>    +% '|'  }
@@ -70,6 +71,24 @@ grammar CSS::Specification:ver<0.5.0> {
     token occurs:sym<list-optional>  {'#?' [<.ws> $<trailing>=',']?}
     token range                   {'{'~'}' [ <min=.digits> [',' <max=.digits>]? ] }
 
+    # stringchar-regular: printable ASCII chars, except: \ ' "
+    token stringchar-regular {<[ \x20 \! \# \$ \% \& \(..\[ \]..\~ ]>+ }
+    proto token stringchar {*}
+    token stringchar:sym<escape>   { <escape> }
+    token stringchar:sym<nonascii> { <nonascii> }
+    token stringchar:sym<ascii>    { <stringchar-regular>+ }
+
+    token single-quote   {\'}
+    token double-quote   {\"}
+    proto token string   {*}
+    token string:sym<double-q>  { \"[ <stringchar> | <stringchar=.single-quote> ]*\" }
+    token string:sym<single-q>  { \'[ <stringchar> | <stringchar=.double-quote> ]*\' }
+    token unicode  { (<xdigit>**1..6) <.wc>? }
+    # w3c nonascii :== #x80-#xD7FF #xE000-#xFFFD #x10000-#x10FFFF
+    token regascii { <[ \x20..\x7F ]> }
+    token nonascii { <- [ \x0..\x7F \n ]> }
+    token escape   { '\\'[ <char=.unicode> || \n || <char=.regascii> | <char=.nonascii> ] }
+
     proto rule value {*}
     rule value:sym<func-proto>    { <func-proto> }
     rule value:sym<keywords>      { [<keyw><!before <occurs>>] +% '|' }
@@ -81,6 +100,8 @@ grammar CSS::Specification:ver<0.5.0> {
     rule value:sym<rule-ref>      { <rule-ref> }
     rule value:sym<op>            { < , / = > }
     rule value:sym<prop-ref>      { <property-ref> }
+    rule value:sym<string>        { <string> }
+    rule value:sym<parenthesized> { <group> }
 
     proto token property-ref      {*}
     token property-ref:sym<css21> { <id=.id-quoted> }

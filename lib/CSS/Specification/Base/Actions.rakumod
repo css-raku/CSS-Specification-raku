@@ -13,12 +13,15 @@ method val($/) {
     }
     else {
         with $<proforma> {
+
             %ast<expr> = [.ast]
         }
         else {
             with $<rx><expr> {
-                %ast<expr> = $.build.list($_)
-                    unless .isa(Capture) && .caps.first: {! .value.ast.defined};
+                unless .isa(Capture) && .caps.first: {! .value.ast.defined} {
+                    my $expr = $.build.list($_);
+                    %ast ,= :$expr;
+                }
             }
         }
     }

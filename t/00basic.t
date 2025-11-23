@@ -121,6 +121,14 @@ for (
                 :!inherit,
                },
     },
+    func-spec => {
+        input => q{<calc()> = calc( <calc-sum> )},
+        ast => :func-spec{:func<calc>, :signature(:rule("calc-sum")), :synopsis("calc( <calc-sum> )")},
+    },
+    rule-spec => {
+        input => q{<calc-sum> = <calc-product> [ [ '+' | '-' ] <calc-product> ]*},
+        ast => {:rule<calc-sum>, :spec(:seq[:rule<calc-product>, :occurs["*", :group(:seq[:group(:alt[:op("+"), :op("-")]), :rule<calc-product>])]]), :synopsis("<calc-product> [ [ '+' | '-' ] <calc-product> ]*")},
+    },
     # css1 spec with property name and '*' junk
     property-spec => {
         input => "'width' *\t<length> | <percentage> | auto	auto	all elements but non-replaced inline elements, table rows, and row groups	no",
