@@ -198,17 +198,17 @@ method value:sym<keywords>($/) {
     make (:@keywords);
 }
 
-method value:sym<keyw-quant>($/) {
-    make 'occurs' => [$<occurs>.ast, $<keyw>.ast];
-}
-
 method value:sym<numbers>($/) {
     my @numbers = @<digits>.map: {.ast.value};
     make (:@numbers);
 }
 
-method value:sym<num-quant>($/) {
-    make 'occurs' => [$<occurs>.ast, $<digits>.ast];
+method value:sym<keyw>($/) {
+    make $<keyw>.ast;
+}
+
+method value:sym<num>($/) {
+    make $<digits>.ast;
 }
 
 method value:sym<group>($/) {
@@ -250,7 +250,7 @@ method value:sym<prop-ref>($/)        {
 
 method value:sym<string>($/)  { make 'op' => $<string>.ast }
 method value:sym<parenthesized>($/)  {
-    my @seq = :op<(>, $<group>.ast, :op<)>;
+    my @seq = $<group>.ast;
     make (:@seq);
 }
 

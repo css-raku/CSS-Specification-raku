@@ -9,8 +9,6 @@ use CSS::Specification::Actions;
 
 lives-ok {require CSS::Grammar:ver(v0.3.0..*) }, "CSS::Grammar version";
 
-my CSS::Specification::Actions $actions .= new;
-
 for (
     'values' => {
         input => 'thin',
@@ -136,28 +134,31 @@ for (
     },
     ) {
 
-    my $rule := .key;
+    my $rule     := .key;
     my $expected := .value;
-    my $input := $expected<input>;
+    my $input    := $expected<input>;
+    subtest "$rule: $input", {
 
-    my @*PROP-NAMES = [];
+        my CSS::Specification::Actions $actions .= new;
 
-    CSS::Grammar::Test::parse-tests(
-        CSS::Specification, $input,
-        :$rule,
-        :$actions,
-        :suite<spec>,
-        :$expected
-    )
-;
-    my $rule-body := $/.ast;
-    $rule-body := $rule-body<raku>
-        if $rule-body.isa('Hash');
+        my @*PROP-NAMES = [];
 
-    with $rule-body {
-        my $anon-rule := "rule \{ $_ \}";
-        lives-ok {EVAL $anon-rule}, "$rule compiles"
-            or diag "invalid rule: $rule-body";
+        CSS::Grammar::Test::parse-tests(
+            CSS::Specification, $input,
+            :$rule,
+            :$actions,
+            :suite<spec>,
+            :$expected
+        );
+        my $rule-body := $/.ast;
+        $rule-body := $rule-body<raku>
+                       if $rule-body.isa('Hash');
+
+        with $rule-body {
+            my $anon-rule := "rule \{ $_ \}";
+            lives-ok {EVAL $anon-rule}, "$rule compiles"
+                                            or diag "invalid rule: $rule-body";
+        }
     }
 }
 

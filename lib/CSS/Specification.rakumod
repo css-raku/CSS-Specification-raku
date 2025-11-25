@@ -93,8 +93,9 @@ grammar CSS::Specification:ver<0.5.0> {
     rule value:sym<func-proto>    { <func-proto> }
     rule value:sym<keywords>      { [<keyw><!before <occurs>>] +% '|' }
     rule value:sym<numbers>       { [<digits><!before <occurs>>] +% '|' }
-    rule value:sym<keyw-quant>    { <keyw><occurs> }
-    rule value:sym<num-quant>     { <digits><occurs> }
+    rule value:sym<keyw>          { <keyw> }
+    rule value:sym<num>           { <digits> }
+
     rule value:sym<group>         { '[' ~ ']' <seq> }
     rule value:sym<func-ref>      { <func-ref> }
     rule value:sym<rule-ref>      { <rule-ref> }
