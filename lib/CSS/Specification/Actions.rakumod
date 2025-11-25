@@ -68,8 +68,16 @@ method func-spec($/) {
     make (:%func-spec);
 }
 
-method group($/) {
-    make $<seq>.ast;
+method required-arg($/) {
+    make $<value>.ast;
+}
+method optional-arg($/) {
+    make 'occurs' => ['?', $<value>.ast]
+}
+
+method signature($/) {
+    my @args = @<arg>>>.ast;
+    make @args;
 }
 
 method func-proto($/) {
@@ -250,7 +258,7 @@ method value:sym<prop-ref>($/)        {
 
 method value:sym<string>($/)  { make 'op' => $<string>.ast }
 method value:sym<parenthesized>($/)  {
-    my @seq = $<group>.ast;
+    my @seq = $<signature>.ast;
     make (:@seq);
 }
 

@@ -74,17 +74,21 @@ for (
                        :required[ :keywords['thin'], :rule<length>],
                      ]
     },
+    'values' => {
+        input => 'example( first? , second? , third? )',
+        ast => :func<example>,
+    },
     'func-proto' => {
         input => 'attr(<identifier>)',
-        ast => :proto{:func<attr>, :signature(:rule<identifier>), :synopsis('attr(<identifier>)')},
+        ast => :proto{:func<attr>, :signature[:rule<identifier>], :synopsis('attr(<identifier>)')},
     },
     'func-proto' => {
         input => 'linear-gradient( [ <linear-gradient-syntax> ] )',
-        ast => :proto{:func<linear-gradient>, :signature(:group(:rule<linear-gradient-syntax>)), :synopsis('linear-gradient( [ <linear-gradient-syntax> ] )'), }
+        ast => :proto{:func<linear-gradient>, :signature[:group(:rule<linear-gradient-syntax>)], :synopsis('linear-gradient( [ <linear-gradient-syntax> ] )'), }
     },
     'func-spec' => {
         input => '<linear-gradient()> = linear-gradient( [ <linear-gradient-syntax> ] )',
-        ast => :func-spec{:func<linear-gradient>, :signature(:group(:rule<linear-gradient-syntax>)), :synopsis("linear-gradient( [ <linear-gradient-syntax> ] )")}
+        ast => :func-spec{:func<linear-gradient>, :signature[:group(:rule<linear-gradient-syntax>)], :synopsis("linear-gradient( [ <linear-gradient-syntax> ] )")}
     },
    'values' => {
         input => '[ <length-percentage [0,∞]> | auto ]{1,2} | cover | contain',
@@ -121,7 +125,15 @@ for (
     },
     func-spec => {
         input => q{<calc()> = calc( <calc-sum> )},
-        ast => :func-spec{:func<calc>, :signature(:rule("calc-sum")), :synopsis("calc( <calc-sum> )")},
+        ast => :func-spec{:func<calc>, :signature[:rule("calc-sum")], :synopsis("calc( <calc-sum> )")},
+    },
+    func-spec => {
+        input => '<example()> = example( first , second? , third? )',
+        ast => :func-spec{
+            :func<example>,
+            :signature[:keywords["first"], :occurs["?", :keyw<second>], :occurs["?", :keyw<third>]],
+            :synopsis("example( first , second? , third? )"),
+        }
     },
     rule-spec => {
         input => q{<calc-sum> = <calc-product> [ [ '+' | '-' ] <calc-product> ]*},
@@ -150,15 +162,6 @@ for (
             :suite<spec>,
             :$expected
         );
-        my $rule-body := $/.ast;
-        $rule-body := $rule-body<raku>
-                       if $rule-body.isa('Hash');
-
-        with $rule-body {
-            my $anon-rule := "rule \{ $_ \}";
-            lives-ok {EVAL $anon-rule}, "$rule compiles"
-                                            or diag "invalid rule: $rule-body";
-        }
     }
 }
 

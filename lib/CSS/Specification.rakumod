@@ -26,8 +26,14 @@ grammar CSS::Specification:ver<0.5.0> {
         :my @*PROP-NAMES = [];
         \t? <func-ref> '=' <func-proto>
     }
-    rule group { '(' ~ ')' <seq> }
-    rule func-proto { <id> <signature=.group> }
+    rule required-arg { <value> <!before '?'> }
+    rule optional-arg { <value> '?' }
+    rule signature { '(' ~ ')' [
+                         [<arg=.required-arg> +% [ ',' ]][',' <arg=.optional-arg> +% [ ',' ]]?
+                     ||  [<arg=.optional-arg> *% [ ',' ]]
+                     ]
+                   }
+    rule func-proto { <id> <signature> }
     token unexpected { \N+ }
     rule values    { <seq> }
     # possibly tab delimited. Assume one synopsis per line.
@@ -102,7 +108,7 @@ grammar CSS::Specification:ver<0.5.0> {
     rule value:sym<op>            { < , / = > }
     rule value:sym<prop-ref>      { <property-ref> }
     rule value:sym<string>        { <string> }
-    rule value:sym<parenthesized> { <group> }
+    rule value:sym<parenthesized> { <signature> }
 
     proto token property-ref      {*}
     token property-ref:sym<css21> { <id=.id-quoted> }
