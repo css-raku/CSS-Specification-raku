@@ -7,9 +7,9 @@
 
 grammar CSS::Specification:ver<0.5.0> {
     use CSS::Grammar::CSS3;
-    rule TOP { [<def=.property-spec> | <def=.rule-spec> | <def=.func-spec> | ^^ $$ || <.unexpected> ] * }
+    rule TOP { [<def=.prop-spec> | <def=.rule-spec> | <def=.func-spec> | ^^ $$ || <.unexpected> ] * }
 
-    rule property-spec {
+    rule prop-spec {
         :my @*PROP-NAMES = [];
         <prop-names>
             \t <values>
@@ -26,13 +26,14 @@ grammar CSS::Specification:ver<0.5.0> {
         :my @*PROP-NAMES = [];
         \t? <func-ref> '=' <func-proto>
     }
-    rule required-arg { <value> <!before '?'> }
+    # e.g.: example( first , second? , third? )
+    rule structured-args {
+        [<arg> +% [ ',' ]][',' <optional-arg> +% [ ',' ]]?
+        ||  [<optional-arg> *% [ ',' ]]
+    }
+    rule arg { <value> <!before '?'> }
     rule optional-arg { <value> '?' }
-    rule signature { '(' ~ ')' [
-                         [<arg=.required-arg> +% [ ',' ]][',' <arg=.optional-arg> +% [ ',' ]]?
-                     ||  [<arg=.optional-arg> *% [ ',' ]]
-                     ]
-                   }
+    rule signature { '(' ~ ')' [<args=.structured-args>||<args=.seq>] }
     rule func-proto { <id> <signature> }
     token unexpected { \N+ }
     rule values    { <seq> }

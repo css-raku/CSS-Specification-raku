@@ -12,7 +12,7 @@ lives-ok {require CSS::Grammar:ver(v0.3.0..*) }, "CSS::Grammar version";
 for (
     'values' => {
         input => 'thin',
-        ast => :keywords['thin'],
+        ast => :keyw<thin>,
     },
     'values' => {
         input => 'thin?',
@@ -64,35 +64,39 @@ for (
     'values' => {
         input => 'bold thin && <length>',
         ast => :required[
-                        :seq[ :keywords['bold'], :keywords['thin'] ]
+                        :seq[ :keyw<bold>, :keyw<thin> ]
                         :rule<length>,
                     ]
     },
     'values' => {
         input => 'bold || thin && <length>',
-        ast => :combo[ :keywords['bold'],
-                       :required[ :keywords['thin'], :rule<length>],
+        ast => :combo[ :keyw<bold>,
+                       :required[ :keyw<thin>, :rule<length>],
                      ]
     },
     'values' => {
         input => 'example( first? , second? , third? )',
         ast => :func<example>,
     },
+    term => {
+        input => '[<length> | auto]#{4,4}',
+        ast => :occurs[[4,4, ','], :group{ :alt[ :rule<length>, :keyw<auto> ] } ],
+    },
     'func-proto' => {
         input => 'attr(<identifier>)',
-        ast => :proto{:func<attr>, :signature[:rule<identifier>], :synopsis('attr(<identifier>)')},
+        ast => :proto{:func<attr>, :signature{ :args[:rule<identifier>] }, :synopsis('attr(<identifier>)')},
     },
     'func-proto' => {
         input => 'linear-gradient( [ <linear-gradient-syntax> ] )',
-        ast => :proto{:func<linear-gradient>, :signature[:group(:rule<linear-gradient-syntax>)], :synopsis('linear-gradient( [ <linear-gradient-syntax> ] )'), }
+        ast => :proto{:func<linear-gradient>, :signature{ :args[:group(:rule<linear-gradient-syntax>)] }, :synopsis('linear-gradient( [ <linear-gradient-syntax> ] )'), }
     },
     'func-spec' => {
         input => '<linear-gradient()> = linear-gradient( [ <linear-gradient-syntax> ] )',
-        ast => :func-spec{:func<linear-gradient>, :signature[:group(:rule<linear-gradient-syntax>)], :synopsis("linear-gradient( [ <linear-gradient-syntax> ] )")}
+        ast => :func-spec{:func<linear-gradient>, :signature{ :args[:group(:rule<linear-gradient-syntax>)] }, :synopsis("linear-gradient( [ <linear-gradient-syntax> ] )")}
     },
    'values' => {
         input => '[ <length-percentage [0,∞]> | auto ]{1,2} | cover | contain',
-        ast => :alt[:occurs[[1, 2], :group(:alt[:rule<length-percentage>, :keywords["auto"]])], :keywords["cover", "contain"]],
+        ast => :alt[:occurs[[1, 2], :group(:alt[:rule<length-percentage>, :keyw<auto>])], :keywords["cover", "contain"]],
     },
     'values' => {
         input => '<bg-layer>#? <final-bg-layer>',
@@ -104,9 +108,9 @@ for (
         ast => :seq[:occurs[["*", ",", :trailing, ], :rule<bg-layer>], :rule<final-bg-layer>]
 
     },
-    'property-spec' => {
+    'prop-spec' => {
         input => "'direction'	ltr | rtl | inherit	ltr	all elements, but see prose	yes",
-        ast => {
+        ast => :prop-spec{
             :props['direction'],
             :default<ltr>,
             :synopsis('ltr | rtl | inherit'),
@@ -114,33 +118,33 @@ for (
             :inherit
         }
     },
-    'property-spec' => {
+    'prop-spec' => {
         input => "'content'\tnormal | none | [ <string> | <uri> | <counter> | attr(<identifier>) | open-quote | close-quote | no-open-quote | no-close-quote ]+ | inherit	normal	:before and :after pseudo-elements	no",
-        ast => {:props['content'],
+        ast => :prop-spec{:props['content'],
                 :default<normal>,
                 :synopsis('normal | none | [ <string> | <uri> | <counter> | attr(<identifier>) | open-quote | close-quote | no-open-quote | no-close-quote ]+ | inherit'),
-                :spec(:alt[:keywords["normal", "none"], :occurs['+', :group(:alt[:rule("string"), :rule("uri"), :rule("counter"), :func("attr"), :keywords["open-quote", "close-quote", "no-open-quote", "no-close-quote"]])], :keywords["inherit"]]),
+                :spec(:alt[:keywords["normal", "none"], :occurs['+', :group(:alt[:rule("string"), :rule("uri"), :rule("counter"), :func("attr"), :keywords["open-quote", "close-quote", "no-open-quote", "no-close-quote"]])], :keyw<inherit>]),
                 :!inherit,
                },
     },
     func-spec => {
         input => q{<calc()> = calc( <calc-sum> )},
-        ast => :func-spec{:func<calc>, :signature[:rule("calc-sum")], :synopsis("calc( <calc-sum> )")},
+        ast => :func-spec{:func<calc>, :signature{:args[:rule("calc-sum")]}, :synopsis("calc( <calc-sum> )")},
     },
     func-spec => {
         input => '<example()> = example( first , second? , third? )',
         ast => :func-spec{
             :func<example>,
-            :signature[:keywords["first"], :occurs["?", :keyw<second>], :occurs["?", :keyw<third>]],
+            :signature{:args[:keyw<first>, :optional[ :keyw<second>, :keyw<third>]]},
             :synopsis("example( first , second? , third? )"),
         }
     },
     rule-spec => {
         input => q{<calc-sum> = <calc-product> [ [ '+' | '-' ] <calc-product> ]*},
-        ast => {:rule<calc-sum>, :spec(:seq[:rule<calc-product>, :occurs["*", :group(:seq[:group(:alt[:op("+"), :op("-")]), :rule<calc-product>])]]), :synopsis("<calc-product> [ [ '+' | '-' ] <calc-product> ]*")},
+        ast => :rule-spec{:rule<calc-sum>, :spec(:seq[:rule<calc-product>, :occurs["*", :group(:seq[:group(:alt[:op("+"), :op("-")]), :rule<calc-product>])]]), :synopsis("<calc-product> [ [ '+' | '-' ] <calc-product> ]*")},
     },
     # css1 spec with property name and '*' junk
-    property-spec => {
+    prop-spec => {
         input => "'width' *\t<length> | <percentage> | auto	auto	all elements but non-replaced inline elements, table rows, and row groups	no",
         ast => Mu,
     },

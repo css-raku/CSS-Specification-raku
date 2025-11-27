@@ -24,21 +24,21 @@ method TOP($/) {
     make @<def>>>.ast;
 };
 
-method property-spec($/) {
+method prop-spec($/) {
     my @props = @($<prop-names>.ast);
     %.props{$_}++ for @props;
 
     my $spec = $<values>.ast;
     my $synopsis = ~$<values>;
 
-    my %prop-def = :@props, :$spec, :$synopsis;
+    my %prop-spec = :@props, :$spec, :$synopsis;
 
-    %prop-def<inherit> = .ast with $<inherit>;
+    %prop-spec<inherit> = .ast with $<inherit>;
 
-    %prop-def<default> = ~$_
+    %prop-spec<default> = ~$_
         with $<default>;
 
-    make %prop-def;
+    make (:%prop-spec);
 }
 
 method rule-spec($/) {
@@ -47,11 +47,11 @@ method rule-spec($/) {
     my $synopsis = ~$<values>;
     %!rules{$rule}++;
 
-    my %rule-def = (
+    my %rule-spec = (
         :$rule, :$synopsis, :$spec
         );
 
-    make %rule-def;
+    make (:%rule-spec);
 }
 
 method func-spec($/) {
@@ -68,23 +68,32 @@ method func-spec($/) {
     make (:%func-spec);
 }
 
-method required-arg($/) {
+method arg($/) {
     make $<value>.ast;
 }
+
 method optional-arg($/) {
-    make 'occurs' => ['?', $<value>.ast]
+    make $<value>.ast;
+}
+
+method structured-args($/) {
+    my %spec;
+    my @args = @<arg>>>.ast;
+    @args.push:  'optional' => [ @<optional-arg>>>.ast ]
+        if @<optional-arg>;
+    make (:@args);
 }
 
 method signature($/) {
-    my @args = @<arg>>>.ast;
-    make @args;
+    my %signature = $<args>.ast;
+    make (:%signature);
 }
 
 method func-proto($/) {
     my $synopsis = $/.trim;
     my $func = $<id>.ast;
     my %proto = :$func, :$synopsis;
-    %proto<signature> = .ast with $<signature>;
+    %proto ,= .ast with $<signature>;
 
     with %!protos{$func} {
        warn "inconsistant function declaration: {$synopsis.raku} vs {.<synopsis>.raku}"
@@ -202,13 +211,25 @@ method string:sym<single-q>($/) { self!string-token($/) }
 method string:sym<double-q>($/) { self!string-token($/) }
 
 method value:sym<keywords>($/) {
-    my @keywords = @<keyw>.map: {.ast.value};
-    make (:@keywords);
+    my @keyws = @<keyw>.map: {.ast};
+
+    if @keyws == 1 {
+        make @keyws.head;
+    }
+    else {
+        make 'keywords' => @keyws.map(*.value).Array;
+    }
 }
 
 method value:sym<numbers>($/) {
-    my @numbers = @<digits>.map: {.ast.value};
-    make (:@numbers);
+    my @nums = @<digits>.map: {.ast };
+
+    if @nums == 1 {
+        make @nums.head;
+    }
+    else {
+        make 'numbers' => @nums.map(*.value).Array;
+    }
 }
 
 method value:sym<keyw>($/) {
