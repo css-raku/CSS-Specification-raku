@@ -17,11 +17,8 @@ method val($/) {
             %ast<expr> = [.ast]
         }
         else {
-            with $<rx><expr> {
-                unless .isa(Capture) && .caps.first: {! .value.ast.defined} {
-                    my $expr = $.build.list($_);
-                    %ast ,= :$expr;
-                }
+            unless .isa(Capture) && .caps.first: {! .value.ast.defined} {
+                %ast = $.build.rule($<rx>);
             }
         }
     }

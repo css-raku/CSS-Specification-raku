@@ -1,4 +1,6 @@
 {{$NEXT}}
+  - More Level 4 upgrades including strings and function
+    definitions
 
 0.5.0  2025-11-14T06:51:05+13:00
   - Some upgrades for Level 4 value definition syntax, including:

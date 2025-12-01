@@ -37,14 +37,14 @@ for (
     'values' => {
         input => "<rule-ref> [ 'css21-prop' <'css3-prop'> ]?",
         ast => :seq[ :rule<rule-ref>,
-                     :occurs['?', :group(:seq[:rule<prop-val-css21-prop>, :rule<prop-val-css3-prop>]) ]
+                     :occurs['?', :group(:seq[:rule<css-val-css21-prop>, :rule<css-val-css3-prop>]) ]
                    ],
     },
     'values' => {
         input => "<rule-ref> [, [ 'css21-prop' | <'css3-prop'> ] ]*",
         ast => :seq[ :rule<rule-ref>,
                      :occurs['*',
-                             :group(:seq[:op<,>, :group(:alt[:rule<prop-val-css21-prop>, :rule<prop-val-css3-prop>]) ])
+                             :group(:seq[:op<,>, :group(:alt[:rule<css-val-css21-prop>, :rule<css-val-css3-prop>]) ])
                             ],
                    ]
     },
