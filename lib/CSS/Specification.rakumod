@@ -5,7 +5,7 @@
 #  https://developer.mozilla.org/en-US/docs/Web/CSS/Value_definition_syntax
 ##use Grammar::Debugger;
 
-grammar CSS::Specification:ver<0.5.0> {
+grammar CSS::Specification:ver<0.5.1> {
     use CSS::Grammar::CSS3;
     rule TOP { [<def=.prop-spec> | <def=.rule-spec> | <def=.func-spec> | ^^ $$ || <.unexpected> ] * }
 
