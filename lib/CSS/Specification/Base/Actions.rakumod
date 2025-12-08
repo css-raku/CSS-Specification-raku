@@ -30,10 +30,10 @@ method usage($/) {
     make ~ $*USAGE;
 }
 
-method make-func($name, $/) {
+method make-func($name, $/, |c) {
     return $.warning('usage: ' ~ .ast)
         with $<usage>;
-    make $.build.func: $name, $.build.list($/);
+    make $.build.func: $name, $.build.list($/), |c;
 }
 # ---- CSS::Grammar overrides ---- #
 

@@ -279,7 +279,6 @@ method value:sym<prop-ref>($/)        {
 
 method value:sym<string>($/)  { make 'op' => $<string>.ast }
 method value:sym<parenthesized>($/)  {
-    my @seq = $<signature>.ast;
-    make (:@seq);
+    make 'paren' => $<signature>.ast<signature><args>;
 }
 
