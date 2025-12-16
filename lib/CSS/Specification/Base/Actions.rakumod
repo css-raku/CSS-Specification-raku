@@ -5,25 +5,14 @@ use CSS::Grammar::AST;
 
 method build { CSS::Grammar::AST }
 
-method val($/) {
-    my %ast;
-
-    with $<usage> {
-        %ast<usage> = .ast;
-    }
-    else {
-        with $<proforma> {
-
-            %ast<expr> = [.ast]
-        }
-        else {
-            unless .isa(Capture) && .caps.first: {! .value.ast.defined} {
-                %ast = $.build.rule($<rx>);
-            }
-        }
-    }
-
-    make %ast;
+multi method val($/ where $<rx>) {
+    make $.build.rule($<rx>);
+}
+multi method val($/ where $<usage>) {
+    make 'usage' => $<usage>.ast
+}
+multi method val($/ where $<proforma>) {
+    make 'expr' => [ $<proforma>.ast ]
 }
 
 method usage($/) {
