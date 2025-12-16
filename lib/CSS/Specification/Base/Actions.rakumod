@@ -19,9 +19,10 @@ method usage($/) {
     make ~ $*USAGE;
 }
 
-method make-func($name, $/, |c) {
-    return $.warning('usage: ' ~ .ast)
-        with $<usage>;
+multi method make-func($, $/ where $<usage>) {
+    $.warning('usage: ' ~ $<usage>.ast)
+}
+multi method make-func($name, $/, |c) {
     make $.build.func: $name, $.build.list($/), |c;
 }
 # ---- CSS::Grammar overrides ---- #
@@ -50,18 +51,20 @@ multi method declaration($/ where $<any-declaration>)  {
         }
     }
 }
+multi method declaration($/ where $<any-arg>) {
+    $.warning(
+        "extra terms following declaration '{$<decl>.trim}'",
+        ~"'$<any-arg>'", 'dropped'
+    );
+}
 multi method declaration(::?CLASS:D $obj: $/)  {
     my %ast = %( $.build.decl($<decl>, :$obj) )
        || return;
 
-    if $<any-arg> {
-        return $.warning("extra terms following '{%ast<ident>}' declaration",
-                         ~$<any-arg>, 'dropped');
-    }
-
     if $<prio> && (my $prio = $<prio>.ast) {
         %ast ,= :$prio;
     }
+
     make $.build.token( %ast, :type(CSSValue::Property) );
 }
 
