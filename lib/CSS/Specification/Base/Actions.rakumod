@@ -101,9 +101,8 @@ my constant %Colors = do {
         $name .= substr(0, $_) with $name.index('-');
         my List $rgb = $val<rgb>;
         %v{$name} = $rgb;
-        with $name.index("gray") {
-            $name.substr-rw($_, 4) = 'grey';
-            %v{$name} = $rgb;
+        if $name.contains("gray") {
+            %v{ $name.subst('gray', 'grey') } = $rgb;
         }
     }
     %v;
