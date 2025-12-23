@@ -122,7 +122,7 @@ method color:sym<named>($/) {
 method integer($/)     {
     my Int $val = $<uint>.ast;
     $val = -$val
-        if $<sign> && $<sign> eq '-';
+        if $<sign> ~~ '-';
     make $.build.token($val, :type(CSSValue::IntegerComponent))
 }
 
@@ -132,5 +132,5 @@ method keyw($/)        { make $.build.token($<id>.lc, :type(CSSValue::KeywordCom
 # case sensitive identifiers
 method identifier($/)  { make $.build.token($<name>.ast, :type(CSSValue::IdentifierComponent)) }
 # identifiers strung-together, e.g New Century Schoolbook
-method identifiers($/) { make $.build.token( $<identifier>.map({ .ast.value }).join(' '), :type(CSSValue::IdentifierComponent)) }
+method identifiers($/) { make $.build.token( @<identifier>.map({ .ast.value }).join(' '), :type(CSSValue::IdentifierComponent)) }
 
