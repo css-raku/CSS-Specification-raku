@@ -27,16 +27,14 @@ multi method make-func($name, $/, |c) {
 }
 # ---- CSS::Grammar overrides ---- #
 
-method any-function($/)             {
-    ##        nextsame if $.lax;
-    if $.lax {
-        $<any-args>
-            ?? $.warning('skipping function arguments', ~$<any-args>)
-            !! make $.build.node($/);
-    }
-    else {
-        $.warning('ignoring function', $<Ident>.ast.lc);
-    }
+multi method any-function($/ where !$.lax) {
+    $.warning('ignoring function', $<Ident>.ast.lc);
+}
+multi method any-function($/ where $<any-args>) {
+     $.warning('skipping function with unrecognised arguments', ~$<any-args>)
+}
+multi method any-function($/) {
+    make $.build.node($/);
 }
 
 multi method declaration($/ where $<any-declaration>)  {
@@ -111,10 +109,10 @@ method colors { %Colors }
 
 method color:sym<named>($/) {
     my Str $color-name = $<keyw>.ast.value;
-    my @rgb = @( $.colors{$color-name} )
-        or die "unknown color: " ~ $color-name;
+    my $rgb = $.colors{$color-name}
+        // die "unknown color: " ~ $color-name;
 
-    my @color = @rgb.map: { (CSSValue::NumberComponent) => $_ };
+    my @color = $rgb.map: { (CSSValue::NumberComponent) => $_ };
 
     make $.build.token(@color, :type<rgb>);
 }
