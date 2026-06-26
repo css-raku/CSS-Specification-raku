@@ -13,7 +13,7 @@ grammar CSS::Specification:ver<0.5.3> {
         :my @*PROP-NAMES = [];
         <prop-names>
             \t <values>
-            \t [:i 'n/a' | ua specific | <-[ \t ]>*? properties || $<default>=<-[ \t ]>* ]
+            \t $<default>=<-[ \t ]>*
             [ \t <-[ \t ]>*? # applies to
               \t [<inherit=.yes>|<inherit=.no>]? ]?
             \t? \N*
