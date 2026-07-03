@@ -55,10 +55,13 @@ method rule-spec($/) {
 }
 
 method func-spec($/) {
-    my $func = $<func-ref>.ast,
+    my $func = $<func-ref>.ast;
     my $proto = $<func-proto>.ast<proto>;
     my $synopsis = ~$<func-proto>;
     my $signature = $proto<signature>;
+    given $<func-proto>.ast<proto><func> {
+        warn "prototype mismatch $func vs $_" unless $func eq $_;
+    }
 
     my %func-spec = (
         :$func, :$signature, :$synopsis,
@@ -161,6 +164,7 @@ method term($/) {
 method occurs:sym<maybe>($/)     { make '?' }
 method occurs:sym<once-plus>($/) { make '+' }
 method occurs:sym<zero-plus>($/) { make '*' }
+method occurs:sym<must>($/)      { make '!' }
 method occurs:sym<list>($/) {
     make $<range>
         ?? $<range>.ast.clone.append: ','

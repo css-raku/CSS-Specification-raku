@@ -72,6 +72,7 @@ grammar CSS::Specification:ver<0.5.3> {
     token occurs:sym<maybe>       {'?'}
     token occurs:sym<once-plus>   {'+'}
     token occurs:sym<zero-plus>   {'*'}
+    token occurs:sym<must>        {'!'}
     token occurs:sym<range>       {<range>}
     token occurs:sym<list>        {'#'<range>?}
     # e.g. <bg-layer>#? , <final-bg-layer>

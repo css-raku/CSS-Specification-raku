@@ -97,9 +97,10 @@ my constant %Colors = do {
     for COLORS.pairs {
         my (Str $name, Hash $val) = .kv;
         $name .= substr(0, $_) with $name.index('-');
-        my List $rgb = $val<rgb>;
+        my List:D $rgb = $val<rgb>;
         %v{$name} = $rgb;
         if $name.contains("gray") {
+            # Also accept British spelling
             %v{ $name.subst('gray', 'grey') } = $rgb;
         }
     }
@@ -109,7 +110,7 @@ method colors { %Colors }
 
 method color:sym<named>($/) {
     my Str $color-name = $<keyw>.ast.value;
-    my $rgb = $.colors{$color-name}
+    my List $rgb = $.colors{$color-name}
         // die "unknown color: " ~ $color-name;
 
     my @color = $rgb.map: { (CSSValue::NumberComponent) => $_ };
