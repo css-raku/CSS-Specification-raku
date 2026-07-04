@@ -53,12 +53,12 @@ grammar CSS::Specification:ver<0.5.3> {
           { @*PROP-NAMES.push: ~$<id> }
         ] +%% <.prop-sep>
     }
-    token id         { <[a..z]>[\w|\-]* }
+    token id         {:i <[a..z0..9_-]>*?<[a..z]><[a..z0..9_-]>* }
     token quote      {< ' ‘ ’ >}
     token id-quoted  { <.quote> <id> <.quote> }
     rule keyw        { <id> }
     rule digits      { \d+ }
-    rule rule-ref    { '<'~'>' [ <id> [ '['~']' [ <.digits> [ ',' [<.digits>|'∞'] ]? ] ]? ] }
+    rule rule-ref    { '<'~'>' [ <id> [ '['~']' [ <.value> [ ',' [<.value>|'∞'] ]? ] ]? ] }
     rule func-ref    { '<'~'>' [ <id> '(' ')' ] }
 
     rule seq           { <term=.term-options>+ }
@@ -66,7 +66,7 @@ grammar CSS::Specification:ver<0.5.3> {
     rule term-combo    { <term=.term-required> +% '||' }
     rule term-required { <term=.term-seq>      +% '&&' }
     rule term-seq      { <term>+ }
-    rule term          { <value><occurs>? }
+    rule term          { <value><occurs>* }
 
     proto token occurs {*}
     token occurs:sym<maybe>       {'?'}

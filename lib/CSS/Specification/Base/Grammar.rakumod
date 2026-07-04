@@ -23,7 +23,9 @@ token frequency:sym<zero> {<number> <?{ +$<number> == 0 }> }
 token integer     {$<sign>=< + - >?<uint>}
 token number      {<num><!before ['%'|\w]>}
 token uri         {<url>}
-multi token keyw  {<id=.Ident>}         # keyword (case insensitive)
+multi token keyw  {   <id=.Ident>          # keyword (case insensitive)
+                  ||  $<id>=[:i <[a..z0..9_-]>*?<[a..z]><[a..z0..9_-]>*] # e.g. 0deg
+                  }
 multi token keyw($rx) {<id={$rx}>}      # keyword (case insensitive)
 token identifier  {<name>}              # identifier (case sensitive)
 rule identifiers  {[ <identifier> ]+}   # E.g. font name: Times New Roman

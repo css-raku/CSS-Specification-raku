@@ -156,9 +156,10 @@ method term-required($/) {
 method term($/) {
     my $value = $<value>.ast;
 
-    make $<occurs>
-        ?? :occurs[$<occurs>.ast, $value]
-        !! $value;
+    $value = :occurs[.ast, $value]
+        for @<occurs>;
+
+    make $value;
 }
 
 method occurs:sym<maybe>($/)     { make '?' }

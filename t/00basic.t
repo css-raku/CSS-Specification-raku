@@ -139,6 +139,15 @@ for (
             :synopsis("example( first , second? , third? )"),
         }
     },
+    func-spec => {
+        input => '<icc-color()> = icc-color(<name> [,<number>]{2}?)',
+        ast => :func-spec{
+            :func<icc-color>,
+            :signature{:seq[:rule<name>, :occurs['?', :occurs[[2,2], :group(:seq[:op<,>, :rule<number>])]]]},
+            :synopsis('icc-color(<name> [,<number>]{2}?)'),
+        }
+    },
+
     rule-spec => {
         input => q{<calc-sum> = <calc-product> [ [ '+' | '-' ] <calc-product> ]*},
         ast => :rule-spec{:rule<calc-sum>, :spec(:seq[:rule<calc-product>, :occurs["*", :group(:seq[:group(:alt[:op("+"), :op("-")]), :rule<calc-product>])]]), :synopsis("<calc-product> [ [ '+' | '-' ] <calc-product> ]*")},
