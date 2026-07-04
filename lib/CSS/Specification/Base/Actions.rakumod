@@ -131,5 +131,6 @@ method keyw($/)        { make $.build.token($<id>.lc, :type(CSSValue::KeywordCom
 # case sensitive identifiers
 method identifier($/)  { make $.build.token($<name>.ast, :type(CSSValue::IdentifierComponent)) }
 # identifiers strung-together, e.g New Century Schoolbook
+method custom-ident($/) { make $<identifier>.ast }
 method identifiers($/) { make $.build.token( @<identifier>.map({ .ast.value }).join(' '), :type(CSSValue::IdentifierComponent)) }
 

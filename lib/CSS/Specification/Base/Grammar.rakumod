@@ -29,3 +29,4 @@ multi token keyw  {   <id=.Ident>          # keyword (case insensitive)
 multi token keyw($rx) {<id={$rx}>}      # keyword (case insensitive)
 token identifier  {<name>}              # identifier (case sensitive)
 rule identifiers  {[ <identifier> ]+}   # E.g. font name: Times New Roman
+rule custom-ident{ <?before '--'><identifier> }
