@@ -88,11 +88,13 @@ for (
     },
     'func-proto' => {
         input => 'linear-gradient( [ <linear-gradient-syntax> ] )',
-        ast => :proto{:func<linear-gradient>, :signature{ :args[:group(:rule<linear-gradient-syntax>)] }, :synopsis('linear-gradient( [ <linear-gradient-syntax> ] )'), }
+        ast => :proto{:func<linear-gradient>, :signature{ :args[:group(:rule<linear-gradient-syntax>)] }, :synopsis('linear-gradient( [ <linear-gradient-syntax> ] )'), },
+        
     },
     'func-spec' => {
         input => '<linear-gradient()> = linear-gradient( [ <linear-gradient-syntax> ] )',
-        ast => :func-spec{:func<linear-gradient>, :signature{ :args[:group(:rule<linear-gradient-syntax>)] }, :synopsis("linear-gradient( [ <linear-gradient-syntax> ] )")}
+        ast => :func-spec{:func<linear-gradient>, :signature{ :args[:group(:rule<linear-gradient-syntax>)] }, :synopsis("linear-gradient( [ <linear-gradient-syntax> ] )")},
+        child-rules => %( :linear-gradient["linear-gradient-syntax"] );
     },
    'values' => {
         input => '[ <length-percentage [0,∞]> | auto ]{1,2} | cover | contain',
@@ -116,7 +118,7 @@ for (
             :synopsis('ltr | rtl | inherit'),
             :spec(:keywords['ltr', 'rtl', 'inherit']),
             :inherit
-        }
+        },
     },
     'prop-spec' => {
         input => "'content'\tnormal | none | [ <string> | <uri> | <counter> | attr(<identifier>) | open-quote | close-quote | no-open-quote | no-close-quote ]+ | inherit	normal	:before and :after pseudo-elements	no",
@@ -126,6 +128,7 @@ for (
                 :spec(:alt[:keywords["normal", "none"], :occurs['+', :group(:alt[:rule("string"), :rule("uri"), :rule("counter"), :func("attr"), :keywords["open-quote", "close-quote", "no-open-quote", "no-close-quote"]])], :keyw<inherit>]),
                 :!inherit,
                },
+        child-rules => %(:css-val-content["string", "uri", "counter", "identifier"]),
     },
     func-spec => {
         input => q{<calc()> = calc( <calc-sum> )},
@@ -145,17 +148,24 @@ for (
             :func<icc-color>,
             :signature{:seq[:rule<name>, :occurs['?', :occurs[[2,2], :group(:seq[:op<,>, :rule<number>])]]]},
             :synopsis('icc-color(<name> [,<number>]{2}?)'),
-        }
+        },
+        child-rules => %(:icc-color["name", "number"]),
     },
 
     rule-spec => {
         input => q{<calc-sum> = <calc-product> [ [ '+' | '-' ] <calc-product> ]*},
         ast => :rule-spec{:rule<calc-sum>, :spec(:seq[:rule<calc-product>, :occurs["*", :group(:seq[:group(:alt[:op("+"), :op("-")]), :rule<calc-product>])]]), :synopsis("<calc-product> [ [ '+' | '-' ] <calc-product> ]*")},
+        child-rules => %(:calc-sum["calc-product", "calc-product"]),
     },
     # css1 spec with property name and '*' junk
     prop-spec => {
         input => "'width' *\t<length> | <percentage> | auto	auto	all elements but non-replaced inline elements, table rows, and row groups	no",
         ast => Mu,
+    },
+    prop-spec => {
+        input => q{'border'	[ 'border-width' || 'border-style' || 'border-color' ] | inherit	see individual properties	 	no	 	visual},
+        ast => Mu,
+        child-rules => %(:css-val-border["css-val-border-width", "css-val-border-style", "css-val-border-color"]),
     },
     ) {
 
@@ -166,7 +176,7 @@ for (
 
         my CSS::Specification::Actions $actions .= new;
 
-        my @*PROP-NAMES = [];
+        my @*DECL-NAMES = [];
 
         CSS::Grammar::Test::parse-tests(
             CSS::Specification, $input,
@@ -175,6 +185,10 @@ for (
             :suite<spec>,
             :$expected
         );
+
+        if $expected<child-rules> -> $child-rules {
+            is-deeply $actions.child-rules, $child-rules, 'child-rules';
+        }
     }
 }
 

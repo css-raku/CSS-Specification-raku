@@ -10,7 +10,7 @@ has %.funcs is rw;
 has %.protos is rw;
 has %.func-refs is rw;
 has %.props is rw;
-has %.child-props is rw;
+has %.child-rules is rw;
 
 method !check-symbols {
     my %ruleish = %!rules, %!rule-refs;
@@ -19,6 +19,7 @@ method !check-symbols {
             if %!funcs{$_} || %!func-refs{$_};
     }
 }
+
 method TOP($/) {
     self!check-symbols;
     make @<def>>>.ast;
@@ -253,6 +254,7 @@ method value:sym<group>($/) {
 method value:sym<rule-ref>($/) {
     my $rule = ~$<rule-ref>.ast;
     %!rule-refs{ $rule }++;
+    %!child-rules{$_}.push: $rule for @*DECL-NAMES;
     make (:$rule);
 }
 
@@ -278,7 +280,7 @@ method value:sym<prop-ref>($/)        {
     my $prop =  $prop-ref.value;
     my $rule = 'css-val-' ~ $prop;;
     %!rule-refs{ $rule }++;
-    %!child-props{$_}.push: $prop for @*PROP-NAMES;
+    %!child-rules{$_}.push: $rule for @*DECL-NAMES;
     make (:$rule);
 }
 

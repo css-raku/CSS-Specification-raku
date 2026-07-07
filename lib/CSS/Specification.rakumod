@@ -10,7 +10,7 @@ grammar CSS::Specification:ver<0.5.3> {
     rule TOP { [<def=.prop-spec> | <def=.rule-spec> | <def=.func-spec> | ^^ $$ || <.unexpected> ] * }
 
     rule prop-spec {
-        :my @*PROP-NAMES = [];
+        :my @*DECL-NAMES;
         <prop-names>
             \t <values>
             \t $<default>=<-[ \t ]>*
@@ -19,12 +19,12 @@ grammar CSS::Specification:ver<0.5.3> {
             \t? \N*
     }
     rule rule-spec {
-        :my @*PROP-NAMES = [];
-        \t? <rule-ref> '=' <values>
+        :my @*DECL-NAMES = [];
+        \t? <rule-ref> '=' { @*DECL-NAMES.push: ~$<rule-ref><id> } <values>
     }
     rule func-spec {
-        :my @*PROP-NAMES = [];
-        \t? <func-ref> '=' <func-proto>
+        :my @*DECL-NAMES = [];
+        \t? <func-ref> '=' { @*DECL-NAMES.push: ~$<func-ref><id> } <func-proto>
     }
     # e.g.: example( first , second? , third? )
     rule structured-args {
@@ -50,7 +50,7 @@ grammar CSS::Specification:ver<0.5.3> {
     token prop-names {
         [
           [<.quote> <id> <.quote> | <id>]
-          { @*PROP-NAMES.push: ~$<id> }
+          { @*DECL-NAMES.push: 'css-val-' ~ $<id> }
         ] +%% <.prop-sep>
     }
     token id         {:i <[a..z0..9_-]>*?<[a..z]><[a..z0..9_-]>* }
