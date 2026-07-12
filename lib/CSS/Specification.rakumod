@@ -75,8 +75,6 @@ grammar CSS::Specification:ver<0.5.3> {
     token occurs:sym<must>        {'!'}
     token occurs:sym<range>       {<range>}
     token occurs:sym<list>        {'#'<range>?}
-    # e.g. <bg-layer>#? , <final-bg-layer>
-    token occurs:sym<list-optional>  {'#?' [<.ws> $<trailing>=',']?}
     token range                   {'{'~'}' [ <min=.digits> [',' <max=.digits>]? ] }
 
     # stringchar-regular: printable ASCII chars, except: \ ' "

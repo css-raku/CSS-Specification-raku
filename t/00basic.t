@@ -102,12 +102,12 @@ for (
     },
     'values' => {
         input => '<bg-layer>#? <final-bg-layer>',
-        ast => :seq[:occurs[["*", ",", :!trailing, ], :rule<bg-layer>], :rule<final-bg-layer>]
+        ast => :seq[:occurs["?", :occurs[",", :rule<bg-layer>]], :rule<final-bg-layer>],
 
     },
     'values' => {
         input => '<bg-layer>#? , <final-bg-layer>',
-        ast => :seq[:occurs[["*", ",", :trailing, ], :rule<bg-layer>], :rule<final-bg-layer>]
+        ast => :seq[:occurs["?", :occurs[",", :rule<bg-layer>]], :op<,>, :rule<final-bg-layer>],
 
     },
     'prop-spec' => {
@@ -149,12 +149,16 @@ for (
             :signature{:seq[:rule<name>, :occurs['?', :occurs[[2,2], :group(:seq[:op<,>, :rule<number>])]]]},
             :synopsis('icc-color(<name> [,<number>]{2}?)'),
         },
-        child-rules => %(:icc-color["name", "number"]),
+        child-rules => %(:icc-color["name", "name", "number"]),
     },
 
     rule-spec => {
         input => q{<calc-sum> = <calc-product> [ [ '+' | '-' ] <calc-product> ]*},
-        ast => :rule-spec{:rule<calc-sum>, :spec(:seq[:rule<calc-product>, :occurs["*", :group(:seq[:group(:alt[:op("+"), :op("-")]), :rule<calc-product>])]]), :synopsis("<calc-product> [ [ '+' | '-' ] <calc-product> ]*")},
+        ast => :rule-spec{
+            :rule<calc-sum>,
+            :spec(:seq[:rule<calc-product>, :occurs["*", :group(:seq[:group(:alt[:op("+"), :op("-")]), :rule<calc-product>])]]),
+            :synopsis("<calc-product> [ [ '+' | '-' ] <calc-product> ]*")
+        },
         child-rules => %(:calc-sum["calc-product", "calc-product"]),
     },
     # css1 spec with property name and '*' junk

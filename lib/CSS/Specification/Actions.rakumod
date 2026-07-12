@@ -172,10 +172,6 @@ method occurs:sym<list>($/) {
         ?? $<range>.ast.clone.append: ','
         !! ','
 }
-method occurs:sym<list-optional>($/) {
-    my $trailing = $<trailing>.so;
-    make ['*', ',', :$trailing ]
-}
 method occurs:sym<range>($/)     { make $<range>.ast }
 method range($/) {
     my $min = $<min>.ast.value;
