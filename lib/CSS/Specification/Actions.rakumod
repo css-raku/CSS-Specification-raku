@@ -157,8 +157,11 @@ method term-required($/) {
 method term($/) {
     my $value = $<value>.ast;
 
-    $value = :occurs[.ast, $value]
-        for @<occurs>;
+    for @<occurs> -> $/ {
+        my @occurs = [$/.ast, $value];
+        @occurs.push: (:trailing<,>) if $<seperator>;
+        $value = :@occurs;
+    }
 
     make $value;
 }
@@ -167,10 +170,11 @@ method occurs:sym<maybe>($/)     { make '?' }
 method occurs:sym<once-plus>($/) { make '+' }
 method occurs:sym<zero-plus>($/) { make '*' }
 method occurs:sym<must>($/)      { make '!' }
-method occurs:sym<list>($/) {
-    make $<range>
-        ?? $<range>.ast.clone.append: ','
-        !! ','
+multi method occurs:sym<list>($/ where $<range>) {
+    make [$<range>.ast.Slip, ','];
+}
+multi method occurs:sym<list>($/) {
+    make ','
 }
 method occurs:sym<range>($/)     { make $<range>.ast }
 method range($/) {

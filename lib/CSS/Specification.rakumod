@@ -69,13 +69,13 @@ grammar CSS::Specification:ver<0.5.3> {
     rule term          { <value><occurs>* }
 
     proto token occurs {*}
-    token occurs:sym<maybe>       {'?'}
+    token occurs:sym<maybe>       {'?'[<.ws> $<seperator>=',']?}
     token occurs:sym<once-plus>   {'+'}
     token occurs:sym<zero-plus>   {'*'}
     token occurs:sym<must>        {'!'}
     token occurs:sym<range>       {<range>}
     token occurs:sym<list>        {'#'<range>?}
-    token range                   {'{'~'}' [ <min=.digits> [',' <max=.digits>]? ] }
+    token range                   {'{'~'}' [ <min=.digits> [',' <max=.digits>]? ]}
 
     # stringchar-regular: printable ASCII chars, except: \ ' "
     token stringchar-regular {<[ \x20 \! \# \$ \% \& \(..\[ \]..\~ ]>+ }
