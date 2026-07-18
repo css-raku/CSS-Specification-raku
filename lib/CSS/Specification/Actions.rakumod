@@ -289,3 +289,6 @@ method value:sym<parenthesized>($/)  {
     make 'paren' => $<signature>.ast<signature><args>;
 }
 
+method value:sym<inf>($/) {
+    make 'num' => ($<sign> ~~ '-' ?? -Inf !! Inf);
+}

@@ -105,9 +105,16 @@ for (
         ast => :seq[:occurs["?", :occurs[",", :rule<bg-layer>]], :rule<final-bg-layer>],
 
     },
+    'rule-spec' => {
+         input => '<color-stop-list> = <linear-color-stop> , [ <linear-color-hint>? , <linear-color-stop> ]#?',
+         ast => :rule-spec{
+             :rule<color-stop-list>,
+             :spec(:seq[:rule<linear-color-stop>, :op<,>, :occurs["?", :occurs[",", :group(:seq[:occurs["?", :rule<linear-color-hint>, :trailing<,>], :rule<linear-color-stop>])]]]),
+             :synopsis("<linear-color-stop> , [ <linear-color-hint>? , <linear-color-stop> ]#?")},
+    },
     'values' => {
         input => '<bg-layer>#? , <final-bg-layer>',
-        ast => :seq[:occurs["?", :occurs[",", :rule<bg-layer>]], :op<,>, :rule<final-bg-layer>],
+        ast => :seq[:occurs["?", :occurs[",", :rule<bg-layer>], :trailing<,>], :rule<final-bg-layer>],
 
     },
     'prop-spec' => {

@@ -57,9 +57,10 @@ grammar CSS::Specification:ver<0.5.3> {
     token quote      {< ' ‘ ’ >}
     token id-quoted  { <.quote> <id> <.quote> }
     rule keyw        { <id> }
+    rule sign        { <[+-]> }
     rule digits      { \d+ }
-    rule rule-ref    { '<'~'>' [ <id> [ '['~']' [ <.value> [ ',' [<.value>|'∞'] ]? ] ]? ] }
-    rule func-ref    { '<'~'>' [ <id> '(' ')' ] }
+    rule rule-ref    { '<'~'>' [ <id> [ '['~']' [ <.value> [ ',' <.value> ]? ] ]? ] }
+    rule func-ref    { '<'~'>' [ <id> '(' ')' ] | <id> '(' ')' }
 
     rule seq           { <term=.term-options>+ }
     rule term-options  { <term=.term-combo>    +% '|'  }
@@ -100,8 +101,7 @@ grammar CSS::Specification:ver<0.5.3> {
     rule value:sym<keywords>      { [<keyw><!before <occurs>>] +% '|' }
     rule value:sym<numbers>       { [<digits><!before <occurs>>] +% '|' }
     rule value:sym<keyw>          { <keyw> }
-    rule value:sym<num>           { <digits> }
-
+    rule value:sym<num>           { <sign>?<digits> }
     rule value:sym<group>         { '[' ~ ']' <seq> }
     rule value:sym<func-ref>      { <func-ref> }
     rule value:sym<rule-ref>      { <rule-ref> }
@@ -109,6 +109,7 @@ grammar CSS::Specification:ver<0.5.3> {
     rule value:sym<prop-ref>      { <property-ref> }
     rule value:sym<string>        { <string> }
     rule value:sym<parenthesized> { <signature> }
+    rule value:sym<inf>           { <sign>?'∞'}
 
     proto token property-ref      {*}
     token property-ref:sym<css21> { <id=.id-quoted> }
