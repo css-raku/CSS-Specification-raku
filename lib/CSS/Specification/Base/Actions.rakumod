@@ -27,6 +27,13 @@ multi method make-func($name, $/, |c) {
 }
 # ---- CSS::Grammar overrides ---- #
 
+multi method inline-function($/ where $<usage>) {
+    $.warning('usage: ' ~ $<usage>.ast);
+}
+multi method inline-function($/) {
+    $.make-func: $*NAME, $.build.list($<args>);
+}
+
 multi method any-function($/ where !$.lax) {
     $.warning('ignoring function', $<Ident>.ast.lc);
 }
@@ -37,15 +44,16 @@ multi method any-function($/) {
     make $.build.node($/);
 }
 
-multi method declaration($/ where $<any-declaration>)  {
+multi method declaration($/ where $<any-declaration>) {
     with $<any-declaration>.ast -> $ast {
-        my :($key, $value) := $ast.kv;
         if $.lax {
-            make $key => $value;
+            make $ast;
         }
         else {
-            $.warning('dropping unknown property',
-                      $value<at-keyw> ?? '@'~$value<at-keyw> !! $value<ident>);
+            given $ast.value {
+                my $prop-name = .<at-keyw> ?? '@'~.<at-keyw> !! .<ident>;
+                $.warning('dropping unknown property', $prop-name);
+            }
         }
     }
 }

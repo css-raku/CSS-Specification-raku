@@ -42,7 +42,21 @@ method prop-spec($/) {
     make (:%prop-spec);
 }
 
-method rule-spec($/) {
+multi method rule-spec($/ where $<func-proto>) {
+    my $rule = $<rule-ref>.ast;
+    my $proto = $<func-proto>.ast<proto>;
+    my $func = $proto<func>;
+    my $synopsis = ~$<func-proto>;
+    my $signature = $proto<signature>;
+
+    my %func-spec = (
+        :$func, :$rule, :$signature, :$synopsis,
+        );
+
+    make (:%func-spec);
+}
+
+multi method rule-spec($/ where $<values>) {
     my $rule = $<rule-ref>.ast,
     my $spec = $<values>.ast;
     my $synopsis = ~$<values>;

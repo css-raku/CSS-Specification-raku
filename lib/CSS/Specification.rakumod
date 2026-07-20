@@ -20,7 +20,7 @@ grammar CSS::Specification:ver<0.5.3> {
     }
     rule rule-spec {
         :my @*DECL-NAMES = [];
-        \t? <rule-ref> '=' { @*DECL-NAMES.push: ~$<rule-ref><id> } <values>
+        \t? <rule-ref> '=' { @*DECL-NAMES.push: ~$<rule-ref><id> } [<func-proto>||<values>]
     }
     rule func-spec {
         :my @*DECL-NAMES = [];
