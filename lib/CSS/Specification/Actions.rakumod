@@ -53,6 +53,7 @@ multi method rule-spec($/ where $<func-proto>) {
         :$func, :$rule, :$signature, :$synopsis,
         );
 
+    %!rules{$rule}++;
     make (:%func-spec);
 }
 
@@ -60,12 +61,12 @@ multi method rule-spec($/ where $<values>) {
     my $rule = $<rule-ref>.ast,
     my $spec = $<values>.ast;
     my $synopsis = ~$<values>;
-    %!rules{$rule}++;
 
     my %rule-spec = (
         :$rule, :$synopsis, :$spec
         );
 
+    %!rules{$rule}++;
     make (:%rule-spec);
 }
 

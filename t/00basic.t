@@ -112,6 +112,10 @@ for (
              :spec(:seq[:rule<linear-color-stop>, :op<,>, :occurs["?", :occurs[",", :group(:seq[:occurs["?", :rule<linear-color-hint>, :trailing<,>], :rule<linear-color-stop>])]]]),
              :synopsis("<linear-color-stop> , [ <linear-color-hint>? , <linear-color-stop> ]#?")},
     },
+    'rule-spec' => {
+        input => '<reversed-counter-name> = reversed( <counter-name> )',
+        ast => :func-spec{:func<reversed>, :rule<reversed-counter-name>, :signature{:args[:rule<counter-name>]}, :synopsis("reversed( <counter-name> )")},
+    },
     'values' => {
         input => '<bg-layer>#? , <final-bg-layer>',
         ast => :seq[:occurs["?", :occurs[",", :rule<bg-layer>], :trailing<,>], :rule<final-bg-layer>],
