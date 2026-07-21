@@ -27,7 +27,6 @@
   ],
   "source-url": "https://github.com/css-raku/CSS-Specification-raku.git",
   "tags": [
-    "rakuast",
     "css"
   ],
   "test-depends": [

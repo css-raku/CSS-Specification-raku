@@ -72,10 +72,10 @@ multi method rule-spec($/ where $<values>) {
 
 method func-spec($/) {
     my $func = $<func-ref>.ast;
-    my $proto = $<func-proto>.ast<proto>;
-    my $synopsis = ~$<func-proto>;
+    my $proto = $<func-decl>.ast<proto>;
+    my $synopsis = ~$<func-decl>;
     my $signature = $proto<signature>;
-    given $<func-proto>.ast<proto><func> {
+    given $proto<func> {
         warn "prototype mismatch $func vs $_" unless $func eq $_;
     }
 
@@ -114,14 +114,19 @@ method func-proto($/) {
     my %proto = :$func, :$synopsis;
     %proto ,= .ast with $<signature>;
 
-    with %!protos{$func} {
+    make (:%proto);
+}
+
+method func-decl($/) {
+    my %proto = $<func-proto>.ast<proto>;
+    with %!protos{ %proto<func> } {
+       my $synopsis = %proto<synopsis>;
        warn "inconsistant function declaration: {$synopsis.raku} vs {.<synopsis>.raku}"
            unless .<signature> eqv %proto<signature>;
     }
     else {
         $_ = %proto;
     }
-
     make (:%proto);
 }
 
@@ -174,7 +179,7 @@ method term($/) {
 
     for @<occurs> -> $/ {
         my @occurs = [$/.ast, $value];
-        @occurs.push: (:trailing<,>) if $<seperator>;
+        @occurs.push: (:trailing<,>) if $<trailing-comma>;
         $value = :@occurs;
     }
 
@@ -194,7 +199,8 @@ multi method occurs:sym<list>($/) {
 method occurs:sym<range>($/)     { make $<range>.ast }
 method range($/) {
     my $min = $<min>.ast.value;
-    my $max = do with $<max> { .ast.value } else { $min };
+    my $max = ($<max> // $<min>).ast.value;
+    warn "$min > $max" if $min > $max;
     make [$min, $max];
 }
 
@@ -231,26 +237,20 @@ method string:sym<single-q>($/) { self!string-token($/) }
 
 method string:sym<double-q>($/) { self!string-token($/) }
 
-method value:sym<keywords>($/) {
-    my @keyws = @<keyw>.map: {.ast};
-
-    if @keyws == 1 {
-        make @keyws.head;
-    }
-    else {
-        make 'keywords' => @keyws.map(*.value).Array;
-    }
+multi method value:sym<keywords>($/ where @<keyw> == 1) {
+    make @<keyw>.head.ast;
+}
+multi method value:sym<keywords>($/) {
+    my @keywords = @<keyw>.map: {.ast.value};
+    make (:@keywords);
 }
 
-method value:sym<numbers>($/) {
-    my @nums = @<digits>.map: {.ast };
-
-    if @nums == 1 {
-        make @nums.head;
-    }
-    else {
-        make 'numbers' => @nums.map(*.value).Array;
-    }
+multi method value:sym<numbers>($/ where @<digits> == 1) {
+    make @<digits>.head.ast;
+}
+multi method value:sym<numbers>($/) {
+    my @numbers = @<digits>.map: {.ast.value };
+    make (:@numbers);
 }
 
 method value:sym<keyw>($/) {
@@ -279,8 +279,8 @@ method value:sym<func-ref>($/) {
     make (:$func);
 }
 
-method value:sym<func-proto>($/) {
-    my $func = ~$<func-proto>.ast<proto><func>;
+method value:sym<func-decl>($/) {
+    my $func = ~$<func-decl>.ast<proto><func>;
     # todo process prototypes
     %!func-refs{ $func }++;
     make (:$func);

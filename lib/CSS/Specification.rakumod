@@ -6,7 +6,6 @@
 ##use Grammar::Debugger;
 
 grammar CSS::Specification:ver<0.5.3> {
-    use CSS::Grammar::CSS3;
     rule TOP { [<def=.prop-spec> | <def=.rule-spec> | <def=.func-spec> | ^^ $$ || <.unexpected> ] * }
 
     rule prop-spec {
@@ -24,7 +23,7 @@ grammar CSS::Specification:ver<0.5.3> {
     }
     rule func-spec {
         :my @*DECL-NAMES = [];
-        \t? <func-ref> '=' { @*DECL-NAMES.push: ~$<func-ref><id> } <func-proto>
+        \t? <func-ref> '=' { @*DECL-NAMES.push: ~$<func-ref><id> } <func-decl>
     }
     # e.g.: example( first , second? , third? )
     rule structured-args {
@@ -35,6 +34,7 @@ grammar CSS::Specification:ver<0.5.3> {
     rule optional-arg { <value> '?' }
     rule signature { '(' ~ ')' [<args=.structured-args>||<args=.seq>] }
     rule func-proto { <id> <signature> }
+    rule func-decl { <func-proto> }
     token unexpected { \N+ }
     rule values    { <seq> }
     # possibly tab delimited. Assume one synopsis per line.
@@ -70,7 +70,7 @@ grammar CSS::Specification:ver<0.5.3> {
     rule term          { <value><occurs>* }
 
     proto token occurs {*}
-    token occurs:sym<maybe>       {'?'[<.ws> $<seperator>=',']?}
+    token occurs:sym<maybe>       {'?'[<.ws> $<trailing-comma>=',']?}
     token occurs:sym<once-plus>   {'+'}
     token occurs:sym<zero-plus>   {'*'}
     token occurs:sym<must>        {'!'}
@@ -97,7 +97,7 @@ grammar CSS::Specification:ver<0.5.3> {
     token escape   { '\\'[ <char=.unicode> || \n || <char=.regascii> | <char=.nonascii> ] }
 
     proto rule value {*}
-    rule value:sym<func-proto>    { <func-proto> }
+    rule value:sym<func-decl>     { <func-decl> }
     rule value:sym<keywords>      { [<keyw><!before <occurs>>] +% '|' }
     rule value:sym<numbers>       { [<digits><!before <occurs>>] +% '|' }
     rule value:sym<keyw>          { <keyw> }
