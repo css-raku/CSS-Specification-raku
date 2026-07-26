@@ -113,6 +113,6 @@ grammar CSS::Specification:ver<0.5.3> {
 
     proto token property-ref      {*}
     token property-ref:sym<css21> { <id=.id-quoted> }
-    token property-ref:sym<css3>  { '<'~'>' <id=.id-quoted> }
+    token property-ref:sym<css3>  { '<'~'>' [[$<weak>='.']? <id=.id-quoted>] }
 
 }

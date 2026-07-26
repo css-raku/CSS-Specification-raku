@@ -11,6 +11,7 @@ has %.protos is rw;
 has %.func-refs is rw;
 has %.props is rw;
 has %.child-rules is rw;
+has %.child-props is rw;
 
 method !check-symbols {
     my %ruleish = %!rules, %!rule-refs;
@@ -293,9 +294,13 @@ method property-ref:sym<css3>($/) { make 'ref' => $<id>.ast }
 method value:sym<prop-ref>($/)        {
     my Pair $prop-ref = $<property-ref>.ast;
     my $prop =  $prop-ref.value;
-    my $rule = 'css-val-' ~ $prop;;
+    my $rule = 'css-val-' ~ $prop;
     %!rule-refs{ $rule }++;
-    %!child-rules{$_}.push: $rule for @*DECL-NAMES;
+    for @*DECL-NAMES {
+        %!child-rules{$_}.push: $rule;
+        %!child-props{$_}.push: $prop
+            unless $<property-ref><weak>;
+    }
     make (:$rule);
 }
 

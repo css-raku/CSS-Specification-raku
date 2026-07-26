@@ -118,7 +118,8 @@ for (
     },
     'values' => {
         input => '<bg-layer>#? , <final-bg-layer>',
-        ast => :seq[:occurs["?", :occurs[",", :rule<bg-layer>], :trailing<,>], :rule<final-bg-layer>],
+        ast =>
+        :seq[:occurs["?", :occurs[",", :rule<bg-layer>], :trailing<,>], :rule<final-bg-layer>],
 
     },
     'prop-spec' => {
@@ -130,6 +131,25 @@ for (
             :spec(:keywords['ltr', 'rtl', 'inherit']),
             :inherit
         },
+    },
+    'prop-spec' => {
+        input => "soft-test\t<rule-ref> [ <'css3-prop'> | <.'css3-soft-prop'> ]?\txxx",
+        ast => :prop-spec{
+            :props['soft-test'],
+            :default<xxx>,
+            :synopsis(q{<rule-ref> [ <'css3-prop'> | <.'css3-soft-prop'> ]?}),
+            :spec(:seq[ :rule<rule-ref>,
+                     :occurs['?', :group(:alt[:rule<css-val-css3-prop>, :rule<css-val-css3-soft-prop>]) ]
+                      ]),
+        },
+        child-rules => %(
+            :css-val-soft-test["rule-ref", "css-val-css3-prop", "css-val-css3-soft-prop"],
+        ),
+ 
+        child-props => %(
+            :css-val-soft-test["css3-prop"],
+        ),
+ 
     },
     'prop-spec' => {
         input => "'content'\tnormal | none | [ <string> | <uri> | <counter> | attr(<identifier>) | open-quote | close-quote | no-open-quote | no-close-quote ]+ | inherit	normal	:before and :after pseudo-elements	no",
@@ -203,6 +223,9 @@ for (
 
         if $expected<child-rules> -> $child-rules {
             is-deeply $actions.child-rules, $child-rules, 'child-rules';
+        }
+        if $expected<child-props> -> $child-props {
+            is-deeply $actions.child-props, $child-props, 'child-props';
         }
     }
 }

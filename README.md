@@ -25,4 +25,4 @@ An example, from http://www.w3.org/TR/CSS21/propidx.html:
 
 ## See Also
 - [CSS::Specification::Compiler](https://github.com/css-raku/CSS-Specification-Compiler-raku.git) - a RakuAST based compiler for property definitions (unreleased)
-- [make-modules.raku](https://github.com/css-raku/CSS-Module-raku/blob/master/make-modules.raku) in [CSS::Module](https://css-raku.github.io/CSS-Module-raku).
+- [compile-modules.raku](https://github.com/css-raku/CSS-Module-raku/blob/master/compile-modules.raku) in [CSS::Module](https://css-raku.github.io/CSS-Module-raku).
