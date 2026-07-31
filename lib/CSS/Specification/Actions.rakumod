@@ -164,7 +164,16 @@ method seq($/) is also<term-seq> {
 }
 
 method term-options($/) {
-    self!make-term: $/, 'alt';
+    my @terms =  @<term>>>.ast;
+    if @terms == 1 {
+        make @terms[0];
+    }
+    else {
+        my @important = @<important>.map({.Str ?? -10000 !! 0});
+        @terms = @terms.pairs.sort({.key + @important[.key]}).map(*.value)
+            if @important.first(*.so);
+        make 'alt' => @terms;
+    }
 }
 
 method term-combo($/) {
@@ -299,7 +308,7 @@ method value:sym<prop-ref>($/)        {
     for @*DECL-NAMES {
         %!child-rules{$_}.push: $rule;
         %!child-props{$_}.push: $prop
-            unless $<property-ref><weak>;
+            unless $<property-ref><inline>;
     }
     make (:$rule);
 }

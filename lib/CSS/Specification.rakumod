@@ -62,12 +62,12 @@ grammar CSS::Specification:ver<0.5.3> {
     rule rule-ref    { '<'~'>' [ <id> [ '['~']' [ <.value> [ ',' <.value> ]? ] ]? ] }
     rule func-ref    { '<'~'>' [ <id> '(' ')' ] | <id> '(' ')' }
 
-    rule seq           { <term=.term-options>+ }
-    rule term-options  { <term=.term-combo>    +% '|'  }
-    rule term-combo    { <term=.term-required> +% '||' }
-    rule term-required { <term=.term-seq>      +% '&&' }
-    rule term-seq      { <term>+ }
-    rule term          { <value><occurs>* }
+    rule seq            { <term=.term-options>+ }
+    rule term-options   { [$<important>='!'? <term=.term-combo>] +% '|' }
+    rule term-combo     { <term=.term-required> +% '||' }
+    rule term-required  { <term=.term-seq>      +% '&&' }
+    rule term-seq       { <term>+ }
+    rule term           { <value><occurs>* }
 
     proto token occurs {*}
     token occurs:sym<maybe>       {'?'[<.ws> $<trailing-comma>=',']?}
@@ -113,6 +113,6 @@ grammar CSS::Specification:ver<0.5.3> {
 
     proto token property-ref      {*}
     token property-ref:sym<css21> { <id=.id-quoted> }
-    token property-ref:sym<css3>  { '<'~'>' [[$<weak>='.']? <id=.id-quoted>] }
+    token property-ref:sym<css3>  { '<'~'>' [[$<inline>='.']? <id=.id-quoted>] }
 
 }
