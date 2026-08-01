@@ -31,8 +31,9 @@ for (
         ast => :alt[ :numbers[35, 7], :occurs['?', :num(42)] ]
     },
     'values' => {
-        input => '<a> | !<b> | <c> |! <d>',
-        ast => :alt[ :rule<b>, :rule<a>, :rule<b>, :rule<c>, ],
+        # forced precedence
+        input => '<a> | ! <b> |!! <c> |!<d> |<e>',
+        ast => :alt[ :rule<c>, :rule<b>, :rule<d>, :rule<a>, :rule<e>, ],
     },
     'values' => {
         input => "<rule-ref>",

@@ -63,7 +63,7 @@ grammar CSS::Specification:ver<0.5.3> {
     rule func-ref    { '<'~'>' [ <id> '(' ')' ] | <id> '(' ')' }
 
     rule seq            { <term=.term-options>+ }
-    rule term-options   { [$<important>='!'? <term=.term-combo>] +% '|' }
+    rule term-options   { [$<important>='!'* <term=.term-combo>] +% '|' }
     rule term-combo     { <term=.term-required> +% '||' }
     rule term-required  { <term=.term-seq>      +% '&&' }
     rule term-seq       { <term>+ }

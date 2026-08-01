@@ -169,7 +169,7 @@ method term-options($/) {
         make @terms[0];
     }
     else {
-        my @important = @<important>.map({.Str ?? -10000 !! 0});
+        my @important = @<important>.map({.chars * -10000});
         @terms = @terms.pairs.sort({.key + @important[.key]}).map(*.value)
             if @important.first(*.so);
         make 'alt' => @terms;
