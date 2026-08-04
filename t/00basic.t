@@ -54,6 +54,11 @@ for (
                    ]
     },
     'values' => {
+        input => q{<'font-variant'=.font-variant-css2>},
+        ast => :alias{ :ref<font-variant>, :rule<font-variant-css2> },
+        rule-refs => ["font-variant-css2"],
+    },
+    'values' => {
         input => '<length>{4}',
         ast => :occurs[ [4,4], :rule<length> ],
     },

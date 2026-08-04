@@ -298,8 +298,8 @@ method value:sym<func-decl>($/) {
 
 method value:sym<op>($/) { my $op = $/.trim; make (:$op); }
 
-method property-ref:sym<css21>($/) { make 'ref' => $<id>.ast }
-method property-ref:sym<css3>($/) { make 'ref' => $<id>.ast }
+method property-ref:sym<css21>($/) { make 'ref' => $<ref>.ast }
+method property-ref:sym<css3>($/) { make 'ref' => $<ref>.ast }
 method value:sym<prop-ref>($/)        {
     my Pair $prop-ref = $<property-ref>.ast;
     my $prop =  $prop-ref.value;
@@ -311,6 +311,13 @@ method value:sym<prop-ref>($/)        {
             unless $<property-ref><inline>;
     }
     make (:$rule);
+}
+method value:sym<prop-alias>($/) {
+    my $ref  = $<ref>.ast;
+    my $rule = $<rule>.ast;
+    %!rule-refs{ $rule }++;
+    my %alias = :$ref, :$rule;
+    make (:%alias);
 }
 
 method value:sym<string>($/)  { make 'op' => $<string>.ast }

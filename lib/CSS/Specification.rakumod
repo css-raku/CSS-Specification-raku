@@ -107,12 +107,13 @@ grammar CSS::Specification:ver<0.5.3> {
     rule value:sym<rule-ref>      { <rule-ref> }
     rule value:sym<op>            { < , / = > }
     rule value:sym<prop-ref>      { <property-ref> }
+    rule value:sym<prop-alias>    { '<'~'>' [<ref=.id-quoted>'=.'<rule=.id>] }
     rule value:sym<string>        { <string> }
     rule value:sym<parenthesized> { <signature> }
     rule value:sym<inf>           { <sign>?'∞'}
 
     proto token property-ref      {*}
-    token property-ref:sym<css21> { <id=.id-quoted> }
-    token property-ref:sym<css3>  { '<'~'>' [[$<inline>='.']? <id=.id-quoted>] }
+    token property-ref:sym<css21> { <ref=.id-quoted> }
+    token property-ref:sym<css3>  { '<'~'>' [[$<inline>='.']? <ref=.id-quoted>] }
 
 }
