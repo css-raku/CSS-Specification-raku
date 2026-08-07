@@ -55,7 +55,8 @@ grammar CSS::Specification:ver<0.5.3> {
     }
     token id         {:i <[a..z0..9_-]>*?<[a..z]><[a..z0..9_-]>* }
     token quote      {< ' ‘ ’ >}
-    token id-quoted  { <.quote> <id> <.quote> }
+    token prop-ref   { <.quote> <id> <.quote> }
+    token prop-val   { <ref=.prop-ref> }
     rule keyw        { <id> }
     rule sign        { <[+-]> }
     rule digits      { \d+ }
@@ -106,14 +107,14 @@ grammar CSS::Specification:ver<0.5.3> {
     rule value:sym<func-ref>      { <func-ref> }
     rule value:sym<rule-ref>      { <rule-ref> }
     rule value:sym<op>            { < , / = > }
-    rule value:sym<prop-ref>      { <property-ref> }
-    rule value:sym<prop-alias>    { '<'~'>' [<ref=.id-quoted>'=.'<rule=.id>] }
+    rule value:sym<prop-val>      { <property-val> }
+    rule value:sym<prop-alias>    { '<'~'>' [<val=.prop-val>'=.'[<rule=.id>|<rule=.prop-val>]] }
     rule value:sym<string>        { <string> }
     rule value:sym<parenthesized> { <signature> }
     rule value:sym<inf>           { <sign>?'∞'}
 
-    proto token property-ref      {*}
-    token property-ref:sym<css21> { <ref=.id-quoted> }
-    token property-ref:sym<css3>  { '<'~'>' [[$<inline>='.']? <ref=.id-quoted>] }
+    proto token property-val      {*}
+    token property-val:sym<css21> { <val=.prop-val> }
+    token property-val:sym<css3>  { '<'~'>' [[$<inline>='.']? <val=.prop-val>] }
 
 }

@@ -148,7 +148,8 @@ method unexpected($/) is hidden-from-backtrace {
 }
 
 method id($/)        { make ~$/ }
-method id-quoted($/) { make $<id>.ast }
+method prop-ref($/)  { make $<id>.ast }
+method prop-val($/)  { make 'css-val-' ~ $<ref>.ast }
 method keyw($/)      { make 'keyw' => ~$<id> }
 method digits($/)    { make 'num' => $/.Int }
 method rule-ref($/)  { make $<id>.ast }
@@ -298,23 +299,24 @@ method value:sym<func-decl>($/) {
 
 method value:sym<op>($/) { my $op = $/.trim; make (:$op); }
 
-method property-ref:sym<css21>($/) { make 'ref' => $<ref>.ast }
-method property-ref:sym<css3>($/) { make 'ref' => $<ref>.ast }
-method value:sym<prop-ref>($/)        {
-    my Pair $prop-ref = $<property-ref>.ast;
-    my $prop =  $prop-ref.value;
-    my $rule = 'css-val-' ~ $prop;
+method property-val:sym<css21>($/) { make $<val>.ast }
+method property-ref:sym<css3>($/)  { make $<val>.ast }
+method value:sym<prop-val>($/)        {
+    my Str:D $rule = $<property-val><val>.ast;
+    my Str:D $prop =  $<property-val><val><ref>.ast;
     %!rule-refs{ $rule }++;
+
     for @*DECL-NAMES {
         %!child-rules{$_}.push: $rule;
         %!child-props{$_}.push: $prop
-            unless $<property-ref><inline>;
+            unless $<property-val><inline>;
     }
+
     make (:$rule);
 }
 method value:sym<prop-alias>($/) {
-    my $ref  = $<ref>.ast;
-    my $rule = $<rule>.ast;
+    my Str:D $ref  = $<val>.ast;
+    my Str:D $rule = $<rule>.ast;
     %!rule-refs{ $rule }++;
     my %alias = :$ref, :$rule;
     make (:%alias);
