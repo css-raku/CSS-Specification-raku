@@ -42,20 +42,20 @@ for (
     'values' => {
         input => "<rule-ref> [ 'css21-prop' <'css3-prop'> ]?",
         ast => :seq[ :rule<rule-ref>,
-                     :occurs['?', :group(:seq[:rule<css-val-css21-prop>, :rule<css-val-css3-prop>]) ]
+                     :occurs['?', :group(:seq[:rule<prop-val-css21-prop>, :rule<prop-val-css3-prop>]) ]
                    ],
     },
     'values' => {
         input => "<rule-ref> [, [ 'css21-prop' | <'css3-prop'> ] ]*",
         ast => :seq[ :rule<rule-ref>,
                      :occurs['*',
-                             :group(:seq[:op<,>, :group(:alt[:rule<css-val-css21-prop>, :rule<css-val-css3-prop>]) ])
+                             :group(:seq[:op<,>, :group(:alt[:rule<prop-val-css21-prop>, :rule<prop-val-css3-prop>]) ])
                             ],
                    ]
     },
     'values' => {
         input => q{<'font-variant'=.font-variant-css2>},
-        ast => :alias{ :ref<css-val-font-variant>, :rule<font-variant-css2> },
+        ast => :alias{ :ref<prop-val-font-variant>, :rule<font-variant-css2> },
         rule-refs => ["font-variant-css2"],
     },
     'values' => {
@@ -161,15 +161,15 @@ for (
             :default<xxx>,
             :synopsis(q{<rule-ref> [ <'css3-prop'> | <.'css3-soft-prop'> ]?}),
             :spec(:seq[ :rule<rule-ref>,
-                     :occurs['?', :group(:alt[:rule<css-val-css3-prop>, :rule<css-val-css3-soft-prop>]) ]
+                     :occurs['?', :group(:alt[:rule<prop-val-css3-prop>, :rule<prop-val-css3-soft-prop>]) ]
                       ]),
         },
         child-rules => %(
-            :css-val-soft-test["rule-ref", "css-val-css3-prop", "css-val-css3-soft-prop"],
+            :prop-val-soft-test["rule-ref", "prop-val-css3-prop", "prop-val-css3-soft-prop"],
         ),
  
         child-props => %(
-            :css-val-soft-test["css3-prop"],
+            :prop-val-soft-test["css3-prop"],
         ),
  
     },
@@ -181,7 +181,7 @@ for (
                 :spec(:alt[:keywords["normal", "none"], :occurs['+', :group(:alt[:rule("string"), :rule("uri"), :rule("counter"), :func("attr"), :keywords["open-quote", "close-quote", "no-open-quote", "no-close-quote"]])], :keyw<inherit>]),
                 :!inherit,
                },
-        child-rules => %(:css-val-content["string", "uri", "counter", "identifier"]),
+        child-rules => %(:prop-val-content["string", "uri", "counter", "identifier"]),
     },
     func-spec => {
         input => q{<calc()> = calc( <calc-sum> )},
@@ -222,7 +222,7 @@ for (
     prop-spec => {
         input => q{'border'	[ 'border-width' || 'border-style' || 'border-color' ] | inherit	see individual properties	 	no	 	visual},
         ast => Mu,
-        child-rules => %(:css-val-border["css-val-border-width", "css-val-border-style", "css-val-border-color"]),
+        child-rules => %(:prop-val-border["prop-val-border-width", "prop-val-border-style", "prop-val-border-color"]),
     },
     ) {
 

@@ -173,7 +173,7 @@ method unexpected($/) is hidden-from-backtrace {
 
 method id($/)        { make ~$/ }
 method prop-ref($/)  { make $<id>.ast }
-method prop-val($/)  { make 'css-val-' ~ $<ref>.ast }
+method prop-val($/)  { make 'prop-val-' ~ $<ref>.ast }
 method keyw($/)      { make 'keyw' => ~$<id> }
 method digits($/)    { make 'num' => $/.Int }
 method rule-ref($/)  { make $<id>.ast }

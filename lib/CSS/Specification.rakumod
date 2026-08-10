@@ -54,7 +54,7 @@ grammar CSS::Specification:ver<0.5.3> {
     token prop-names {
         [
           [<.quote> <id> <.quote> | <id>]
-          { @*DECL-NAMES.push: 'css-val-' ~ $<id> }
+          { @*DECL-NAMES.push: 'prop-val-' ~ $<id> }
         ] +%% <.prop-sep>
     }
     token id         {:i <[a..z0..9_-]>*?<[a..z]><[a..z0..9_-]>* }
