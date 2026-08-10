@@ -6,7 +6,7 @@
 ##use Grammar::Debugger;
 
 grammar CSS::Specification:ver<0.5.3> {
-    rule TOP { [<def=.prop-spec> | <def=.rule-spec> | <def=.func-spec> | ^^ $$ || <.unexpected> ] * }
+    rule TOP { [<def=.prop-spec> | <def=.rule-spec> | <def=.func-spec> | <def=.at-rule-spec> | ^^ $$ || <.unexpected> ] * }
 
     rule prop-spec {
         :my @*DECL-NAMES;
@@ -25,6 +25,10 @@ grammar CSS::Specification:ver<0.5.3> {
         :my @*DECL-NAMES = [];
         \t? <func-ref> '=' { @*DECL-NAMES.push: ~$<func-ref><id> } <func-decl>
     }
+    rule at-rule-spec {
+        \t? <def=.at-rule-ref> '=' <ref=.at-rule-ref> <values>
+    }
+    rule at-rule-ref { '@'<id> }
     # e.g.: example( first , second? , third? )
     rule structured-args {
         [<arg> +% [ ',' ]][',' <optional-arg> +% [ ',' ]]?
@@ -64,7 +68,7 @@ grammar CSS::Specification:ver<0.5.3> {
     rule func-ref    { '<'~'>' [ <id> '(' ')' ] | <id> '(' ')' }
 
     rule seq            { <term=.term-options>+ }
-    rule term-options   { [$<important>='!'* <term=.term-combo>] +% '|' }
+    rule term-options   { [$<precedence>='!'* <term=.term-combo>] +% '|' }
     rule term-combo     { <term=.term-required> +% '||' }
     rule term-required  { <term=.term-seq>      +% '&&' }
     rule term-seq       { <term>+ }
@@ -104,6 +108,7 @@ grammar CSS::Specification:ver<0.5.3> {
     rule value:sym<keyw>          { <keyw> }
     rule value:sym<num>           { <sign>?<digits> }
     rule value:sym<group>         { '[' ~ ']' <seq> }
+    rule value:sym<decls>         { '{' ~ '}' <seq> }
     rule value:sym<func-ref>      { <func-ref> }
     rule value:sym<rule-ref>      { <rule-ref> }
     rule value:sym<op>            { < , / = > }

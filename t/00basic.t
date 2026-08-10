@@ -132,6 +132,18 @@ for (
         :seq[:occurs["?", :occurs[",", :rule<bg-layer>], :trailing<,>], :rule<final-bg-layer>],
 
     },
+    'at-rule-spec' => {
+        input => '@font-feature-values = @font-feature-values <font-family-name># { <declaration-rule-list> }',
+        ast => :at-rule-spec{
+            :at-rule<font-feature-values>,
+            :synopsis('<font-family-name># { <declaration-rule-list> }'),
+            :spec(
+                :seq[ { :occurs[",", { :rule<font-family-name>, } ] },
+                      { :decls{ :rule<declaration-rule-list> } },
+                    ]
+            ),
+        }
+    },
     'prop-spec' => {
         input => "'direction'	ltr | rtl | inherit	ltr	all elements, but see prose	yes",
         ast => :prop-spec{

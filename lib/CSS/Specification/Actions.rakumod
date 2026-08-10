@@ -5,6 +5,8 @@ use Method::Also;
 # these actions translate a CSS property specification to an
 # intermediate AST
 has %.rules is rw;
+has %.at-rules is rw;
+has %.at-rule-refs is rw;
 has %.rule-refs is rw;
 has %.funcs is rw;
 has %.protos is rw;
@@ -86,6 +88,28 @@ method func-spec($/) {
 
     %!funcs{$func}++;
     make (:%func-spec);
+}
+
+method at-rule-spec($/) {
+    my $at-rule = $<def>.ast;
+    my $spec = $<values>.ast;
+    my $synopsis = ~$<values>;
+
+    given $<ref>.ast {
+        warn '@rule mismatch @%s vs @%s'.sprintf($at-rule, $_)
+            unless $at-rule eq $_;
+    }
+
+    %!at-rules{$at-rule}++;
+    my %at-rule-spec = (
+        :$at-rule, :$synopsis, :$spec
+    );
+    make (:%at-rule-spec);
+}
+
+method at-rule-ref($/) {
+    %!at-rule-refs{$<id>.ast}++;
+    make $<id>.ast
 }
 
 method arg($/) {
@@ -170,9 +194,9 @@ method term-options($/) {
         make @terms[0];
     }
     else {
-        my @important = @<important>.map({.chars * -10000});
-        @terms = @terms.pairs.sort({.key + @important[.key]}).map(*.value)
-            if @important.first(*.so);
+        my @precedence = @<precedence>.map({.chars * -10000});
+        @terms = @terms.pairs.sort({.key + @precedence[.key]}).map(*.value)
+            if @precedence.first(*.so);
         make 'alt' => @terms;
     }
 }
@@ -275,6 +299,11 @@ method value:sym<num>($/) {
 method value:sym<group>($/) {
     my $group = $<seq>.ast;
     make (:$group);
+}
+
+method value:sym<decls>($/) {
+    my $decls = $<seq>.ast;
+    make (:$decls);
 }
 
 method value:sym<rule-ref>($/) {
