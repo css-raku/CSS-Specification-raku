@@ -26,7 +26,8 @@ grammar CSS::Specification:ver<0.5.3> {
         \t? <func-ref> '=' { @*DECL-NAMES.push: ~$<func-ref><id> } <func-decl>
     }
     rule at-rule-spec {
-        \t? <def=.at-rule-ref> '=' <ref=.at-rule-ref> <values>
+        :my @*DECL-NAMES = [];
+        \t? <def=.at-rule-ref> '=' { @*DECL-NAMES.push: ~$<def> }  <ref=.at-rule-ref> <values>
     }
     rule at-rule-ref { '@'<id> }
     # e.g.: example( first , second? , third? )
@@ -108,10 +109,10 @@ grammar CSS::Specification:ver<0.5.3> {
     rule value:sym<keyw>          { <keyw> }
     rule value:sym<num>           { <sign>?<digits> }
     rule value:sym<group>         { '[' ~ ']' <seq> }
-    rule value:sym<decls>         { '{' ~ '}' <seq> }
     rule value:sym<func-ref>      { <func-ref> }
     rule value:sym<rule-ref>      { <rule-ref> }
-    rule value:sym<op>            { < , / = > }
+    rule value:sym<at-rule-ref>   { '<@' ~ '>' <at-rule-ref=.id> }
+    rule value:sym<op>            { < , / = ; { } > }
     rule value:sym<prop-val>      { <property-val> }
     rule value:sym<prop-alias>    { '<'~'>' [<val=.prop-val>'=.'[<rule=.id>|<rule=.prop-val>]] }
     rule value:sym<string>        { <string> }

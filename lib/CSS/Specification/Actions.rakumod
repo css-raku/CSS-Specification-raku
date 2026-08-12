@@ -176,7 +176,12 @@ method prop-ref($/)  { make $<id>.ast }
 method prop-val($/)  { make 'prop-val-' ~ $<ref>.ast }
 method keyw($/)      { make 'keyw' => ~$<id> }
 method digits($/)    { make 'num' => $/.Int }
-method rule-ref($/)  { make $<id>.ast }
+method rule-ref($/)  {
+    my $id = $<id>.ast;
+    # avoid Raku built-in <ident> in favoor of <css-ident>
+    $id = 'css-ident' if $id eq 'ident';
+    make $id;
+}
 method func-ref($/)  { make $<id>.ast }
 
 method !make-term($/, $name) {
@@ -301,16 +306,17 @@ method value:sym<group>($/) {
     make (:$group);
 }
 
-method value:sym<decls>($/) {
-    my $decls = $<seq>.ast;
-    make (:$decls);
-}
-
 method value:sym<rule-ref>($/) {
     my $rule = ~$<rule-ref>.ast;
     %!rule-refs{ $rule }++;
     %!child-rules{$_}.push: $rule for @*DECL-NAMES;
     make (:$rule);
+}
+
+method value:sym<at-rule-ref>($/) {
+    my $at-rule = ~$<at-rule-ref>.ast;
+    %!at-rule-refs{ $at-rule }++;
+    make (:$at-rule);
 }
 
 method value:sym<func-ref>($/) {
@@ -326,7 +332,7 @@ method value:sym<func-decl>($/) {
     make (:$func);
 }
 
-method value:sym<op>($/) { my $op = $/.trim; make (:$op); }
+method value:sym<op>($/)  { my $op = $/.trim; make (:$op); }
 
 method property-val:sym<css21>($/) { make $<val>.ast }
 method property-ref:sym<css3>($/)  { make $<val>.ast }

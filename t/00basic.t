@@ -36,8 +36,10 @@ for (
         ast => :alt[ :rule<c>, :rule<b>, :rule<d>, :rule<a>, :rule<e>, ],
     },
     'values' => {
-        input => "<rule-ref>",
-        ast => :rule<rule-ref>,
+        # <ident> is mapped to the CSS::Grammar <css-ident> rule, to
+        # bypass Raku built-in <ident> rule.
+        input => "<rule-ref> <ident>",
+        ast => :seq(:rule<rule-ref>, :rule<css-ident>),
     },
     'values' => {
         input => "<rule-ref> [ 'css21-prop' <'css3-prop'> ]?",
@@ -88,6 +90,10 @@ for (
         input => 'example( first? , second? , third? )',
         ast => :func<example>,
     },
+    'values' => {
+        input => '<@annotation>',
+        ast => :at-rule<annotation>,
+    },
     term => {
         input => '[<length> | auto]#{4,4}',
         ast => :occurs[[4,4, ','], :group{ :alt[ :rule<length>, :keyw<auto> ] } ],
@@ -126,6 +132,14 @@ for (
         input => '<reversed-counter-name> = reversed( <counter-name> )',
         ast => :func-spec{:func<reversed>, :rule<reversed-counter-name>, :signature{:args[:rule<counter-name>]}, :synopsis("reversed( <counter-name> )")},
     },
+    'rule-spec' => {
+        input => '<shape> = <rect()>',
+        ast => :rule-spec{
+            :rule<shape>
+            :spec(:func<rect>),
+            :synopsis("<rect()>")
+        },
+    },
     'values' => {
         input => '<bg-layer>#? , <final-bg-layer>',
         ast =>
@@ -139,7 +153,7 @@ for (
             :synopsis('<font-family-name># { <declaration-rule-list> }'),
             :spec(
                 :seq[ { :occurs[",", { :rule<font-family-name>, } ] },
-                      { :decls{ :rule<declaration-rule-list> } },
+                      :op<{>, :rule<declaration-rule-list>, :op<}>,
                     ]
             ),
         }
