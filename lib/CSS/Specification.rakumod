@@ -112,7 +112,8 @@ grammar CSS::Specification:ver<0.5.3> {
     rule value:sym<func-ref>      { <func-ref> }
     rule value:sym<rule-ref>      { <rule-ref> }
     rule value:sym<at-rule-ref>   { '<@' ~ '>' <at-rule-ref=.id> }
-    rule value:sym<op>            { < , / = ; { } > }
+    rule value:sym<op>            { < , / : ; > }
+    rule value:sym<punc>          { < = { } > }
     rule value:sym<prop-val>      { <property-val> }
     rule value:sym<prop-alias>    { '<'~'>' [<val=.prop-val>'=.'[<rule=.id>|<rule=.prop-val>]] }
     rule value:sym<string>        { <string> }

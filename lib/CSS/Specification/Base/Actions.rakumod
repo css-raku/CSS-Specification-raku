@@ -57,6 +57,9 @@ multi method declaration($/ where $<any-declaration>) {
         }
     }
 }
+multi method declaration($/ where $<decl><at-rule>) {
+    make $<decl><at-rule>.ast;
+}
 multi method declaration($/ where $<any-arg>) {
     $.warning(
         "extra terms following declaration '{$<decl>.trim}'",

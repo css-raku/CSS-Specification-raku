@@ -34,10 +34,10 @@ for (
         ast => :alt[ :rule<c>, :rule<b>, :rule<d>, :rule<a>, :rule<e>, ],
     },
     'values' => {
-        # <ident> is mapped to the CSS::Grammar <css-ident> rule, to
+        # <ident> is mapped to the CSS::Grammar <Ident> rule, to
         # bypass Raku built-in <ident> rule.
         input => "<rule-ref> <ident>",
-        ast => :seq(:rule<rule-ref>, :rule<css-ident>),
+        ast => :seq(:rule<rule-ref>, :rule<Ident>),
     },
     'values' => {
         input => "<rule-ref> [ 'css21-prop' <'css3-prop'> ]?",
@@ -151,7 +151,7 @@ for (
             :synopsis('<font-family-name># { <declaration-rule-list> }'),
             :spec(
                 :seq[ { :occurs[",", { :rule<font-family-name>, } ] },
-                      :op<{>, :rule<declaration-rule-list>, :op<}>,
+                      :lit<{>, :rule<declaration-rule-list>, :lit<}>,
                     ]
             ),
         }

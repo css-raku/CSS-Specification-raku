@@ -178,8 +178,8 @@ method keyw($/)      { make 'keyw' => ~$<id> }
 method digits($/)    { make 'num' => $/.Int }
 method rule-ref($/)  {
     my $id = $<id>.ast;
-    # avoid Raku built-in <ident> in favoor of <css-ident>
-    $id = 'css-ident' if $id eq 'ident';
+    # avoid Raku built-in <ident> in favor of <Ident>
+    $id = 'Ident' if $id eq 'ident';
     make $id;
 }
 method func-ref($/)  { make $<id>.ast }
@@ -332,7 +332,8 @@ method value:sym<func-decl>($/) {
     make (:$func);
 }
 
-method value:sym<op>($/)  { my $op = $/.trim; make (:$op); }
+method value:sym<op>($/)    { my $op = $/.trim; make (:$op); }
+method value:sym<punc>($/)  { my $lit = $/.trim; make (:$lit); }
 
 method property-val:sym<css21>($/) { make $<val>.ast }
 method property-ref:sym<css3>($/)  { make $<val>.ast }
