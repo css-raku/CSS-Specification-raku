@@ -5,6 +5,7 @@ use Test;
 use CSS::Grammar::Test;
 
 use CSS::Specification;
+use CSS::Specification::Extended;
 use CSS::Specification::Actions;
 
 for (
@@ -29,7 +30,7 @@ for (
         ast => :alt[ :numbers[35, 7], :occurs['?', :num(42)] ]
     },
     'values' => {
-        # forced precedence
+        :extended, # forced precedence
         input => '<a> | ! <b> |!! <c> |!<d> |<e>',
         ast => :alt[ :rule<c>, :rule<b>, :rule<d>, :rule<a>, :rule<e>, ],
     },
@@ -54,6 +55,7 @@ for (
                    ]
     },
     'values' => {
+        :extended, # property alias
         input => q{<'font-variant'=.font-variant-css2>},
         ast => :alias{ :ref<prop-val-font-variant>, :rule<font-variant-css2> },
         rule-refs => ["font-variant-css2"],
@@ -168,6 +170,7 @@ for (
     },
     'prop-spec' => {
         input => "soft-test\t<rule-ref> [ <'css3-prop'> | <.'css3-soft-prop'> ]?\txxx",
+        :extended,
         ast => :prop-spec{
             :props['soft-test'],
             :default<xxx>,
@@ -241,14 +244,18 @@ for (
     my $rule     := .key;
     my $expected := .value;
     my $input    := $expected<input>;
+    my $extended := $expected<extended>;
     subtest "$rule: $input", {
 
         my CSS::Specification::Actions $actions .= new;
+        my $grammar := $extended
+                        ?? CSS::Specification::Extended
+                        !! CSS::Specification;
 
         my @*DECL-NAMES = [];
 
         CSS::Grammar::Test::parse-tests(
-            CSS::Specification, $input,
+            $grammar, $input,
             :$rule,
             :$actions,
             :suite<spec>,

@@ -199,7 +199,7 @@ method term-options($/) {
         make @terms[0];
     }
     else {
-        my @precedence = @<precedence>.map({.chars * -10000});
+        my @precedence = .map({.chars * -10000}) with $<precedence>;
         @terms = @terms.pairs.sort({.key + @precedence[.key]}).map(*.value)
             if @precedence.first(*.so);
         make 'alt' => @terms;

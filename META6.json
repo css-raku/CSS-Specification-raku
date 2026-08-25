@@ -16,6 +16,7 @@
   "perl": "6.c",
   "provides": {
     "CSS::Specification": "lib/CSS/Specification.rakumod",
+    "CSS::Specification::Extended": "lib/CSS/Specification//Extended.rakumod",
     "CSS::Specification::AST": "lib/CSS/Specification/AST.rakumod",
     "CSS::Specification::Actions": "lib/CSS/Specification/Actions.rakumod",
     "CSS::Specification::Base::Actions": "lib/CSS/Specification/Base/Actions.rakumod",
