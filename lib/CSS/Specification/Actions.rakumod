@@ -332,7 +332,7 @@ method value:sym<func-decl>($/) {
     make (:$func);
 }
 
-method value:sym<op>($/)    { my $op = $/.trim; make (:$op); }
+method value:sym<delim>($/) { my $op = $/.trim; make (:$op); }
 method value:sym<punc>($/)  { my $lit = $/.trim; make (:$lit); }
 
 method property-val:sym<css21>($/) { make $<val>.ast }

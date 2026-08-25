@@ -113,7 +113,7 @@ rule value:sym<group>         { '[' ~ ']' <seq> }
 rule value:sym<func-ref>      { <func-ref> }
 rule value:sym<rule-ref>      { <rule-ref> }
 rule value:sym<at-rule-ref>   { '<@' ~ '>' <at-rule-ref=.id> }
-rule value:sym<op>            { < , / > }
+rule value:sym<delim>         { < , / > }
 rule value:sym<punc>          { < = { } > }
 rule value:sym<prop-val>      { <property-val> }
 rule value:sym<string>        { <string> }
