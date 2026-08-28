@@ -9,15 +9,11 @@ grammar CSS::Specification::Extended {
     # e.g. 'font-family'	[ <family-name> | !<generic-family> ]#
     rule term-options   { [$<precedence>='!'* <term=.term-combo>] +% '|' }
 
-    # allow a custom rule as a property setter
+    # allow a rule as a property setter
     # e.g. font	[ [ <'font-style'> || <'font-variant'=.font-variant-css2> || ...
     rule value:sym<prop-alias>    { '<'~'>' [<val=.prop-val>'=.'[<rule=.id>|<rule=.prop-val>]] }
 
-    # leading dot on property reference - to share syntax, but not set property
+    # leading dot on property reference - to use syntax, but not set property
     # e.g. flex-basis	content | <.'width'>
     token property-val:sym<css3>  { '<'~'>' [[$<inline>='.']? <val=.prop-val>] }
-
-    # allow ':', ';' as delimiters
-    # e.g. <font-feature-property> = <font-feature-value-name> : <font-feature-index> <any-args> ;?
-    rule value:sym<delim>  { < , / : ; > }
 }
