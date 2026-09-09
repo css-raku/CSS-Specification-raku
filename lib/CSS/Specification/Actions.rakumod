@@ -123,8 +123,9 @@ method optional-arg($/) {
 method structured-args($/) {
     my %spec;
     my @args = @<arg>>>.ast;
-    @args.push:  'optional' => [ @<optional-arg>>>.ast ]
-        if @<optional-arg>;
+    my @optional = @<optional-arg>>>.ast;
+    @args.push: (:@optional)
+        if @optional;
     make (:@args);
 }
 
@@ -360,7 +361,8 @@ method value:sym<prop-alias>($/) {
 
 method value:sym<string>($/)  { make 'op' => $<string>.ast }
 method value:sym<parenthesized>($/)  {
-    make 'paren' => $<signature>.ast<signature><args>;
+    my %paren = $<signature>.ast;
+    make (:%paren);
 }
 
 method value:sym<inf>($/) {

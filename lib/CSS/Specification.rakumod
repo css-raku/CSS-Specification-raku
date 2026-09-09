@@ -34,7 +34,6 @@ rule at-rule-ref { '@'<id> }
 # e.g.: example( first , second? , third? )
 rule structured-args {
     [<arg> +% [ ',' ]][',' <optional-arg> +% [ ',' ]]?
-    ||  [<optional-arg> *% [ ',' ]]
 }
 rule arg { <value> <!before '?'> }
 rule optional-arg { <value> '?' }
@@ -114,7 +113,7 @@ rule value:sym<func-ref>      { <func-ref> }
 rule value:sym<rule-ref>      { <rule-ref> }
 rule value:sym<at-rule-ref>   { '<@' ~ '>' <at-rule-ref=.id> }
 rule value:sym<delim>         { < , / > }
-rule value:sym<punc>          { < = { } > }
+rule value:sym<punc>          { < = { } : ; () > }
 rule value:sym<prop-val>      { <property-val> }
 rule value:sym<string>        { <string> }
 rule value:sym<parenthesized> { <signature> }

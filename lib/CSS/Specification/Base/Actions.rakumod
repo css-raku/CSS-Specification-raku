@@ -129,19 +129,20 @@ method color:sym<named>($/) {
     make $.build.token(@color, :type<rgb>);
 }
 
-method integer($/)     {
-    my Int $val = $<uint>.ast;
-    $val = -$val
-        if $<sign> ~~ '-';
-    make $.build.token($val, :type(CSSValue::IntegerComponent))
+multi method integer($/ where $<sign> ~~ '-' ) {
+    make $.build.token(-$<uint>.ast, :type(CSSValue::IntegerComponent))
 }
 
-method number($/)      { make $.build.token($<num>.ast, :type(CSSValue::NumberComponent)) }
-method uri($/)         { make $<url>.ast }
-method keyw($/)        { make $.build.token($<id>.lc, :type(CSSValue::KeywordComponent)) }
+multi method integer($/) {
+    make $.build.token($<uint>.ast, :type(CSSValue::IntegerComponent))
+}
+
+method number($/)       { make $.build.token($<num>.ast, :type(CSSValue::NumberComponent)) }
+method uri($/)          { make $<url>.ast }
+method keyw($/)         { make $.build.token($<id>.lc, :type(CSSValue::KeywordComponent)) }
 # case sensitive identifiers
-method identifier($/)  { make $.build.token($<name>.ast, :type(CSSValue::IdentifierComponent)) }
+method identifier($/)   { make $.build.token($<name>.ast, :type(CSSValue::IdentifierComponent)) }
 # identifiers strung-together, e.g New Century Schoolbook
 method custom-ident($/) { make $<identifier>.ast }
-method identifiers($/) { make $.build.token( @<identifier>.map({ .ast.value }).join(' '), :type(CSSValue::IdentifierComponent)) }
+method identifiers($/)  { make $.build.token( @<identifier>.map({ .ast.value }).join(' '), :type(CSSValue::IdentifierComponent)) }
 
