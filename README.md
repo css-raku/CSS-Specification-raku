@@ -19,9 +19,11 @@ An example, from http://www.w3.org/TR/CSS21/propidx.html:
                  ]+ \
                | inherit
 
-## Grammars and Classes
+## Additional Grammars and Classes
 
 - `CSS::Specification::Base::Grammar` + `CSS::Specification::Base::Actions` - maps property specification terminology to CSS Core syntax and defines any newly introduced terms. For example `integer` is mapped to `int`.
+
+- `CSS::Specification::Extended` - Some additional custom directives, to specify parsing precedence and property mappings.
 
 ## See Also
 - [CSS::Specification::Compiler](https://github.com/css-raku/CSS-Specification-Compiler-raku.git) - a RakuAST based compiler for property definitions (unreleased)

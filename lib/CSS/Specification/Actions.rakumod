@@ -179,7 +179,7 @@ method keyw($/)      { make 'keyw' => ~$<id> }
 method digits($/)    { make 'num' => $/.Int }
 method rule-ref($/)  {
     my $id = $<id>.ast;
-    # avoid Raku built-in <ident> in favor of <Ident>
+    # avoid Raku built-in <ident> in favor of CSS-specifc <Ident>
     $id = 'Ident' if $id eq 'ident';
     make $id;
 }
