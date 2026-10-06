@@ -1,4 +1,14 @@
 {{$NEXT}}
+  - CSS4/5 support. Handle the sources for CSS:Snapshot2026
+    (under construction). Including
+    -- ':', ';' delimiters
+    -- Handle nested properties (Borders and Backgrounds)
+    -- Remove filtering of default values. Leave this to
+       CSS::Properties, which was already partially filtering.
+    -- Extended syntax:
+      --- property/rule aliasing: <'font-variant'=.font-variant-css2>
+      --- property inlining: <.'width'>
+      --- "!" in alternations to indicate higher precedence
 
 0.5.3  2025-12-24T09:28:50+13:00
   - Changed 'dropping declaration...' warning
