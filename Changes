@@ -1,4 +1,6 @@
 {{$NEXT}}
+
+0.6.0  2026-10-07T08:52:26+13:00
   - CSS4/5 support. Handle the sources for CSS:Snapshot2026
     (under construction). Including
     -- ':', ';' delimiters
