@@ -25,7 +25,7 @@ token time:sym<zero>      {<number> <?{ +$<number> == 0 }> }
 token frequency:sym<zero> {<number> <?{ +$<number> == 0 }> }
 
 token integer     {$<sign>=< + - >?<uint>}
-token number      {<num><!before ['%'|\w]>}
+token number      {<num><!before ['%'|\w]><.ws>}
 token uri         {<url>}
 multi token keyw  {   <id=.Ident>          # keyword (case insensitive)
                   ||  $<id>=[:i <[0..9]>*?<[a..z]><[a..z0..9_-]>*] # e.g. 0deg
