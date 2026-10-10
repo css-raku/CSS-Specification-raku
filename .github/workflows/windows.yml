@@ -1,4 +1,4 @@
-name: test
+name: test windows
 
 on:
   push:
@@ -13,12 +13,10 @@ jobs:
     strategy:
       matrix:
         os:
-          - ubuntu-latest
-          - macOS-latest
-          #- windows-latest
+          - windows-latest
         raku-version:
           - 'latest'
-          #- '2024.01'
+          - '2024.01'
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
